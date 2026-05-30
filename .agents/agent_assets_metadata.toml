@@ -1,0 +1,8 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "_AdWoDBROF458_QP2lMkm"
+uri = "file://AqariTalk_Build_Plan.docx"
+type = "word_document"
+title = "AqariTalk — Final Build Plan v1.0"
