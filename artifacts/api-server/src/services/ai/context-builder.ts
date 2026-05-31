@@ -1,4 +1,5 @@
 import type { ConversationState, BuyerCriteria, SellerData } from "./state-machine";
+import { getMissingFieldNudges } from "./guidance";
 
 const STATE_PROMPTS_BUYER: Record<string, string> = {
   greeting:
@@ -33,7 +34,7 @@ const STATE_PROMPTS_SELLER: Record<string, string> = {
   details_collection:
     "اسأل عن المساحة (م²)، عدد الغرف، الحمامات، الطابق، التأثيث، موقف السيارة. سؤال واحد في كل مرة.",
   guidance_review:
-    "راجع البيانات المُدخلة وقدّم اقتراحات لتحسين الإعلان بأسلوب ودي. مثال: 'المشترون يسألون عادةً عن...'",
+    "راجع البيانات المُدخلة وقدّم اقتراحات لتحسين الإعلان بأسلوب ودي. ابدأ بالمعلومة الأهم المفقودة واسأل عنها بشكل طبيعي.",
   submit_ready:
     "أخبر البائع أن إعلانه جاهز وأنه يمكنه مراجعته وإرساله.",
 };
@@ -53,6 +54,16 @@ export function buildSystemPrompt(
     .map(([k, v]) => `  - ${k}: ${v}`)
     .join("\n");
 
+  let guidanceSection = "";
+  if (currentState === "guidance_review" && conversationType === "seller_listing") {
+    const nudges = getMissingFieldNudges(extractedData as SellerData);
+    if (nudges.length > 0) {
+      guidanceSection = `\nالحقول المفقودة التي يجب السؤال عنها بشكل طبيعي (ابدأ بالأول):\n${nudges.map((n) => `  - ${n.field}: ${n.messageAr}`).join("\n")}\n`;
+    } else {
+      guidanceSection = "\nجميع الحقول مكتملة — أخبر البائع أن إعلانه جاهز للنشر.\n";
+    }
+  }
+
   return `أنت مساعد عقاري ذكي ومتخصص لمنصة AqariTalk. تعمل في سوق ${market === "SA" ? "المملكة العربية السعودية" : "الأردن"}.
 العملة: ${currency}.
 
@@ -66,7 +77,7 @@ export function buildSystemPrompt(
 
 الحالة الحالية: ${currentState}
 تعليمات الحالة: ${stateInstruction}
-
+${guidanceSection}
 البيانات المُجمَّعة حتى الآن:
 ${dataLines || "  (لا شيء بعد)"}
 

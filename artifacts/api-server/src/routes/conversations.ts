@@ -1,5 +1,5 @@
 import { Router, type IRouter } from "express";
-import { db, conversationsTable } from "@workspace/db";
+import { db, conversationsTable, propertiesTable } from "@workspace/db";
 import { eq, and } from "drizzle-orm";
 import {
   CreateConversationBody,
@@ -8,6 +8,7 @@ import {
   SendMessageBody,
   GetConversationResponse,
   ListConversationsResponse,
+  GetPropertyResponse,
 } from "@workspace/api-zod";
 import { authenticate } from "../middleware/authenticate";
 import { getChatModel } from "../services/ai/client";
@@ -230,6 +231,93 @@ router.post(
       message: aiMsg,
       conversation: GetConversationResponse.parse(updated),
     });
+  },
+);
+
+// Submit listing: create a property from seller conversation extracted data
+router.post(
+  "/conversations/:id/submit-listing",
+  authenticate,
+  async (req, res): Promise<void> => {
+    const id = paramStr(req.params.id);
+
+    const [convo] = await db
+      .select()
+      .from(conversationsTable)
+      .where(
+        and(
+          eq(conversationsTable.id, id),
+          eq(conversationsTable.userId, req.user!.userId),
+        ),
+      );
+
+    if (!convo) {
+      res.status(404).json({ error: "Conversation not found" });
+      return;
+    }
+
+    if (convo.type !== "seller_listing") {
+      res.status(400).json({ error: "Only seller_listing conversations can submit a listing" });
+      return;
+    }
+
+    if (convo.currentState !== "submit_ready" && convo.currentState !== "guidance_review") {
+      res.status(400).json({ error: "Listing is not ready for submission yet" });
+      return;
+    }
+
+    const data = (convo.extractedData ?? {}) as SellerData;
+
+    if (!data.category || !data.transactionMode) {
+      res.status(400).json({ error: "Property type and transaction mode are required" });
+      return;
+    }
+
+    const currency = convo.market === "SA" ? "SAR" : "JOD";
+
+    const insertValues: Record<string, unknown> = {
+      createdBy: req.user!.userId,
+      listingDirection: "offering",
+      propertyType: data.category,
+      transactionMode: data.transactionMode as "sale" | "rent" | "lease",
+      status: "pending_review",
+      market: convo.market ?? "JO",
+      priceCurrency: currency,
+    };
+
+    if (data.price != null) insertValues.price = String(data.price);
+    if (data.city != null) insertValues.city = data.city;
+    if (data.district != null) insertValues.district = data.district;
+    if (data.areaSqm != null) insertValues.areaSqm = String(data.areaSqm);
+    if (data.rooms != null) insertValues.rooms = data.rooms;
+    if (data.bathrooms != null) insertValues.bathrooms = data.bathrooms;
+    if (data.floorNumber != null) insertValues.floorNumber = data.floorNumber;
+    if (data.parking != null) insertValues.parking = data.parking;
+    if (data.description != null) insertValues.description = data.description;
+    if (data.furnished != null) {
+      const furnishedMap: Record<string, string> = {
+        furnished: "furnished",
+        مفروش: "furnished",
+        "semi-furnished": "semi_furnished",
+        "نصف مفروش": "semi_furnished",
+        unfurnished: "unfurnished",
+        "غير مفروش": "unfurnished",
+      };
+      insertValues.furnishedStatus = furnishedMap[data.furnished] ?? "unfurnished";
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const [property] = await db.insert(propertiesTable).values(insertValues as any).returning();
+
+    // Link conversation to the created property and mark completed
+    await db
+      .update(conversationsTable)
+      .set({ propertyId: property.id, status: "completed", currentState: "submit_ready", updatedAt: new Date() })
+      .where(eq(conversationsTable.id, convo.id));
+
+    req.log.info({ propertyId: property.id, conversationId: convo.id }, "Listing submitted from conversation");
+
+    res.status(201).json(GetPropertyResponse.parse(property));
   },
 );
 

@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useSearch, useLocation } from "wouter";
 import { useTranslation } from "react-i18next";
-import { ArrowRight, Send, Mic, MicOff } from "lucide-react";
+import { ArrowRight, Send, Mic, MicOff, Map, ImagePlus, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   useGetConversation,
@@ -11,6 +11,7 @@ import {
 } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/auth";
+import { useToast } from "@/hooks/use-toast";
 import type { ConversationMessage } from "@workspace/api-client-react";
 
 // Web Speech API types (not in lib.dom by default)
@@ -32,6 +33,65 @@ declare global {
   }
 }
 
+// ── Criteria chip helpers ─────────────────────────────────────────────────────
+
+const BUYER_CHIP_LABELS: Record<string, (v: unknown) => string> = {
+  category: (v) => String(v),
+  transactionMode: (v) => ({ sale: "للبيع", rent: "للإيجار", lease: "للتأجير" }[String(v)] ?? String(v)),
+  budgetMax: (v) => `حتى ${Number(v).toLocaleString()}`,
+  rooms: (v) => `${v} غرف`,
+  city: (v) => String(v),
+  district: (v) => String(v),
+  furnished: (v) => ({ furnished: "مفروش", unfurnished: "غير مفروش" }[String(v)] ?? String(v)),
+};
+
+const SELLER_CHIP_LABELS: Record<string, (v: unknown) => string> = {
+  category: (v) => String(v),
+  transactionMode: (v) => ({ sale: "للبيع", rent: "للإيجار", lease: "للتأجير" }[String(v)] ?? String(v)),
+  price: (v) => Number(v).toLocaleString(),
+  city: (v) => String(v),
+  district: (v) => String(v),
+  rooms: (v) => `${v} غرف`,
+  areaSqm: (v) => `${v} م²`,
+};
+
+function CriteriaChips({
+  data,
+  type,
+}: {
+  data: Record<string, unknown>;
+  type: "buyer_search" | "seller_listing";
+}) {
+  const labels = type === "buyer_search" ? BUYER_CHIP_LABELS : SELLER_CHIP_LABELS;
+  const chips = Object.entries(data)
+    .filter(([k, v]) => v != null && labels[k])
+    .map(([k, v]) => ({ key: k, label: labels[k](v) }));
+
+  if (chips.length === 0) return null;
+
+  return (
+    <div className="flex flex-wrap gap-1.5 px-4 pt-2 pb-0">
+      {chips.map(({ key, label }) => (
+        <span
+          key={key}
+          className="text-[11px] bg-primary/10 text-primary px-2.5 py-1 rounded-full font-medium"
+        >
+          {label}
+        </span>
+      ))}
+    </div>
+  );
+}
+
+// ── Seller states that allow image upload ─────────────────────────────────────
+const SELLER_IMAGE_STATES = new Set([
+  "details_collection",
+  "guidance_review",
+  "submit_ready",
+]);
+
+// ── Main component ────────────────────────────────────────────────────────────
+
 export default function ChatDetailPage() {
   const { id } = useParams<{ id: string }>();
   const search = useSearch();
@@ -39,6 +99,7 @@ export default function ChatDetailPage() {
   const { t, i18n } = useTranslation();
   const { isAuthenticated, user } = useAuth();
   const queryClient = useQueryClient();
+  const { toast } = useToast();
 
   const isNew = id === "new";
   const params = new URLSearchParams(search);
@@ -51,6 +112,7 @@ export default function ChatDetailPage() {
   const [localMessages, setLocalMessages] = useState<ConversationMessage[]>([]);
   const [isListening, setIsListening] = useState(false);
   const [speechError, setSpeechError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const recognitionRef = useRef<SR | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -153,10 +215,46 @@ export default function ChatDetailPage() {
     }
   }
 
+  async function handleSubmitListing() {
+    if (!convId) return;
+    setSubmitting(true);
+    try {
+      const res = await fetch(`/api/conversations/${convId}/submit-listing`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("aqari_token")}`,
+        },
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error ?? "فشل نشر الإعلان");
+      }
+      const property = await res.json();
+      toast({ title: "تم نشر الإعلانك بنجاح! 🎉", description: "سيتم مراجعته قريباً." });
+      navigate(`/property/${property.id}`);
+    } catch (err: unknown) {
+      toast({
+        title: "حدث خطأ",
+        description: err instanceof Error ? err.message : "يرجى المحاولة مرة أخرى",
+        variant: "destructive",
+      });
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
   const messages: ConversationMessage[] = [
     ...(convo?.messages ?? []),
     ...localMessages,
   ];
+
+  const currentState = convo?.currentState ?? "";
+  const extractedData = (convo?.extractedData ?? {}) as Record<string, unknown>;
+  const isSeller = (convo?.type ?? convoType) === "seller_listing";
+
+  const showViewOnMap = !isSeller && currentState === "results_presented";
+  const showAddImages = isSeller && SELLER_IMAGE_STATES.has(currentState);
+  const showSubmit = isSeller && currentState === "submit_ready";
 
   const isLoading = createConvo.isPending || sendMsg.isPending;
 
@@ -167,17 +265,20 @@ export default function ChatDetailPage() {
         <button onClick={() => navigate("/chat")} type="button">
           <ArrowRight size={20} className="text-gray-600 rtl:rotate-180" />
         </button>
-        <div className="flex-1">
-          <p className="font-semibold text-sm text-gray-900">
-            {convoType === "buyer_search"
-              ? t("chat.newSearch")
-              : t("chat.newListing")}
+        <div className="flex-1 min-w-0">
+          <p className="font-semibold text-sm text-gray-900 truncate">
+            {isSeller ? t("chat.newListing") : t("chat.newSearch")}
           </p>
-          {convo?.currentState && (
-            <p className="text-xs text-gray-400">{convo.currentState}</p>
+          {currentState && (
+            <p className="text-[10px] text-gray-400">{currentState.replace(/_/g, " ")}</p>
           )}
         </div>
       </div>
+
+      {/* Criteria chips */}
+      {Object.keys(extractedData).length > 0 && (
+        <CriteriaChips data={extractedData} type={isSeller ? "seller_listing" : "buyer_search"} />
+      )}
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-3">
@@ -198,6 +299,45 @@ export default function ChatDetailPage() {
         <div ref={bottomRef} />
       </div>
 
+      {/* Action buttons (context-sensitive) */}
+      {(showViewOnMap || showAddImages || showSubmit) && (
+        <div className="bg-white border-t border-gray-50 px-3 py-2 flex flex-wrap gap-2">
+          {showViewOnMap && (
+            <Button
+              size="sm"
+              variant="outline"
+              className="gap-1.5 text-xs h-9"
+              onClick={() => navigate("/")}
+            >
+              <Map size={14} />
+              {t("chat.viewResults")}
+            </Button>
+          )}
+          {showAddImages && convId && (
+            <Button
+              size="sm"
+              variant="outline"
+              className="gap-1.5 text-xs h-9"
+              onClick={() => navigate("/list")}
+            >
+              <ImagePlus size={14} />
+              {t("list.addImages")}
+            </Button>
+          )}
+          {showSubmit && (
+            <Button
+              size="sm"
+              className="gap-1.5 text-xs h-9 bg-green-600 hover:bg-green-700"
+              onClick={handleSubmitListing}
+              disabled={submitting}
+            >
+              <CheckCircle size={14} />
+              {submitting ? t("common.loading") : t("list.submitListing")}
+            </Button>
+          )}
+        </div>
+      )}
+
       {/* Speech error */}
       {speechError && (
         <div className="mx-3 mb-1 text-xs text-red-500 text-center">
@@ -207,7 +347,6 @@ export default function ChatDetailPage() {
 
       {/* Input row */}
       <div className="bg-white border-t border-gray-100 px-3 py-3 flex items-end gap-2">
-        {/* Mic button — always shown; disabled with tooltip if unsupported */}
         <Button
           size="icon"
           variant={isListening ? "default" : "outline"}
@@ -224,8 +363,8 @@ export default function ChatDetailPage() {
             !SpeechRecognitionAPI
               ? "الصوت غير مدعوم في هذا المتصفح"
               : isListening
-                ? "إيقاف الاستماع"
-                : "تحدث الآن"
+                ? t("chat.stopListening")
+                : t("chat.startListening")
           }
         >
           {isListening ? <MicOff size={16} /> : <Mic size={16} />}
@@ -242,7 +381,7 @@ export default function ChatDetailPage() {
             }
           }}
           placeholder={
-            isListening ? "🎙 جاري الاستماع..." : t("chat.placeholder")
+            isListening ? `🎙 ${t("chat.listening")}` : t("chat.placeholder")
           }
           className="flex-1 resize-none border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-primary max-h-32 bg-gray-50"
           rows={1}

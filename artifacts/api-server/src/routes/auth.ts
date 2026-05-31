@@ -61,7 +61,9 @@ router.post("/auth/otp/verify", async (req, res): Promise<void> => {
     .from(usersTable)
     .where(eq(usersTable.phone, phone));
 
+  let isNewUser = false;
   if (!user) {
+    isNewUser = true;
     [user] = await db
       .insert(usersTable)
       .values({ phone, role: "buyer", verificationStatus: "verified", status: "active" })
@@ -86,6 +88,7 @@ router.post("/auth/otp/verify", async (req, res): Promise<void> => {
   res.json(
     VerifyOtpResponse.parse({
       token,
+      isNewUser,
       user: {
         id: user.id,
         phone: user.phone,
@@ -96,6 +99,8 @@ router.post("/auth/otp/verify", async (req, res): Promise<void> => {
         verificationStatus: user.verificationStatus,
         status: user.status,
         autoSendVoice: user.autoSendVoice,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
       },
     }),
   );

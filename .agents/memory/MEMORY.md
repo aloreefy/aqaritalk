@@ -1,1 +1,2 @@
 - [Vite workflow port fix](vite-workflow-port.md) — Vite 7 exits on stdin close in workflow env; port must be in .replit [[ports]] or workflow health check fails silently.
+- [OTP verify response shape](otp-verify-response.md) — VerifyOtpResponse requires isNewUser + user.createdAt/updatedAt; omitting any causes a 500 Zod parse error.
