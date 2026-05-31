@@ -3,20 +3,34 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: AqariTalk API — AI-guided real estate workflow platform
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: auth
+    description: Authentication
+  - name: properties
+    description: Property listings
+  - name: conversations
+    description: AI conversations
+  - name: contact-release
+    description: Contact release flow
+  - name: commission
+    description: Commission settings
+  - name: notifications
+    description: User notifications
+  - name: admin
+    description: Admin operations
+
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,13 +38,1275 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  # ── Auth ──────────────────────────────────────────────
+  /auth/otp/request:
+    post:
+      operationId: requestOtp
+      tags: [auth]
+      summary: Request OTP code
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OtpRequest"
+      responses:
+        "200":
+          description: OTP sent
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OtpRequestResponse"
+        "429":
+          description: Rate limited
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auth/otp/verify:
+    post:
+      operationId: verifyOtp
+      tags: [auth]
+      summary: Verify OTP and authenticate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OtpVerify"
+      responses:
+        "200":
+          description: Authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "400":
+          description: Invalid or expired code
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auth/me:
+    get:
+      operationId: getMe
+      tags: [auth]
+      summary: Get current user
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Current user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    put:
+      operationId: updateMe
+      tags: [auth]
+      summary: Update current user profile
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserUpdate"
+      responses:
+        "200":
+          description: Updated user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+
+  # ── Properties ────────────────────────────────────────
+  /properties:
+    get:
+      operationId: listProperties
+      tags: [properties]
+      summary: Search/list properties
+      parameters:
+        - name: lat
+          in: query
+          schema:
+            type: ["number", "null"]
+        - name: lng
+          in: query
+          schema:
+            type: ["number", "null"]
+        - name: radiusKm
+          in: query
+          schema:
+            type: ["number", "null"]
+        - name: propertyType
+          in: query
+          schema:
+            type: ["string", "null"]
+        - name: transactionMode
+          in: query
+          schema:
+            type: ["string", "null"]
+        - name: minPrice
+          in: query
+          schema:
+            type: ["number", "null"]
+        - name: maxPrice
+          in: query
+          schema:
+            type: ["number", "null"]
+        - name: rooms
+          in: query
+          schema:
+            type: ["integer", "null"]
+        - name: furnished
+          in: query
+          schema:
+            type: ["string", "null"]
+        - name: district
+          in: query
+          schema:
+            type: ["string", "null"]
+        - name: country
+          in: query
+          schema:
+            type: ["string", "null"]
+        - name: status
+          in: query
+          schema:
+            type: ["string", "null"]
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        "200":
+          description: Property list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PropertyList"
+    post:
+      operationId: createProperty
+      tags: [properties]
+      summary: Create a property listing draft
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PropertyInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Property"
+
+  /properties/{id}:
+    get:
+      operationId: getProperty
+      tags: [properties]
+      summary: Get property detail
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Property
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Property"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    put:
+      operationId: updateProperty
+      tags: [properties]
+      summary: Update property
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PropertyUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Property"
+    delete:
+      operationId: deleteProperty
+      tags: [properties]
+      summary: Soft-delete property
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Deleted
+
+  /properties/{id}/images/{imageId}:
+    delete:
+      operationId: deletePropertyImage
+      tags: [properties]
+      summary: Delete a property image
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: imageId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Deleted
+
+  /properties/mine:
+    get:
+      operationId: listMyProperties
+      tags: [properties]
+      summary: List current user's properties
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: ["string", "null"]
+      responses:
+        "200":
+          description: User's properties
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PropertyList"
+
+  # ── Conversations ─────────────────────────────────────
+  /conversations:
+    get:
+      operationId: listConversations
+      tags: [conversations]
+      summary: List user's conversations
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Conversations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Conversation"
+    post:
+      operationId: createConversation
+      tags: [conversations]
+      summary: Start a new conversation
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ConversationInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Conversation"
+
+  /conversations/{id}:
+    get:
+      operationId: getConversation
+      tags: [conversations]
+      summary: Get a conversation with messages
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Conversation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Conversation"
+
+  /conversations/{id}/messages:
+    post:
+      operationId: sendMessage
+      tags: [conversations]
+      summary: Send a message and get AI response
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MessageInput"
+      responses:
+        "200":
+          description: AI response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConversationTurn"
+
+  # ── Contact Release ───────────────────────────────────
+  /contact-release:
+    post:
+      operationId: requestContactRelease
+      tags: [contact-release]
+      summary: Buyer requests contact release for a property
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ContactReleaseInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ContactRelease"
+
+  /contact-release/{id}:
+    get:
+      operationId: getContactRelease
+      tags: [contact-release]
+      summary: Get a contact release record
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Contact release record
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ContactRelease"
+
+  /contact-release/{id}/acknowledge:
+    post:
+      operationId: acknowledgeContactRelease
+      tags: [contact-release]
+      summary: Buyer or seller acknowledges commission terms
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AckInput"
+      responses:
+        "200":
+          description: Updated contact release
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ContactRelease"
+
+  /contact-release/property/{propertyId}:
+    get:
+      operationId: getContactReleaseByProperty
+      tags: [contact-release]
+      summary: Get contact release for a specific property (for current user)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: propertyId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Contact release or null
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ContactReleaseOrNull"
+
+  # ── Commission ────────────────────────────────────────
+  /commission/settings:
+    get:
+      operationId: getCommissionSettings
+      tags: [commission]
+      summary: Get platform commission settings
+      responses:
+        "200":
+          description: Settings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CommissionSettings"
+    put:
+      operationId: updateCommissionSettings
+      tags: [commission]
+      summary: Update commission settings (admin only)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CommissionSettingsUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CommissionSettings"
+
+  # ── Notifications ─────────────────────────────────────
+  /notifications:
+    get:
+      operationId: listNotifications
+      tags: [notifications]
+      summary: List user notifications
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Notifications
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Notification"
+
+  /notifications/{id}/read:
+    put:
+      operationId: markNotificationRead
+      tags: [notifications]
+      summary: Mark notification as read
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Marked read
+
+  # ── Admin ─────────────────────────────────────────────
+  /admin/users:
+    get:
+      operationId: adminListUsers
+      tags: [admin]
+      summary: List all users
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: role
+          in: query
+          schema:
+            type: ["string", "null"]
+        - name: status
+          in: query
+          schema:
+            type: ["string", "null"]
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+      responses:
+        "200":
+          description: Users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+
+  /admin/users/{id}:
+    put:
+      operationId: adminUpdateUser
+      tags: [admin]
+      summary: Update user (admin)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminUserUpdate"
+      responses:
+        "200":
+          description: Updated user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+
+  /admin/properties:
+    get:
+      operationId: adminListProperties
+      tags: [admin]
+      summary: List all properties (admin)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: ["string", "null"]
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+      responses:
+        "200":
+          description: Properties
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PropertyList"
+
+  /admin/properties/{id}/status:
+    put:
+      operationId: adminUpdatePropertyStatus
+      tags: [admin]
+      summary: Approve or reject a property listing
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminPropertyStatusUpdate"
+      responses:
+        "200":
+          description: Updated property
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Property"
+
+  /admin/stats:
+    get:
+      operationId: getAdminStats
+      tags: [admin]
+      summary: Platform statistics
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminStats"
+
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
   schemas:
     HealthStatus:
       type: object
+      required: [status]
       properties:
         status:
           type: string
-      required:
-        - status
 
+    ErrorResponse:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string
+
+    # ── Auth schemas ──────────────────────────────────
+    OtpRequest:
+      type: object
+      required: [phone]
+      properties:
+        phone:
+          type: string
+          minLength: 7
+          maxLength: 20
+
+    OtpRequestResponse:
+      type: object
+      required: [sessionId, expiresAt]
+      properties:
+        sessionId:
+          type: string
+        expiresAt:
+          type: string
+          format: date-time
+
+    OtpVerify:
+      type: object
+      required: [phone, code]
+      properties:
+        phone:
+          type: string
+        code:
+          type: string
+          minLength: 6
+          maxLength: 6
+
+    AuthResponse:
+      type: object
+      required: [token, user, isNewUser]
+      properties:
+        token:
+          type: string
+        user:
+          $ref: "#/components/schemas/User"
+        isNewUser:
+          type: boolean
+
+    # ── User schemas ──────────────────────────────────
+    User:
+      type: object
+      required: [id, phone, role, market, language, verificationStatus, status, autoSendVoice, createdAt, updatedAt]
+      properties:
+        id:
+          type: string
+        phone:
+          type: string
+        name:
+          type: ["string", "null"]
+        role:
+          type: string
+          enum: [buyer, seller, broker, admin]
+        market:
+          type: string
+          enum: [JO, SA, AE, EG, KW, QA, BH, OM, MA, LB, IQ]
+        language:
+          type: string
+          enum: [ar, en]
+        verificationStatus:
+          type: string
+          enum: [unverified, verified]
+        status:
+          type: string
+          enum: [active, suspended]
+        autoSendVoice:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    UserUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        role:
+          type: string
+          enum: [buyer, seller, broker]
+        market:
+          type: string
+          enum: [JO, SA, AE, EG, KW, QA, BH, OM, MA, LB, IQ]
+        language:
+          type: string
+          enum: [ar, en]
+        autoSendVoice:
+          type: boolean
+
+    # ── Property schemas ──────────────────────────────
+    Property:
+      type: object
+      required: [id, createdBy, propertyType, transactionMode, listingDirection, status, brokerListing, createdAt, updatedAt]
+      properties:
+        id:
+          type: string
+        createdBy:
+          type: string
+        listingName:
+          type: ["string", "null"]
+        listingDirection:
+          type: string
+          enum: [offering, seeking]
+        propertyType:
+          type: string
+        transactionMode:
+          type: string
+          enum: [sale, rent, lease]
+        rentalPeriod:
+          type: ["string", "null"]
+        price:
+          type: ["number", "null"]
+        priceCurrency:
+          type: string
+        priceNegotiable:
+          type: boolean
+        country:
+          type: ["string", "null"]
+        city:
+          type: ["string", "null"]
+        district:
+          type: ["string", "null"]
+        street:
+          type: ["string", "null"]
+        addressFull:
+          type: ["string", "null"]
+        latitude:
+          type: ["number", "null"]
+        longitude:
+          type: ["number", "null"]
+        locationAccuracy:
+          type: ["string", "null"]
+        areaSqm:
+          type: ["number", "null"]
+        rooms:
+          type: ["integer", "null"]
+        bathrooms:
+          type: ["integer", "null"]
+        floorNumber:
+          type: ["integer", "null"]
+        furnishedStatus:
+          type: ["string", "null"]
+        parking:
+          type: ["boolean", "null"]
+        hasElevator:
+          type: ["boolean", "null"]
+        condition:
+          type: ["string", "null"]
+        description:
+          type: ["string", "null"]
+        status:
+          type: string
+          enum: [draft, pending_review, active, sold, rented, expired, rejected, deleted]
+        verified:
+          type: boolean
+        aiMissingFields:
+          type: ["array", "null"]
+          items:
+            type: string
+        contactPreference:
+          type: ["string", "null"]
+        brokerListing:
+          type: boolean
+        images:
+          type: array
+          items:
+            $ref: "#/components/schemas/PropertyImage"
+        distance:
+          type: ["number", "null"]
+          description: Distance in km from search center (only present in search results)
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    PropertyInput:
+      type: object
+      required: [propertyType, transactionMode]
+      properties:
+        listingName:
+          type: string
+        listingDirection:
+          type: string
+          enum: [offering, seeking]
+        propertyType:
+          type: string
+        transactionMode:
+          type: string
+          enum: [sale, rent, lease]
+        rentalPeriod:
+          type: string
+        price:
+          type: number
+        priceCurrency:
+          type: string
+        priceNegotiable:
+          type: boolean
+        country:
+          type: string
+        city:
+          type: string
+        district:
+          type: string
+        street:
+          type: string
+        addressFull:
+          type: string
+        latitude:
+          type: number
+        longitude:
+          type: number
+        locationAccuracy:
+          type: string
+        areaSqm:
+          type: number
+        rooms:
+          type: integer
+        bathrooms:
+          type: integer
+        floorNumber:
+          type: integer
+        floorsInBuilding:
+          type: integer
+        furnishedStatus:
+          type: string
+        parking:
+          type: boolean
+        hasElevator:
+          type: boolean
+        buildingAgeYears:
+          type: integer
+        condition:
+          type: string
+        description:
+          type: string
+        contactPreference:
+          type: string
+
+    PropertyUpdate:
+      type: object
+      properties:
+        listingName:
+          type: string
+        propertyType:
+          type: string
+        transactionMode:
+          type: string
+        rentalPeriod:
+          type: string
+        price:
+          type: number
+        priceCurrency:
+          type: string
+        priceNegotiable:
+          type: boolean
+        country:
+          type: string
+        city:
+          type: string
+        district:
+          type: string
+        street:
+          type: string
+        addressFull:
+          type: string
+        latitude:
+          type: number
+        longitude:
+          type: number
+        areaSqm:
+          type: number
+        rooms:
+          type: integer
+        bathrooms:
+          type: integer
+        floorNumber:
+          type: integer
+        furnishedStatus:
+          type: string
+        parking:
+          type: boolean
+        hasElevator:
+          type: boolean
+        condition:
+          type: string
+        description:
+          type: string
+        contactPreference:
+          type: string
+
+    PropertyList:
+      type: object
+      required: [items, total, page, limit]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Property"
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+
+    PropertyImage:
+      type: object
+      required: [id, propertyId, path, isVoiceNote, createdAt]
+      properties:
+        id:
+          type: string
+        propertyId:
+          type: string
+        path:
+          type: string
+        gpsLat:
+          type: ["number", "null"]
+        gpsLng:
+          type: ["number", "null"]
+        sizeBytes:
+          type: ["integer", "null"]
+        isVoiceNote:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+
+    # ── Conversation schemas ──────────────────────────
+    Conversation:
+      type: object
+      required: [id, userId, type, market, messages, extractedData, currentState, status, createdAt, updatedAt]
+      properties:
+        id:
+          type: string
+        userId:
+          type: string
+        propertyId:
+          type: ["string", "null"]
+        type:
+          type: string
+          enum: [buyer_search, seller_listing]
+        market:
+          type: string
+        messages:
+          type: array
+          items:
+            $ref: "#/components/schemas/ConversationMessage"
+        extractedData:
+          type: object
+        currentState:
+          type: string
+        status:
+          type: string
+          enum: [active, completed, abandoned]
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    ConversationMessage:
+      type: object
+      required: [role, content, timestamp]
+      properties:
+        role:
+          type: string
+          enum: [user, assistant]
+        content:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+
+    ConversationInput:
+      type: object
+      required: [type]
+      properties:
+        type:
+          type: string
+          enum: [buyer_search, seller_listing]
+        propertyId:
+          type: string
+        market:
+          type: string
+
+    MessageInput:
+      type: object
+      required: [content]
+      properties:
+        content:
+          type: string
+          minLength: 1
+        isVoice:
+          type: boolean
+
+    ConversationTurn:
+      type: object
+      required: [message, conversation]
+      properties:
+        message:
+          $ref: "#/components/schemas/ConversationMessage"
+        conversation:
+          $ref: "#/components/schemas/Conversation"
+        searchResults:
+          type: array
+          items:
+            $ref: "#/components/schemas/Property"
+        offTopic:
+          type: boolean
+
+    # ── Contact release schemas ───────────────────────
+    ContactRelease:
+      type: object
+      required: [id, buyerId, sellerId, propertyId, status, commissionBuyerPct, commissionSellerPct, createdAt]
+      properties:
+        id:
+          type: string
+        buyerId:
+          type: string
+        sellerId:
+          type: string
+        propertyId:
+          type: string
+        status:
+          type: string
+          enum: [pending, buyer_acked, seller_acked, released, expired]
+        commissionBuyerPct:
+          type: number
+        commissionSellerPct:
+          type: number
+        buyerAckAt:
+          type: ["string", "null"]
+          format: date-time
+        sellerAckAt:
+          type: ["string", "null"]
+          format: date-time
+        releasedAt:
+          type: ["string", "null"]
+          format: date-time
+        buyerPhone:
+          type: ["string", "null"]
+          description: Only present when status = released
+        sellerPhone:
+          type: ["string", "null"]
+          description: Only present when status = released
+        createdAt:
+          type: string
+          format: date-time
+
+    ContactReleaseOrNull:
+      oneOf:
+        - $ref: "#/components/schemas/ContactRelease"
+        - type: "null"
+
+    ContactReleaseInput:
+      type: object
+      required: [propertyId]
+      properties:
+        propertyId:
+          type: string
+
+    AckInput:
+      type: object
+      required: [role]
+      properties:
+        role:
+          type: string
+          enum: [buyer, seller]
+
+    # ── Commission schemas ────────────────────────────
+    CommissionSettings:
+      type: object
+      required: [id, defaultBuyerPct, defaultSellerPct, negotiable, updatedAt]
+      properties:
+        id:
+          type: string
+        defaultBuyerPct:
+          type: number
+        defaultSellerPct:
+          type: number
+        negotiable:
+          type: boolean
+        updatedAt:
+          type: string
+          format: date-time
+
+    CommissionSettingsUpdate:
+      type: object
+      properties:
+        defaultBuyerPct:
+          type: number
+          minimum: 0
+          maximum: 10
+        defaultSellerPct:
+          type: number
+          minimum: 0
+          maximum: 10
+        negotiable:
+          type: boolean
+
+    # ── Notification schemas ──────────────────────────
+    Notification:
+      type: object
+      required: [id, userId, type, titleAr, titleEn, bodyAr, bodyEn, createdAt]
+      properties:
+        id:
+          type: string
+        userId:
+          type: string
+        type:
+          type: string
+        titleAr:
+          type: string
+        titleEn:
+          type: string
+        bodyAr:
+          type: string
+        bodyEn:
+          type: string
+        readAt:
+          type: ["string", "null"]
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+
+    # ── Admin schemas ─────────────────────────────────
+    AdminUserUpdate:
+      type: object
+      properties:
+        role:
+          type: string
+          enum: [buyer, seller, broker, admin]
+        status:
+          type: string
+          enum: [active, suspended]
+        verificationStatus:
+          type: string
+          enum: [unverified, verified]
+
+    AdminPropertyStatusUpdate:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+          enum: [active, rejected, deleted]
+        rejectionReason:
+          type: string
+
+    AdminStats:
+      type: object
+      required: [totalUsers, activeListings, contactReleasesThisMonth, pendingReview]
+      properties:
+        totalUsers:
+          type: integer
+        activeListings:
+          type: integer
+        contactReleasesThisMonth:
+          type: integer
+        pendingReview:
+          type: integer
+        usersByRole:
+          type: object
+          properties:
+            buyer:
+              type: integer
+            seller:
+              type: integer
+            broker:
+              type: integer
