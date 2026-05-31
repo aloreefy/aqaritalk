@@ -28,7 +28,8 @@ export function useSpeechInput({ lang = "ar-JO", onTranscript }: UseSpeechInputO
   const [interimText, setInterimText] = useState("");
   const [error, setError] = useState<string | null>(null);
   const recognitionRef = useRef<SR | null>(null);
-  const accumulatedRef = useRef<string>("");
+  const finalTextRef = useRef<string>("");
+  const stoppedManuallyRef = useRef(false);
 
   const SpeechRecognitionAPI =
     typeof window !== "undefined"
@@ -38,6 +39,7 @@ export function useSpeechInput({ lang = "ar-JO", onTranscript }: UseSpeechInputO
   const isSupported = !!SpeechRecognitionAPI;
 
   const stop = useCallback(() => {
+    stoppedManuallyRef.current = true;
     recognitionRef.current?.stop();
     recognitionRef.current = null;
     setIsListening(false);
@@ -50,44 +52,53 @@ export function useSpeechInput({ lang = "ar-JO", onTranscript }: UseSpeechInputO
       return;
     }
     setError(null);
-    accumulatedRef.current = "";
+    finalTextRef.current = "";
+    stoppedManuallyRef.current = false;
 
     const recognition = new SpeechRecognitionAPI();
     recognition.lang = lang;
-    recognition.continuous = true;      // keep listening after each pause
-    recognition.interimResults = true;  // show partial results live
+    // continuous=false: one utterance per activation — avoids Android duplicate-result bug.
+    // Android Chrome ignores continuous=true and fires onend after each pause anyway,
+    // leading to repeated final results when the session is restarted automatically.
+    recognition.continuous = false;
+    recognition.interimResults = true;
 
     recognition.onresult = (event: any) => {
       let interim = "";
       for (let i = event.resultIndex; i < event.results.length; i++) {
         const result = event.results[i];
         if (result.isFinal) {
-          accumulatedRef.current += result[0].transcript;
+          // Append only genuinely new final text (avoid Android double-final bug).
+          const newText = result[0].transcript;
+          if (!finalTextRef.current.endsWith(newText)) {
+            finalTextRef.current += newText;
+          }
         } else {
           interim += result[0].transcript;
         }
       }
-      setInterimText(accumulatedRef.current + interim);
+      setInterimText(finalTextRef.current + interim);
     };
 
     recognition.onerror = (ev: any) => {
-      // 'no-speech' is not a real error — user just paused
-      if (ev.error !== "no-speech") {
-        setError("تعذّر التعرف على الصوت");
-        setIsListening(false);
-      }
+      if (ev.error === "no-speech") return; // user paused — not a real error
+      if (ev.error === "aborted") return;   // user stopped manually
+      setError("تعذّر التعرف على الصوت");
+      setIsListening(false);
     };
 
-    // continuous mode means onend fires when stop() is explicitly called
     recognition.onend = () => {
-      // If we still have accumulated text, send it
-      const final = accumulatedRef.current.trim();
-      if (final) {
+      const final = finalTextRef.current.trim();
+      if (final && !stoppedManuallyRef.current) {
+        onTranscript(final);
+      } else if (final && stoppedManuallyRef.current) {
+        // Still send if user stopped after speaking
         onTranscript(final);
       }
-      accumulatedRef.current = "";
+      finalTextRef.current = "";
       setInterimText("");
       setIsListening(false);
+      recognitionRef.current = null;
     };
 
     recognitionRef.current = recognition;
@@ -97,7 +108,7 @@ export function useSpeechInput({ lang = "ar-JO", onTranscript }: UseSpeechInputO
 
   const toggle = useCallback(() => {
     if (isListening) {
-      stop();        // stop() → triggers onend → sends accumulated text
+      stop();
     } else {
       start();
     }

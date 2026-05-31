@@ -11,7 +11,7 @@ import {
   GetPropertyResponse,
 } from "@workspace/api-zod";
 import { authenticate } from "../middleware/authenticate";
-import { getModel } from "../services/ai/client";
+import { createChat, type ChatHistory } from "../services/ai/client";
 import { isOffTopic, OFF_TOPIC_RESPONSE_AR } from "../services/ai/guardrails";
 import { buildSystemPrompt } from "../services/ai/context-builder";
 import { extractBuyerCriteria, extractSellerData } from "../services/ai/extraction";
@@ -62,6 +62,8 @@ router.post("/conversations", authenticate, async (req, res): Promise<void> => {
     timestamp: new Date().toISOString(),
   };
 
+  const initialState = type === "seller_listing" ? "greeting" : "type_collection";
+
   const [conversation] = await db
     .insert(conversationsTable)
     .values({
@@ -70,7 +72,7 @@ router.post("/conversations", authenticate, async (req, res): Promise<void> => {
       type,
       messages: [greetingMsg],
       extractedData: {},
-      currentState: "type_collection",
+      currentState: initialState,
       status: "active",
       market: market ?? "JO",
     })
@@ -190,21 +192,17 @@ router.post(
     // --- Call Gemini ---
     let aiText = "";
     try {
-      const model = getModel(systemPrompt);
-
-      // Gemini requires chat history to start with role 'user'.
-      // The greeting is an assistant message, so we drop any leading model messages.
-      const mappedHistory = existingMessages.map((m) => ({
+      // Build history: strip leading model messages (chat must start with user turn).
+      const mapped: ChatHistory = existingMessages.map((m) => ({
         role: m.role === "assistant" ? ("model" as const) : ("user" as const),
         parts: [{ text: m.content }],
       }));
-      const firstUserIdx = mappedHistory.findIndex((h) => h.role === "user");
-      const history = firstUserIdx >= 0 ? mappedHistory.slice(firstUserIdx) : [];
+      const firstUserIdx = mapped.findIndex((h) => h.role === "user");
+      const history = firstUserIdx >= 0 ? mapped.slice(firstUserIdx) : [];
 
-      const chat = model.startChat({ history });
-
-      const result = await chat.sendMessage(userText);
-      aiText = result.response.text().trim();
+      const chat = createChat(systemPrompt, history);
+      const result = await chat.sendMessage({ message: userText });
+      aiText = (result.text ?? "").trim();
     } catch (err) {
       req.log.error({ err }, "Gemini call failed");
       aiText = "عذراً، حدث خطأ تقني. يرجى المحاولة مرة أخرى.";

@@ -1,17 +1,25 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenAI } from "@google/genai";
 
 const apiKey = process.env.GEMINI_API_KEY;
 if (!apiKey) {
   throw new Error("GEMINI_API_KEY env var is required");
 }
 
-export const genAI = new GoogleGenerativeAI(apiKey);
+// @google/genai v1.x — supports AQ. prefix keys from Google AI Studio.
+// The old @google/generative-ai v0.24 only handled AIza... keys.
+export const ai = new GoogleGenAI({ apiKey });
 
-// gemini-1.5-flash on v1beta works with systemInstruction at model level.
-// gemini-2.0-flash requires paid quota even on AI Studio free-tier projects.
-// gemini-1.5-flash free tier: 15 RPM, 1M TPM, 1500 req/day.
-export const FLASH_MODEL = "gemini-1.5-flash";
+export const FLASH_MODEL = "gemini-2.5-flash";
 
-export function getModel(systemInstruction: string) {
-  return genAI.getGenerativeModel({ model: FLASH_MODEL, systemInstruction });
+export type ChatHistory = Array<{
+  role: "user" | "model";
+  parts: Array<{ text: string }>;
+}>;
+
+export function createChat(systemInstruction: string, history: ChatHistory) {
+  return ai.chats.create({
+    model: FLASH_MODEL,
+    config: { systemInstruction, maxOutputTokens: 512 },
+    history,
+  });
 }

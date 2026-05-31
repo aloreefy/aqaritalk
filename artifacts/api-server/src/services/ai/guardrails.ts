@@ -15,14 +15,27 @@ const REAL_ESTATE_KEYWORDS_EN = [
   "listing", "search", "location", "map",
 ];
 
-const HARD_OFF_TOPIC = [
-  "سياسة", "دين", "طب", "وصفة", "طبخ", "رياضة", "فيلم", "أغنية",
+// Use explicit forms (with and without definite article) rather than bare roots.
+// Bare roots like "دين" are dangerous — they match inside "دينار" (Jordanian dinar).
+const HARD_OFF_TOPIC: string[] = [
+  // politics
+  "سياسة", "السياسة", "سياسي", "انتخابات",
+  // religion — use full forms to avoid matching "دينار"
+  "الدين", "ديني", "دينية", "صلاة", "عبادة", "كنيسة", "مسجد",
+  // medicine
+  "الطب", "طبيب", "مستشفى", "دواء",
+  // cooking / recipes
+  "وصفة", "الوصفة", "طبخ", "الطبخ", "مطبخ",
+  // sports / entertainment
+  "رياضة", "الرياضة", "فيلم", "الفيلم", "أغنية", "أغاني",
+  // security exploits
   "politics", "religion", "medicine", "recipe", "cooking", "sport", "movie", "song",
   "hack", "illegal", "crack", "jailbreak",
 ];
 
 export function isOffTopic(text: string): boolean {
   const lower = text.toLowerCase();
+
   if (HARD_OFF_TOPIC.some((kw) => lower.includes(kw))) return true;
 
   const hasRealEstate =

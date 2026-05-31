@@ -1,2 +1,4 @@
 - [Vite workflow port fix](vite-workflow-port.md) — Vite 7 exits on stdin close in workflow env; port must be in .replit [[ports]] or workflow health check fails silently.
 - [OTP verify response shape](otp-verify-response.md) — VerifyOtpResponse requires isNewUser + user.createdAt/updatedAt; omitting any causes a 500 Zod parse error.
+- [Gemini SDK and model config](gemini-config.md) — AQ. prefix keys require @google/genai v1.x; gemini-2.0-flash has quota=0 on this key; gemini-2.5-flash works.
+- [Guardrail false positive: دين in دينار](guardrail-dinar-bug.md) — Arabic substring "دين" (religion keyword) matched inside "دينار" (JOD currency), silently triggering off-topic guard on every price mention. Fixed with explicit full-form keywords.
