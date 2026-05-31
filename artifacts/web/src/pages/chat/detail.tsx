@@ -67,8 +67,9 @@ function CriteriaChips({
 }
 
 const SELLER_IMAGE_STATES = new Set([
-  "details_collection",
-  "guidance_review",
+  // Photos belong in the wizard (step 3), not during AI chat collection
+  // Keeping set for future use but not rendering the button
+  "__disabled__",
   "submit_ready",
 ]);
 

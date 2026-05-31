@@ -26,8 +26,9 @@ const CATEGORY_MAP: Record<string, string> = {
 };
 
 const TRANSACTION_MAP: Record<string, string> = {
-  إيجار: "rent", rent: "rent", للإيجار: "rent", تأجير: "rent", بأجار: "rent",
-  بيع: "sale", sale: "sale", للبيع: "sale",
+  للإيجار: "rent", تأجير: "rent", للايجار: "rent", تاجير: "rent",
+  إيجار: "rent", ايجار: "rent", rent: "rent", بأجار: "rent", بأجر: "rent",
+  للبيع: "sale", بيع: "sale", sale: "sale",
   "إيجار منتهي": "rent_to_own", "rent to own": "rent_to_own",
 };
 
@@ -66,6 +67,10 @@ const SUBMIT_INTENT_PHRASES = [
   "نزله", "نزلها", "نشره", "نشرها", "انشر", "نشر الإعلان", "ابعثه", "أرسله", "ارسله",
   "خلص", "كفاية", "يكفي", "كافي", "اكتفينا", "انتهينا", "انتهى وصف",
   "ضعه", "ضعها", "نشر", "publish", "post the ad",
+  // Common end-of-conversation phrasing
+  "تنزيل الإعلان", "تنزيل الاعلان", "انتهى العرض", "انهى العرض",
+  "سجل الإعلان", "سجل الاعلان", "اضف الإعلان", "ضع الإعلان",
+  "رفع الإعلان", "ارفع الإعلان", "submit", "ابدأ الإعلان",
 ];
 
 export function isSubmitIntent(text: string): boolean {

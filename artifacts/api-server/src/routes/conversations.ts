@@ -208,9 +208,19 @@ router.post(
       const chat = createChat(systemPrompt, history);
       const result = await chat.sendMessage({ message: userText });
       aiText = (result.text ?? "").trim();
+      // Strip any leaked chain-of-thought blocks (fallback guard)
+      aiText = aiText.replace(/^(THOUGHT|THINKING):[\s\S]*?\n\n/i, "").trim();
+      if (!aiText) aiText = "أعد المحاولة من فضلك.";
     } catch (err) {
       req.log.error({ err }, "Gemini call failed");
-      aiText = "عذراً، حدث خطأ تقني. يرجى المحاولة مرة أخرى.";
+      const errMsg = String((err as { message?: string })?.message ?? "");
+      const isQuota =
+        (err as { status?: number })?.status === 429 ||
+        errMsg.includes("RESOURCE_EXHAUSTED") ||
+        errMsg.includes("quota");
+      aiText = isQuota
+        ? "عذراً، تم الوصول إلى الحد اليومي لطلبات الذكاء الاصطناعي. يرجى المحاولة لاحقاً."
+        : "عذراً، حدث خطأ تقني. يرجى المحاولة مرة أخرى.";
     }
 
     const aiMsg: Message = {

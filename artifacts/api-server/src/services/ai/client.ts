@@ -19,7 +19,12 @@ export type ChatHistory = Array<{
 export function createChat(systemInstruction: string, history: ChatHistory) {
   return ai.chats.create({
     model: FLASH_MODEL,
-    config: { systemInstruction, maxOutputTokens: 1500 },
+    config: {
+      systemInstruction,
+      maxOutputTokens: 1500,
+      // Disable chain-of-thought thinking so internal reasoning never leaks to users
+      thinkingConfig: { thinkingBudget: 0 },
+    },
     history,
   });
 }
