@@ -14,7 +14,7 @@ import { authenticate } from "../middleware/authenticate";
 import { createChat, type ChatHistory } from "../services/ai/client";
 import { isOffTopic, OFF_TOPIC_RESPONSE_AR } from "../services/ai/guardrails";
 import { buildSystemPrompt } from "../services/ai/context-builder";
-import { extractBuyerCriteria, extractSellerData } from "../services/ai/extraction";
+import { extractBuyerCriteria, extractSellerData, isSubmitIntent } from "../services/ai/extraction";
 import {
   advanceBuyerState,
   advanceSellerState,
@@ -177,6 +177,11 @@ router.post(
     } else {
       newData = extractSellerData(userText, existingData as SellerData);
       newState = advanceSellerState(currentState as SellerState, newData as SellerData);
+
+      const LATE_SELLER_STATES: SellerState[] = ["details_collection", "guidance_review", "submit_ready"];
+      if (isSubmitIntent(userText) && LATE_SELLER_STATES.includes(currentState as SellerState)) {
+        newState = "submit_ready";
+      }
     }
 
     // --- Build Gemini history ---

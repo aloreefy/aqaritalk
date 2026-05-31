@@ -19,7 +19,7 @@ export type ChatHistory = Array<{
 export function createChat(systemInstruction: string, history: ChatHistory) {
   return ai.chats.create({
     model: FLASH_MODEL,
-    config: { systemInstruction, maxOutputTokens: 512 },
+    config: { systemInstruction, maxOutputTokens: 1500 },
     history,
   });
 }
