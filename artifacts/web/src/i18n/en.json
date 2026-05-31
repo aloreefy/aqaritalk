@@ -115,7 +115,10 @@
     "thinking": "Thinking...",
     "viewResults": "View Results on Map",
     "criteria": "Search Criteria",
-    "offTopic": "I'm specialized in real estate assistance only."
+    "offTopic": "I'm specialized in real estate assistance only.",
+    "listening": "Listening...",
+    "startListening": "Speak now",
+    "stopListening": "Stop listening"
   },
   "list": {
     "title": "Add a Property",

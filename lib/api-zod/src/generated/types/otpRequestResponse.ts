@@ -7,6 +7,5 @@
  */
 
 export interface OtpRequestResponse {
-  sessionId: string;
-  expiresAt: Date;
+  message: string;
 }

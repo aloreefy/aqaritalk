@@ -22,8 +22,7 @@ export interface OtpRequest {
 }
 
 export interface OtpRequestResponse {
-  sessionId: string;
-  expiresAt: string;
+  message: string;
 }
 
 export interface OtpVerify {

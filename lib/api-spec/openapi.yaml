@@ -743,13 +743,10 @@ components:
 
     OtpRequestResponse:
       type: object
-      required: [sessionId, expiresAt]
+      required: [message]
       properties:
-        sessionId:
+        message:
           type: string
-        expiresAt:
-          type: string
-          format: date-time
 
     OtpVerify:
       type: object

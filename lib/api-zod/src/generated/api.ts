@@ -29,8 +29,7 @@ export const RequestOtpBody = zod.object({
 })
 
 export const RequestOtpResponse = zod.object({
-  "sessionId": zod.string(),
-  "expiresAt": zod.coerce.date()
+  "message": zod.string()
 })
 
 
