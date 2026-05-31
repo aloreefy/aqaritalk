@@ -7,7 +7,11 @@ if (!apiKey) {
 
 export const genAI = new GoogleGenerativeAI(apiKey);
 
-// gemini-2.0-flash on v1beta:
-//   - systemInstruction at getGenerativeModel level works (camelCase accepted by v1beta)
-//   - gemini-1.5-flash is 404 on v1beta; v1 rejects camelCase systemInstruction
-export const FLASH_MODEL = "gemini-2.0-flash";
+// gemini-1.5-flash on v1beta works with systemInstruction at model level.
+// gemini-2.0-flash requires paid quota even on AI Studio free-tier projects.
+// gemini-1.5-flash free tier: 15 RPM, 1M TPM, 1500 req/day.
+export const FLASH_MODEL = "gemini-1.5-flash";
+
+export function getModel(systemInstruction: string) {
+  return genAI.getGenerativeModel({ model: FLASH_MODEL, systemInstruction });
+}

@@ -11,7 +11,7 @@ import {
   GetPropertyResponse,
 } from "@workspace/api-zod";
 import { authenticate } from "../middleware/authenticate";
-import { genAI, FLASH_MODEL } from "../services/ai/client";
+import { getModel } from "../services/ai/client";
 import { isOffTopic, OFF_TOPIC_RESPONSE_AR } from "../services/ai/guardrails";
 import { buildSystemPrompt } from "../services/ai/context-builder";
 import { extractBuyerCriteria, extractSellerData } from "../services/ai/extraction";
@@ -190,13 +190,7 @@ router.post(
     // --- Call Gemini ---
     let aiText = "";
     try {
-      // systemInstruction must be set at getGenerativeModel level — not startChat.
-      // Passing it to startChat sends a raw string to the v1beta API which rejects it.
-      const model = genAI.getGenerativeModel({
-        model: FLASH_MODEL,
-        generationConfig: { maxOutputTokens: 512 },
-        systemInstruction: systemPrompt,
-      });
+      const model = getModel(systemPrompt);
 
       // Gemini requires chat history to start with role 'user'.
       // The greeting is an assistant message, so we drop any leading model messages.
