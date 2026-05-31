@@ -7,11 +7,7 @@ if (!apiKey) {
 
 export const genAI = new GoogleGenerativeAI(apiKey);
 
-export const FLASH_MODEL = "gemini-1.5-flash";
-
-export function getChatModel() {
-  return genAI.getGenerativeModel({
-    model: FLASH_MODEL,
-    generationConfig: { maxOutputTokens: 8192 },
-  });
-}
+// gemini-2.0-flash on v1beta:
+//   - systemInstruction at getGenerativeModel level works (camelCase accepted by v1beta)
+//   - gemini-1.5-flash is 404 on v1beta; v1 rejects camelCase systemInstruction
+export const FLASH_MODEL = "gemini-2.0-flash";

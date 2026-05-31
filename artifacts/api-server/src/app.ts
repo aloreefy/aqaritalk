@@ -8,6 +8,10 @@ import { logger } from "./lib/logger";
 
 const app: Express = express();
 
+// Trust the reverse proxy (Replit / nginx) so express-rate-limit can read
+// the real client IP from X-Forwarded-For without throwing a validation error.
+app.set("trust proxy", 1);
+
 app.use(
   pinoHttp({
     logger,
