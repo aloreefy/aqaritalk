@@ -16,6 +16,10 @@ import ProfilePage from "@/pages/profile";
 import PropertyPage from "@/pages/property";
 import ContactReleasePage from "@/pages/contact-release";
 import AdminPage from "@/pages/admin";
+import WizardStep1Preview from "@/pages/list/wizard/step1-preview";
+import WizardStep2Location from "@/pages/list/wizard/step2-location";
+import WizardStep3Photos from "@/pages/list/wizard/step3-photos";
+import WizardStep4Review from "@/pages/list/wizard/step4-review";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -41,6 +45,10 @@ function AppRoutes() {
       <Route path="/auth" component={AuthPage} />
       <Route path="/chat" component={ChatPage} />
       <Route path="/chat/:id" component={ChatDetailPage} />
+      <Route path="/list/wizard/:id/preview" component={WizardStep1Preview} />
+      <Route path="/list/wizard/:id/location" component={WizardStep2Location} />
+      <Route path="/list/wizard/:id/photos" component={WizardStep3Photos} />
+      <Route path="/list/wizard/:id/review" component={WizardStep4Review} />
       <Route path="/list" component={ListPage} />
       <Route path="/property/:id" component={PropertyPage} />
       <Route path="/profile" component={ProfilePage} />

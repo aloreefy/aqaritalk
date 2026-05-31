@@ -1,3 +1,4 @@
+import path from "path";
 import express, { type Express } from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
@@ -63,8 +64,11 @@ const aiLimiter = rateLimit({
 });
 
 app.use(cookieParser());
-app.use(express.json());
+app.use(express.json({ limit: "6mb" }));
 app.use(express.urlencoded({ extended: true }));
+
+// Serve uploaded property images
+app.use("/api/uploads", express.static(path.join(process.cwd(), "uploads")));
 
 // Apply AI limiter to conversation messages only
 app.use("/api/conversations/:id/messages", aiLimiter);

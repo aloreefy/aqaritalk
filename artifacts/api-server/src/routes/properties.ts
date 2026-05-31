@@ -1,3 +1,5 @@
+import fs from "fs/promises";
+import path from "path";
 import { Router, type IRouter } from "express";
 import { db, propertiesTable, propertyImagesTable, usersTable } from "@workspace/db";
 import { eq, and, isNull, sql, inArray } from "drizzle-orm";
@@ -346,6 +348,115 @@ router.get("/my/properties", authenticate, async (req, res): Promise<void> => {
   const items = rows.map((r) => toApiProperty(r));
 
   res.json({ items, total: items.length });
+});
+
+// POST /properties/:id/images — base64 JSON upload
+router.post("/properties/:id/images", authenticate, async (req, res): Promise<void> => {
+  const id = paramStr(req.params.id);
+  const { data: imageData, filename = "photo.jpg" } = req.body as { data?: string; filename?: string };
+
+  if (!imageData) {
+    res.status(400).json({ error: "Image data (base64) is required" });
+    return;
+  }
+
+  const [property] = await db
+    .select()
+    .from(propertiesTable)
+    .where(and(eq(propertiesTable.id, id), isNull(propertiesTable.deletedAt)));
+  if (!property) { res.status(404).json({ error: "Property not found" }); return; }
+  if (property.createdBy !== req.user!.userId && req.user!.role !== "admin") {
+    res.status(403).json({ error: "Forbidden" }); return;
+  }
+
+  const existingImages = await db
+    .select()
+    .from(propertyImagesTable)
+    .where(eq(propertyImagesTable.propertyId, id));
+  if (existingImages.length >= 20) {
+    res.status(400).json({ error: "Maximum 20 images per property" });
+    return;
+  }
+
+  const base64 = imageData.replace(/^data:image\/\w+;base64,/, "");
+  const buffer = Buffer.from(base64, "base64");
+
+  const uploadsDir = path.join(process.cwd(), "uploads");
+  await fs.mkdir(uploadsDir, { recursive: true });
+  const rawExt = (filename.split(".").pop() ?? "jpg").toLowerCase();
+  const ext = ["jpg", "jpeg", "png", "webp", "gif"].includes(rawExt) ? rawExt : "jpg";
+  const uniqueName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+  await fs.writeFile(path.join(uploadsDir, uniqueName), buffer);
+
+  const [image] = await db.insert(propertyImagesTable).values({
+    propertyId: id,
+    path: `/api/uploads/${uniqueName}`,
+    sizeBytes: buffer.length,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } as any).returning();
+
+  req.log.info({ propertyId: id, imageId: image.id }, "Image uploaded");
+  res.status(201).json({ id: image.id, path: image.path, sizeBytes: image.sizeBytes });
+});
+
+// DELETE /properties/:id/images/:imageId
+router.delete("/properties/:id/images/:imageId", authenticate, async (req, res): Promise<void> => {
+  const propertyId = paramStr(req.params.id);
+  const imageId = paramStr(req.params.imageId);
+
+  const [image] = await db
+    .select()
+    .from(propertyImagesTable)
+    .where(and(eq(propertyImagesTable.id, imageId), eq(propertyImagesTable.propertyId, propertyId)));
+  if (!image) { res.status(404).json({ error: "Image not found" }); return; }
+
+  const [property] = await db
+    .select({ createdBy: propertiesTable.createdBy })
+    .from(propertiesTable)
+    .where(eq(propertiesTable.id, propertyId));
+  if (property?.createdBy !== req.user!.userId && req.user!.role !== "admin") {
+    res.status(403).json({ error: "Forbidden" }); return;
+  }
+
+  const fileName = image.path.replace("/api/uploads/", "");
+  await fs.unlink(path.join(process.cwd(), "uploads", fileName)).catch(() => {});
+  await db.delete(propertyImagesTable).where(eq(propertyImagesTable.id, imageId));
+
+  res.sendStatus(204);
+});
+
+// POST /properties/:id/publish — move draft → pending_review
+router.post("/properties/:id/publish", authenticate, async (req, res): Promise<void> => {
+  const id = paramStr(req.params.id);
+
+  const [property] = await db
+    .select()
+    .from(propertiesTable)
+    .where(and(eq(propertiesTable.id, id), isNull(propertiesTable.deletedAt)));
+  if (!property) { res.status(404).json({ error: "Property not found" }); return; }
+  if (property.createdBy !== req.user!.userId && req.user!.role !== "admin") {
+    res.status(403).json({ error: "Forbidden" }); return;
+  }
+  if (property.status !== "draft") {
+    res.status(409).json({ error: "Property must be in draft state to publish" }); return;
+  }
+  if (!property.propertyType || !property.transactionMode) {
+    res.status(400).json({ error: "Property type and transaction mode are required before publishing" }); return;
+  }
+
+  const [updated] = await db
+    .update(propertiesTable)
+    .set({ status: "pending_review", updatedAt: new Date() })
+    .where(eq(propertiesTable.id, id))
+    .returning();
+
+  const images = await db
+    .select()
+    .from(propertyImagesTable)
+    .where(eq(propertyImagesTable.propertyId, id));
+
+  req.log.info({ propertyId: id }, "Property submitted for review");
+  res.json(GetPropertyResponse.parse(toApiProperty(updated, images)));
 });
 
 export default router;

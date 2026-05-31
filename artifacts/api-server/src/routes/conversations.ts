@@ -273,6 +273,22 @@ router.post(
 
     const data = (convo.extractedData ?? {}) as SellerData;
 
+    // Idempotent: if property was already created from this conversation, return it
+    if (convo.propertyId) {
+      const [existing] = await db
+        .select()
+        .from(propertiesTable)
+        .where(eq(propertiesTable.id, convo.propertyId));
+      if (existing) {
+        const existingImages = await db
+          .select()
+          .from(propertyImagesTable)
+          .where(eq(propertyImagesTable.propertyId, existing.id));
+        res.json(GetPropertyResponse.parse(toApiProperty(existing, existingImages)));
+        return;
+      }
+    }
+
     if (!data.category || !data.transactionMode) {
       res.status(400).json({ error: "Property type and transaction mode are required" });
       return;
@@ -285,7 +301,7 @@ router.post(
       listingDirection: "offering",
       propertyType: data.category,
       transactionMode: data.transactionMode as "sale" | "rent" | "lease",
-      status: "pending_review",
+      status: "draft",
       market: convo.market ?? "JO",
       priceCurrency: currency,
     };

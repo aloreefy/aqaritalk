@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useParams, useSearch, useLocation } from "wouter";
 import { useTranslation } from "react-i18next";
-import { ArrowRight, Send, Mic, MicOff, Map, ImagePlus, CheckCircle } from "lucide-react";
+import { ArrowRight, Send, Mic, MicOff, Map, ImagePlus, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   useGetConversation,
@@ -176,8 +176,8 @@ export default function ChatDetailPage() {
         throw new Error(err.error ?? "فشل نشر الإعلان");
       }
       const property = await res.json();
-      toast({ title: "تم نشر إعلانك بنجاح! 🎉", description: "سيتم مراجعته قريباً." });
-      navigate(`/property/${property.id}`);
+      toast({ title: "تم إنشاء مسودة الإعلان", description: "استكمل بقية التفاصيل ثم انشر." });
+      navigate(`/list/wizard/${property.id}/preview`);
     } catch (err: unknown) {
       toast({
         title: t("common.error"),
@@ -271,12 +271,12 @@ export default function ChatDetailPage() {
           {showSubmit && (
             <Button
               size="sm"
-              className="gap-1.5 text-xs h-9 bg-green-600 hover:bg-green-700"
+              className="gap-1.5 text-xs h-9 bg-primary"
               onClick={handleSubmitListing}
               disabled={submitting}
             >
-              <CheckCircle size={14} />
-              {submitting ? t("common.loading") : t("list.submitListing")}
+              <Eye size={14} />
+              {submitting ? t("common.loading") : t("wizard.startWizard")}
             </Button>
           )}
         </div>
