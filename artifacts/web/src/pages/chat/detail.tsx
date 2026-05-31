@@ -13,41 +13,23 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/auth";
 import type { ConversationMessage } from "@workspace/api-client-react";
 
-declare global {
-  interface Window {
-    SpeechRecognition?: new () => SpeechRecognition;
-    webkitSpeechRecognition?: new () => SpeechRecognition;
-  }
-}
-
-interface SpeechRecognition extends EventTarget {
+// Web Speech API types (not in lib.dom by default)
+type SR = {
   lang: string;
   continuous: boolean;
   interimResults: boolean;
   start(): void;
   stop(): void;
-  onresult: ((ev: SpeechRecognitionEvent) => void) | null;
-  onerror: ((ev: Event) => void) | null;
+  onresult: ((ev: any) => void) | null;
+  onerror: ((ev: any) => void) | null;
   onend: (() => void) | null;
-}
+};
 
-interface SpeechRecognitionEvent extends Event {
-  results: SpeechRecognitionResultList;
-}
-
-interface SpeechRecognitionResultList {
-  readonly length: number;
-  [index: number]: SpeechRecognitionResult;
-}
-
-interface SpeechRecognitionResult {
-  readonly length: number;
-  readonly isFinal: boolean;
-  [index: number]: SpeechRecognitionAlternative;
-}
-
-interface SpeechRecognitionAlternative {
-  readonly transcript: string;
+declare global {
+  interface Window {
+    SpeechRecognition?: new () => SR;
+    webkitSpeechRecognition?: new () => SR;
+  }
 }
 
 export default function ChatDetailPage() {
@@ -68,8 +50,9 @@ export default function ChatDetailPage() {
   const [input, setInput] = useState("");
   const [localMessages, setLocalMessages] = useState<ConversationMessage[]>([]);
   const [isListening, setIsListening] = useState(false);
+  const [speechError, setSpeechError] = useState<string | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
-  const recognitionRef = useRef<SpeechRecognition | null>(null);
+  const recognitionRef = useRef<SR | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const createConvo = useCreateConversation();
@@ -82,25 +65,20 @@ export default function ChatDetailPage() {
     },
   });
 
-  const hasSpeechSupport = !!(
-    typeof window !== "undefined" &&
-    (window.SpeechRecognition || window.webkitSpeechRecognition)
-  );
+  const SpeechRecognitionAPI =
+    typeof window !== "undefined"
+      ? window.SpeechRecognition ?? window.webkitSpeechRecognition
+      : undefined;
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      navigate("/auth");
-    }
+    if (!isAuthenticated) navigate("/auth");
   }, [isAuthenticated, navigate]);
 
   useEffect(() => {
     if (isNew && !convId) {
       createConvo
         .mutateAsync({
-          data: {
-            type: convoType,
-            market: user?.market ?? "JO",
-          },
+          data: { type: convoType, market: user?.market ?? "JO" },
         })
         .then((c) => {
           setConvId(c.id);
@@ -119,36 +97,32 @@ export default function ChatDetailPage() {
   }, []);
 
   const startListening = useCallback(() => {
-    const SR = window.SpeechRecognition ?? window.webkitSpeechRecognition;
-    if (!SR) return;
-
-    const recognition = new SR();
+    setSpeechError(null);
+    if (!SpeechRecognitionAPI) {
+      setSpeechError("المتصفح لا يدعم التعرف على الصوت");
+      return;
+    }
+    const recognition = new SpeechRecognitionAPI();
     recognition.lang = i18n.language === "ar" ? "ar-JO" : "en-US";
     recognition.continuous = false;
     recognition.interimResults = false;
-
-    recognition.onresult = (event) => {
-      const transcript = event.results[0]?.[0]?.transcript ?? "";
+    recognition.onresult = (event: any) => {
+      const transcript: string = event.results[0]?.[0]?.transcript ?? "";
       if (transcript) {
         setInput((prev) => (prev ? prev + " " + transcript : transcript));
-        setTimeout(() => textareaRef.current?.focus(), 100);
+        setTimeout(() => textareaRef.current?.focus(), 50);
       }
     };
-
     recognition.onerror = () => setIsListening(false);
     recognition.onend = () => setIsListening(false);
-
     recognitionRef.current = recognition;
     recognition.start();
     setIsListening(true);
-  }, [i18n.language]);
+  }, [SpeechRecognitionAPI, i18n.language]);
 
   const toggleListening = useCallback(() => {
-    if (isListening) {
-      stopListening();
-    } else {
-      startListening();
-    }
+    if (isListening) stopListening();
+    else startListening();
   }, [isListening, startListening, stopListening]);
 
   async function handleSend() {
@@ -170,7 +144,10 @@ export default function ChatDetailPage() {
         data: { content: text },
       });
       setLocalMessages([]);
-      queryClient.setQueryData(getGetConversationQueryKey(convId), res.conversation);
+      queryClient.setQueryData(
+        getGetConversationQueryKey(convId),
+        res.conversation,
+      );
     } catch {
       setLocalMessages((m) => m.slice(0, -1));
     }
@@ -192,7 +169,9 @@ export default function ChatDetailPage() {
         </button>
         <div className="flex-1">
           <p className="font-semibold text-sm text-gray-900">
-            {convoType === "buyer_search" ? t("chat.newSearch") : t("chat.newListing")}
+            {convoType === "buyer_search"
+              ? t("chat.newSearch")
+              : t("chat.newListing")}
           </p>
           {convo?.currentState && (
             <p className="text-xs text-gray-400">{convo.currentState}</p>
@@ -219,22 +198,39 @@ export default function ChatDetailPage() {
         <div ref={bottomRef} />
       </div>
 
-      {/* Input */}
+      {/* Speech error */}
+      {speechError && (
+        <div className="mx-3 mb-1 text-xs text-red-500 text-center">
+          {speechError}
+        </div>
+      )}
+
+      {/* Input row */}
       <div className="bg-white border-t border-gray-100 px-3 py-3 flex items-end gap-2">
-        {hasSpeechSupport && (
-          <Button
-            size="icon"
-            variant={isListening ? "default" : "outline"}
-            className={`h-10 w-10 shrink-0 transition-colors ${
-              isListening ? "bg-red-500 hover:bg-red-600 border-red-500 animate-pulse" : ""
-            }`}
-            onClick={toggleListening}
-            type="button"
-            title={isListening ? t("chat.stopListening") : t("chat.startListening")}
-          >
-            {isListening ? <MicOff size={16} /> : <Mic size={16} />}
-          </Button>
-        )}
+        {/* Mic button — always shown; disabled with tooltip if unsupported */}
+        <Button
+          size="icon"
+          variant={isListening ? "default" : "outline"}
+          className={`h-10 w-10 shrink-0 transition-colors ${
+            isListening
+              ? "bg-red-500 hover:bg-red-600 border-red-500 text-white"
+              : !SpeechRecognitionAPI
+                ? "opacity-40 cursor-not-allowed"
+                : ""
+          }`}
+          onClick={toggleListening}
+          type="button"
+          title={
+            !SpeechRecognitionAPI
+              ? "الصوت غير مدعوم في هذا المتصفح"
+              : isListening
+                ? "إيقاف الاستماع"
+                : "تحدث الآن"
+          }
+        >
+          {isListening ? <MicOff size={16} /> : <Mic size={16} />}
+        </Button>
+
         <textarea
           ref={textareaRef}
           value={input}
@@ -245,11 +241,14 @@ export default function ChatDetailPage() {
               handleSend();
             }
           }}
-          placeholder={isListening ? "🎙 " + (t("chat.listening") ?? "جاري الاستماع...") : t("chat.placeholder")}
+          placeholder={
+            isListening ? "🎙 جاري الاستماع..." : t("chat.placeholder")
+          }
           className="flex-1 resize-none border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-primary max-h-32 bg-gray-50"
           rows={1}
           dir="auto"
         />
+
         <Button
           size="icon"
           className="h-10 w-10 shrink-0"

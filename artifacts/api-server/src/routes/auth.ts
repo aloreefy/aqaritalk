@@ -23,8 +23,9 @@ router.post("/auth/otp/request", async (req, res): Promise<void> => {
     return;
   }
 
+  let devCode: string | undefined;
   try {
-    await requestOtp(parsed.data.phone);
+    devCode = await requestOtp(parsed.data.phone);
   } catch (err: unknown) {
     if (err instanceof Error && err.message === "RATE_LIMITED") {
       res.status(429).json({ error: "Too many OTP requests. Try again in 15 minutes." });
@@ -33,7 +34,11 @@ router.post("/auth/otp/request", async (req, res): Promise<void> => {
     throw err;
   }
 
-  res.json(RequestOtpResponse.parse({ message: "OTP sent" }));
+  const isDev = process.env.NODE_ENV !== "production";
+  res.json(RequestOtpResponse.parse({
+    message: "OTP sent",
+    ...(isDev && devCode ? { devCode } : {}),
+  }));
 });
 
 router.post("/auth/otp/verify", async (req, res): Promise<void> => {

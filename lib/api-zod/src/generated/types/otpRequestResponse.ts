@@ -8,4 +8,6 @@
 
 export interface OtpRequestResponse {
   message: string;
+  /** Only present in development mode. The OTP code for testing. */
+  devCode?: string;
 }

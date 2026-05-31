@@ -20,9 +20,9 @@ export default function AuthPage() {
 
   const [step, setStep] = useState<Step>("phone");
   const [phone, setPhone] = useState("");
-  const [code, setCode] = useState("");
   const [role, setRole] = useState<"buyer" | "seller" | "broker">("buyer");
   const [name, setName] = useState("");
+  const [devCode, setDevCode] = useState<string | null>(null);
 
   const requestOtp = useRequestOtp();
   const verifyOtp = useVerifyOtp();
@@ -30,8 +30,10 @@ export default function AuthPage() {
 
   async function handlePhoneSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setDevCode(null);
     try {
-      await requestOtp.mutateAsync({ data: { phone } });
+      const res = await requestOtp.mutateAsync({ data: { phone } });
+      if (res.devCode) setDevCode(res.devCode);
       setStep("otp");
     } catch {
       toast({ title: t("common.error"), variant: "destructive" });
@@ -72,9 +74,7 @@ export default function AuthPage() {
       {/* Header */}
       <div className="bg-primary px-6 pt-16 pb-10 text-white">
         <h1 className="text-3xl font-bold">{t("app.name")}</h1>
-        <p className="text-primary-foreground/80 mt-1 text-sm">
-          {t("app.tagline")}
-        </p>
+        <p className="mt-1 text-sm opacity-80">{t("app.tagline")}</p>
       </div>
 
       <div className="flex-1 px-6 py-8">
@@ -115,6 +115,20 @@ export default function AuthPage() {
                 {t("auth.otpSubtitle", { phone })}
               </p>
             </div>
+
+            {/* Dev-mode OTP hint — only shown in development */}
+            {devCode && (
+              <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 flex items-center gap-3">
+                <span className="text-amber-600 text-lg">🔑</span>
+                <div>
+                  <p className="text-xs text-amber-700 font-medium">رمز التطوير</p>
+                  <p className="text-2xl font-mono font-bold tracking-widest text-amber-900">
+                    {devCode}
+                  </p>
+                </div>
+              </div>
+            )}
+
             <OtpInput
               length={6}
               onComplete={handleOtpSubmit}

@@ -747,6 +747,9 @@ components:
       properties:
         message:
           type: string
+        devCode:
+          type: string
+          description: "Only present in development mode. The OTP code for testing."
 
     OtpVerify:
       type: object

@@ -29,7 +29,8 @@ export const RequestOtpBody = zod.object({
 })
 
 export const RequestOtpResponse = zod.object({
-  "message": zod.string()
+  "message": zod.string(),
+  "devCode": zod.string().optional().describe('Only present in development mode. The OTP code for testing.')
 })
 
 

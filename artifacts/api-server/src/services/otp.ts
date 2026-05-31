@@ -8,7 +8,7 @@ const RATE_WINDOW_MS = 15 * 60 * 1000;
 const RATE_LIMIT_MAX = 3;
 const MAX_ATTEMPTS = 5;
 
-export async function requestOtp(phone: string): Promise<void> {
+export async function requestOtp(phone: string): Promise<string> {
   const windowStart = new Date(Date.now() - RATE_WINDOW_MS);
   const [{ value: recentCount }] = await db
     .select({ value: count() })
@@ -41,6 +41,8 @@ export async function requestOtp(phone: string): Promise<void> {
   } else {
     logger.info({ phone }, "OTP requested — send via provider");
   }
+
+  return code;
 }
 
 export async function verifyOtp(
