@@ -10,20 +10,26 @@ import {
   ListConversationsResponse,
 } from "@workspace/api-zod";
 import { authenticate } from "../middleware/authenticate";
+import { getChatModel } from "../services/ai/client";
+import { isOffTopic, OFF_TOPIC_RESPONSE_AR } from "../services/ai/guardrails";
+import { buildSystemPrompt } from "../services/ai/context-builder";
+import { extractBuyerCriteria, extractSellerData } from "../services/ai/extraction";
+import {
+  advanceBuyerState,
+  advanceSellerState,
+  type BuyerState,
+  type SellerState,
+  type BuyerCriteria,
+  type SellerData,
+} from "../services/ai/state-machine";
 
 const router: IRouter = Router();
 
 type Message = { role: "user" | "assistant"; content: string; timestamp: string };
 
-const GREETING: Record<string, Record<string, string>> = {
-  buyer_search: {
-    ar: "مرحباً! أنا مساعدك العقاري. أخبرني، ما نوع العقار الذي تبحث عنه؟ 🏠",
-    en: "Hello! I'm your real estate assistant. What type of property are you looking for? 🏠",
-  },
-  seller_listing: {
-    ar: "مرحباً! سأساعدك في تسجيل عقارك. ما نوع العقار الذي تريد إدراجه؟ 🔑",
-    en: "Hello! I'll help you list your property. What type of property would you like to list? 🔑",
-  },
+const GREETING: Record<string, string> = {
+  buyer_search: "مرحباً! أنا مساعدك العقاري في AqariTalk. أخبرني، ما نوع العقار الذي تبحث عنه؟ 🏠",
+  seller_listing: "مرحباً! سأساعدك في تسجيل عقارك بأفضل طريقة ممكنة. ما نوع العقار الذي تريد إدراجه؟ 🔑",
 };
 
 function paramStr(p: string | string[]): string {
@@ -47,12 +53,11 @@ router.post("/conversations", authenticate, async (req, res): Promise<void> => {
     return;
   }
 
-  const { type, propertyId } = parsed.data;
+  const { type, propertyId, market } = parsed.data;
 
-  const greeting = GREETING[type]?.ar ?? "مرحباً!";
   const greetingMsg: Message = {
     role: "assistant",
-    content: greeting,
+    content: GREETING[type] ?? "مرحباً!",
     timestamp: new Date().toISOString(),
   };
 
@@ -64,8 +69,9 @@ router.post("/conversations", authenticate, async (req, res): Promise<void> => {
       type,
       messages: [greetingMsg],
       extractedData: {},
-      currentState: "greeting",
+      currentState: "type_collection",
       status: "active",
+      market: market ?? "JO",
     })
     .returning();
 
@@ -133,26 +139,88 @@ router.post(
       return;
     }
 
+    const userText = body.data.content;
+
+    // --- Guardrail ---
+    if (isOffTopic(userText)) {
+      const offTopicMsg: Message = {
+        role: "assistant",
+        content: OFF_TOPIC_RESPONSE_AR,
+        timestamp: new Date().toISOString(),
+      };
+      const existingMsgs = (convo.messages as Message[]) ?? [];
+      const userMsg: Message = { role: "user", content: userText, timestamp: new Date().toISOString() };
+      const updatedMessages = [...existingMsgs, userMsg, offTopicMsg];
+      const [updated] = await db
+        .update(conversationsTable)
+        .set({ messages: updatedMessages, updatedAt: new Date() })
+        .where(eq(conversationsTable.id, convo.id))
+        .returning();
+      res.json({ message: offTopicMsg, conversation: GetConversationResponse.parse(updated) });
+      return;
+    }
+
+    // --- Extract & advance state ---
+    const existingData = (convo.extractedData ?? {}) as BuyerCriteria | SellerData;
+    const currentState = convo.currentState as BuyerState | SellerState;
+    const market = convo.market ?? "JO";
+
+    let newData: BuyerCriteria | SellerData;
+    let newState: BuyerState | SellerState;
+
+    if (convo.type === "buyer_search") {
+      newData = extractBuyerCriteria(userText, existingData as BuyerCriteria);
+      newState = advanceBuyerState(currentState as BuyerState, newData as BuyerCriteria);
+    } else {
+      newData = extractSellerData(userText, existingData as SellerData);
+      newState = advanceSellerState(currentState as SellerState, newData as SellerData);
+    }
+
+    // --- Build Gemini history ---
+    const existingMessages = (convo.messages as Message[]) ?? [];
+    const systemPrompt = buildSystemPrompt(convo.type, newState, newData, market);
+
     const userMsg: Message = {
       role: "user",
-      content: body.data.content,
+      content: userText,
       timestamp: new Date().toISOString(),
     };
+
+    // --- Call Gemini ---
+    let aiText = "";
+    try {
+      const model = getChatModel();
+      const history = existingMessages.map((m) => ({
+        role: m.role === "assistant" ? ("model" as const) : ("user" as const),
+        parts: [{ text: m.content }],
+      }));
+
+      const chat = model.startChat({
+        history,
+        systemInstruction: systemPrompt,
+      });
+
+      const result = await chat.sendMessage(userText);
+      aiText = result.response.text().trim();
+    } catch (err) {
+      req.log.error({ err }, "Gemini call failed");
+      aiText = "عذراً، حدث خطأ تقني. يرجى المحاولة مرة أخرى.";
+    }
 
     const aiMsg: Message = {
       role: "assistant",
-      content:
-        "شكراً على ردك. سأعالج طلبك قريباً. (AI integration coming in next phase)",
+      content: aiText,
       timestamp: new Date().toISOString(),
     };
 
-    const existingMessages = (convo.messages as Message[]) ?? [];
     const updatedMessages = [...existingMessages, userMsg, aiMsg];
 
     const [updated] = await db
       .update(conversationsTable)
       .set({
         messages: updatedMessages,
+        extractedData: newData,
+        currentState: newState,
         updatedAt: new Date(),
       })
       .where(eq(conversationsTable.id, convo.id))

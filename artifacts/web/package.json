@@ -44,6 +44,7 @@
     "@tailwindcss/typography": "^0.5.15",
     "@tailwindcss/vite": "catalog:",
     "@tanstack/react-query": "catalog:",
+    "@types/mapbox-gl": "^3.5.0",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
@@ -76,6 +77,8 @@
   },
   "dependencies": {
     "i18next": "^26.3.0",
-    "react-i18next": "^17.0.8"
+    "mapbox-gl": "^3.24.0",
+    "react-i18next": "^17.0.8",
+    "react-map-gl": "^8.1.1"
   }
 }
