@@ -1,0 +1,21 @@
+FROM node:24-alpine AS base
+
+RUN corepack enable && corepack prepare pnpm@latest --activate
+
+WORKDIR /app
+
+COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
+COPY tsconfig.base.json tsconfig.json ./
+
+COPY lib/ ./lib/
+COPY artifacts/api-server/ ./artifacts/api-server/
+
+RUN pnpm install --frozen-lockfile
+
+WORKDIR /app/artifacts/api-server
+
+ENV NODE_ENV=development
+
+EXPOSE 8080
+
+CMD ["pnpm", "run", "dev"]

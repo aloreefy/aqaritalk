@@ -99,6 +99,16 @@ export default defineConfig({
     fs: {
       strict: true,
     },
+    // In Docker (no REPL_ID), proxy /api to the API container so relative
+    // fetch calls work without the Replit shared reverse proxy.
+    ...(!process.env.REPL_ID && {
+      proxy: {
+        "/api": {
+          target: process.env.API_URL ?? "http://api:8080",
+          changeOrigin: true,
+        },
+      },
+    }),
   },
   preview: {
     port,
