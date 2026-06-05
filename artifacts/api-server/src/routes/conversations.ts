@@ -170,20 +170,29 @@ router.post(
     };
 
     // --- Call the Python broker-agent sidecar ---
+    // 60s timeout: generous for local Gemma inference, but bounds the worst
+    // case so a stalled sidecar can't hang the request indefinitely.
     let aiText = "";
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 60_000);
     try {
       const resp = await fetch(`${AGENT_URL}/chat`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: userText, history }),
+        signal: controller.signal,
       });
       if (!resp.ok) throw new Error(`agent sidecar HTTP ${resp.status}`);
+      // Cast is safe: a body without `reply` falls through to the "" fallback;
+      // a non-object body throws here and is handled by the catch below.
       const data = (await resp.json()) as { reply?: string };
       aiText = (data.reply ?? "").trim();
       if (!aiText) aiText = "أعد المحاولة من فضلك.";
     } catch (err) {
       req.log.error({ err }, "Agent sidecar call failed");
       aiText = "عذراً، حدث خطأ تقني. يرجى المحاولة مرة أخرى.";
+    } finally {
+      clearTimeout(timer);
     }
 
     const aiMsg: Message = {
