@@ -11,9 +11,11 @@ Run (on the Windows host, where the GGUF lives):
 
 from __future__ import annotations
 
+import logging
 import os
+from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from llama_cpp import Llama
 
@@ -23,11 +25,23 @@ MODEL_PATH = os.environ.get("MODEL_PATH", agent_mod.MODEL_PATH)
 HOST = os.environ.get("AGENT_HOST", "0.0.0.0")
 PORT = int(os.environ.get("AGENT_PORT", "8000"))
 
-app = FastAPI(title="AqariTalk broker agent")
+# Loaded once at startup, reused for every request. Held at module level so the
+# request handlers can reach it; populated by the lifespan handler below (not at
+# import time, so importing this module doesn't require the GGUF to be present).
+_llm: Llama | None = None
 
-# Loaded once at import/startup; reused for every request.
-_llm = Llama(model_path=MODEL_PATH, n_ctx=4096,
-             n_threads=os.cpu_count(), verbose=False)
+logger = logging.getLogger(__name__)
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    global _llm
+    _llm = Llama(model_path=MODEL_PATH, n_ctx=4096,
+                 n_threads=os.cpu_count(), verbose=False)
+    yield
+
+
+app = FastAPI(title="AqariTalk broker agent", lifespan=lifespan)
 
 
 class Turn(BaseModel):
@@ -52,7 +66,11 @@ def health():
 @app.post("/chat", response_model=ChatResponse)
 def chat(req: ChatRequest):
     history = [{"role": t.role, "content": t.content} for t in req.history]
-    reply = agent_mod.run(req.message, model=_llm, history=history, verbose=False)
+    try:
+        reply = agent_mod.run(req.message, model=_llm, history=history, verbose=False)
+    except Exception as exc:  # noqa: BLE001 — surface as 500, Node renders the user fallback
+        logger.exception("agent.run failed")
+        raise HTTPException(status_code=500, detail="agent error") from exc
     return ChatResponse(reply=reply)
 
 
