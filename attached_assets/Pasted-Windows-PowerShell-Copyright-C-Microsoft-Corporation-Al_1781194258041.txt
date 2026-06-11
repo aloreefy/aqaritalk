@@ -1,0 +1,2999 @@
+Windows PowerShell
+Copyright (C) Microsoft Corporation. All rights reserved.
+
+Try the new cross-platform PowerShell https://aka.ms/pscore6
+
+PS C:\Users\USER> cmake --version
+cmake version 4.3.3
+
+CMake suite maintained and supported by Kitware (kitware.com/cmake).
+PS C:\Users\USER> cd C:\Users\USER\llama.cpp
+>>
+>> cmake -B build
+>>
+>> cmake --build build --config Release
+-- Building for: Visual Studio 17 2022
+-- Selecting Windows SDK version 10.0.26100.0 to target Windows 10.0.19045.
+-- The C compiler identification is MSVC 19.44.35222.0
+-- The CXX compiler identification is MSVC 19.44.35222.0
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/cl.exe - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/cl.exe - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+CMAKE_BUILD_TYPE=
+-- Found Git: C:/Program Files/Git/cmd/git.exe (found version "2.54.0.windows.1")
+-- The ASM compiler identification is MSVC
+CMake Warning (dev) at C:/Program Files/CMake/share/cmake-4.3/Modules/CMakeDetermineASMCompiler.cmake:234 (message):
+  Policy CMP194 is not set: MSVC is not an assembler for language ASM.  Run
+  "cmake --help-policy CMP194" for policy details.  Use the cmake_policy
+  command to set the policy and suppress this warning.
+Call Stack (most recent call first):
+  ggml/CMakeLists.txt:3 (project)
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+-- Found assembler: C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/cl.exe
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Failed
+-- Looking for pthread_create in pthreads
+-- Looking for pthread_create in pthreads - not found
+-- Looking for pthread_create in pthread
+-- Looking for pthread_create in pthread - not found
+-- Found Threads: TRUE
+-- Warning: ccache not found - consider installing it for faster compilation or disable this warning with GGML_CCACHE=OFF
+-- CMAKE_SYSTEM_PROCESSOR: AMD64
+-- CMAKE_GENERATOR_PLATFORM:
+-- GGML_SYSTEM_ARCH: x86
+-- Found OpenMP_C: -openmp (found version "2.0")
+-- Found OpenMP_CXX: -openmp (found version "2.0")
+-- Found OpenMP: TRUE (found version "2.0")
+-- Including CPU backend
+-- x86 detected
+-- Performing Test HAS_AVX_1
+-- Performing Test HAS_AVX_1 - Success
+-- Performing Test HAS_AVX2_1
+-- Performing Test HAS_AVX2_1 - Success
+-- Performing Test HAS_FMA_1
+-- Performing Test HAS_FMA_1 - Success
+-- Performing Test HAS_AVX512_1
+-- Performing Test HAS_AVX512_1 - Success
+-- Adding CPU backend variant ggml-cpu: /arch:AVX512 GGML_AVX512
+-- ggml version: 0.14.0
+-- ggml commit:  fdc3db9b6
+-- Could NOT find OpenSSL, try to set the path to OpenSSL root folder in the system variable OPENSSL_ROOT_DIR (missing: OPENSSL_CRYPTO_LIBRARY OPENSSL_INCLUDE_DIR)
+CMake Warning at vendor/cpp-httplib/CMakeLists.txt:152 (message):
+  OpenSSL not found, HTTPS support disabled
+
+
+-- Generating embedded license file for target: llama-app
+-- Configuring done (16.2s)
+-- Generating done (1.5s)
+-- Build files have been written to: C:/Users/USER/llama.cpp/build
+MSBuild version 17.14.23+b0019275e for .NET Framework
+
+  1>Checking Build System
+  Building Custom Rule C:/Users/USER/llama.cpp/tools/ui/CMakeLists.txt
+  embed.cpp
+  llama-ui-embed.vcxproj -> C:\Users\USER\llama.cpp\build\tools\ui\Release\llama-ui-embed.exe
+  1>Provisioning UI assets
+  -- UI: running npm install
+
+  added 738 packages, and audited 739 packages in 15s
+
+  249 packages are looking for funding
+    run `npm fund` for details
+
+  1 moderate severity vulnerability
+
+  To address all issues, run:
+    npm audit fix
+
+  Run `npm audit` for details.
+  -- UI: running npm run build, output -> C:/Users/USER/llama.cpp/build/tools/ui/dist
+
+  > llama-ui@1.0.0 build
+  > vite build
+
+  vite v7.3.2 building ssr environment for production...
+  transforming...
+  ╪╕┬ث├┤ 4839 modules transformed.
+  rendering chunks...
+  vite v7.3.2 building client environment for production...
+  transforming...
+  ╪╕┬ث├┤ 8012 modules transformed.
+  rendering chunks...
+  computing gzip size...
+  .svelte-kit/output/client/_app/version.json                              0.02 kB
+22m ╪╕┬ج├ر gzip:     0.04 kB
+  .svelte-kit/output/client/.vite/manifest.json                            0.30 kB
+22m ╪╕┬ج├ر gzip:     0.19 kB
+  .svelte-kit/output/client/_app/immutable/assets/bundle.Cu1iJ-NX.css    517.01 kB
+22m ╪╕┬ج├ر gzip:   289.94 kB
+  .svelte-kit/output/client/_app/immutable/bundle.CMay4902.js          8,225.46 kB
+ ╪╕┬ج├ر gzip: 2,386.36 kB
+  ╪╕┬ث├┤ built in 38.98s
+  .svelte-kit/output/server/.vite/manifest.json                                      11.63 k
+  B
+  .svelte-kit/output/server/_app/immutable/assets/_page.CV-KWLNP.css                  0.29 k
+  B
+  .svelte-kit/output/server/_app/immutable/assets/DialogConfirmation.bHHIbcsu.css     0.35 k
+  B
+  .svelte-kit/output/server/_app/immutable/assets/_layout.ClyNc778.css              132.29 k
+  B
+  .svelte-kit/output/server/_app/immutable/assets/sidebar-menu-button.Cm1ru3aZ.css  383.72 k
+  B
+  .svelte-kit/output/server/chunks/environment.js                                     0.07 k
+  B
+  .svelte-kit/output/server/chunks/api-key-validation.js                              0.19 k
+  B
+  .svelte-kit/output/server/chunks/server.js                                          0.20 k
+  B
+  .svelte-kit/output/server/entries/pages/(chat)/_page.ts.js                          0.29 k
+  B
+  .svelte-kit/output/server/entries/pages/(chat)/chat/_id_/_page.ts.js                0.31 k
+  B
+  .svelte-kit/output/server/chunks/arrow-right.js                                     0.31 k
+  B
+  .svelte-kit/output/server/internal.js                                               0.37 k
+  B
+  .svelte-kit/output/server/chunks/refresh-cw.js                                      0.44 k
+  B
+  .svelte-kit/output/server/chunks/utils.js                                           0.60 k
+  B
+  .svelte-kit/output/server/entries/pages/settings/_layout.svelte.js                  0.85 k
+  B
+  .svelte-kit/output/server/chunks/ui.js                                              0.86 k
+  B
+  .svelte-kit/output/server/entries/pages/(chat)/_page.svelte.js                      1.06 k
+  B
+  .svelte-kit/output/server/chunks/settings.js                                        1.12 k
+  B
+  .svelte-kit/output/server/chunks/trash-2.js                                         1.16 k
+  B
+  .svelte-kit/output/server/entries/pages/(chat)/chat/_id_/_page.svelte.js            1.21 k
+  B
+  .svelte-kit/output/server/chunks/exports.js                                         1.46 k
+  B
+  .svelte-kit/output/server/chunks/url.js                                             1.60 k
+  B
+  .svelte-kit/output/server/chunks/input.js                                           1.62 k
+  B
+  .svelte-kit/output/server/chunks/label.js                                           1.78 k
+  B
+  .svelte-kit/output/server/chunks/render-context.js                                  1.81 k
+  B
+  .svelte-kit/output/server/chunks/internal.js                                        2.60 k
+  B
+  .svelte-kit/output/server/chunks/DialogModelNotAvailable.js                         2.70 k
+  B
+  .svelte-kit/output/server/chunks/index2.js                                          3.41 k
+  B
+  .svelte-kit/output/server/chunks/dialog-footer.js                                   5.64 k
+  B
+  .svelte-kit/output/server/entries/pages/_error.svelte.js                            8.50 k
+  B
+  .svelte-kit/output/server/entries/pages/mcp-servers/_page.svelte.js                 9.30 k
+  B
+  .svelte-kit/output/server/chunks/McpServerIdentity.js                              10.55 k
+  B
+  .svelte-kit/output/server/remote-entry.js                                          14.02 k
+  B
+  .svelte-kit/output/server/chunks/shared.js                                         15.12 k
+  B
+  .svelte-kit/output/server/chunks/popper-layer-force-mount.js                       15.40 k
+  B
+  .svelte-kit/output/server/chunks/conversations.svelte.js                           17.26 k
+  B
+  .svelte-kit/output/server/chunks/index.js                                          20.65 k
+  B
+  .svelte-kit/output/server/chunks/ActionIcon.js                                     22.79 k
+  B
+  .svelte-kit/output/server/chunks/DialogConfirmation.js                             34.81 k
+  B
+  .svelte-kit/output/server/entries/pages/_layout.svelte.js                          39.93 k
+  B
+  .svelte-kit/output/server/chunks/root.js                                           40.11 k
+  B
+  .svelte-kit/output/server/chunks/url2.js                                           51.63 k
+  B
+  .svelte-kit/output/server/index.js                                                 57.10 k
+  B
+  .svelte-kit/output/server/chunks/chat.svelte.js                                    60.20 k
+  B
+  .svelte-kit/output/server/entries/pages/settings/__section__/_page.svelte.js       67.85 k
+  B
+  .svelte-kit/output/server/chunks/sidebar-menu-button.js                           138.75 k
+  B
+  .svelte-kit/output/server/entries/pages/(chat)/_layout.svelte.js                  261.46 k
+  B
+  ╪╕┬ث├┤ built in 1m 1s
+
+  Run npm run preview to preview your production build locally.
+
+  > Using @sveltejs/adapter-static
+  Overwriting C:\Users\USER\llama.cpp\build\tools\ui\dist\index.html with fallback page. Consider using a different nam
+  e for the fallback.
+    Wrote site to "C:/Users/USER/llama.cpp/build/tools/ui/dist"
+    ╪╕┬ث┬ج done
+  ╪╕┬ث├┤ Inlined favicon.svg as base64 data URL
+  ╪╕┬ث├┤ Updated index.html
+  ╪╕┬ث├┤ Copied bundle.CMay4902.js -> bundle.js
+  ╪╕┬ث├┤ Copied bundle.Cu1iJ-NX.css -> bundle.css
+  ╪╕┬ث├┤ Removed _app directory
+  ╪╕┬ث├┤ Removed favicon.svg
+  -- UI: npm build succeeded
+  Building Custom Rule C:/Users/USER/llama.cpp/tools/ui/CMakeLists.txt
+  Building Custom Rule C:/Users/USER/llama.cpp/examples/gguf-hash/CMakeLists.txt
+  sha1.c
+  sha1.vcxproj -> C:\Users\USER\llama.cpp\build\examples\gguf-hash\sha1.dir\Release\sha1.lib
+  Building Custom Rule C:/Users/USER/llama.cpp/examples/gguf-hash/CMakeLists.txt
+  sha256.c
+  sha256.vcxproj -> C:\Users\USER\llama.cpp\build\examples\gguf-hash\sha256.dir\Release\sha256.lib
+  Building Custom Rule C:/Users/USER/llama.cpp/examples/gguf-hash/CMakeLists.txt
+  xxhash.c
+  xxhash.vcxproj -> C:\Users\USER\llama.cpp\build\examples\gguf-hash\xxhash.dir\Release\xxhash.lib
+  Building Custom Rule C:/Users/USER/llama.cpp/vendor/cpp-httplib/CMakeLists.txt
+cl : command line  warning D9025: overriding '/W1' with '/w' [C:\Users\USER\llama.cpp\build\vendor\cpp-httplib\cpp-http
+lib.vcxproj]
+  httplib.cpp
+  cpp-httplib.vcxproj -> C:\Users\USER\llama.cpp\build\vendor\cpp-httplib\Release\cpp-httplib.lib
+  Building Custom Rule C:/Users/USER/llama.cpp/ggml/src/CMakeLists.txt
+  ggml.c
+  ggml-backend.cpp
+  ggml-quants.c
+  ggml.cpp
+  ggml-alloc.c
+  ggml-opt.cpp
+  ggml-backend-meta.cpp
+  ggml-threading.cpp
+  gguf.cpp
+     Creating library C:/Users/USER/llama.cpp/build/ggml/src/Release/ggml-base.lib and object C:/Users/USER/llama.cpp/b
+  uild/ggml/src/Release/ggml-base.exp
+  ggml-base.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\ggml-base.dll
+  Building Custom Rule C:/Users/USER/llama.cpp/ggml/src/CMakeLists.txt
+  quants.c
+  traits.cpp
+  ggml-cpu.cpp
+  ggml-cpu.c
+  mmq.cpp
+  hbm.cpp
+  amx.cpp
+  repack.cpp
+  binary-ops.cpp
+  unary-ops.cpp
+  vec.cpp
+  ops.cpp
+  sgemm.cpp
+  quants.c
+  repack.cpp
+     Creating library C:/Users/USER/llama.cpp/build/ggml/src/Release/ggml-cpu.lib and object C:/Users/USER/llama.cpp/bu
+  ild/ggml/src/Release/ggml-cpu.exp
+  ggml-cpu.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\ggml-cpu.dll
+  Building Custom Rule C:/Users/USER/llama.cpp/ggml/src/CMakeLists.txt
+  ggml-backend-reg.cpp
+  ggml-backend-dl.cpp
+     Creating library C:/Users/USER/llama.cpp/build/ggml/src/Release/ggml.lib and object C:/Users/USER/llama.cpp/build/
+  ggml/src/Release/ggml.exp
+  ggml.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\ggml.dll
+  Building Custom Rule C:/Users/USER/llama.cpp/src/CMakeLists.txt
+  llama-batch.cpp
+  llama-arch.cpp
+  llama-adapter.cpp
+  llama-grammar.cpp
+  llama-chat.cpp
+  llama-cparams.cpp
+  llama-context.cpp
+  llama.cpp
+  llama-hparams.cpp
+  llama-graph.cpp
+  llama-impl.cpp
+  llama-io.cpp
+  llama-kv-cache-dsa.cpp
+  llama-kv-cache-iswa.cpp
+  llama-kv-cache.cpp
+  llama-memory-hybrid.cpp
+  llama-memory.cpp
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\memory(3630,56): warni
+ng C4244: 'argument': conversion from 'const int64_t' to 'uint32_t', possible loss of data [C:\Users\USER\llama.cpp\bui
+ld\src\llama.vcxproj]
+  (compiling source file '../../src/llama-graph.cpp')
+      C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\memory(3630,56):
+      the template instantiation context (the oldest one first) is
+          C:\Users\USER\llama.cpp\src\llama-graph.cpp(1933,21):
+          see reference to function template instantiation 'std::unique_ptr<llm_graph_input_out_ids,std::default_delete
+  <llm_graph_input_out_ids>> std::make_unique<llm_graph_input_out_ids,const llama_hparams&,const llama_cparams&,const i
+  nt64_t&,0>(const llama_hparams &,const llama_cparams &,const int64_t &)' being compiled
+
+  llama-memory-hybrid-iswa.cpp
+  llama-memory-recurrent.cpp
+  llama-mmap.cpp
+  llama-model-loader.cpp
+  llama-model-saver.cpp
+  unicode-data.cpp
+  llama-quant.cpp
+  unicode.cpp
+  llama-sampler.cpp
+  llama-vocab.cpp
+  llama-model.cpp
+  afmoe.cpp
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\utility(274,54): warni
+ng C4244: 'initializing': conversion from '_Ty' to '_Ty2', possible loss of data [C:\Users\USER\llama.cpp\build\src\lla
+ma.vcxproj]
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\utility(274,54): warni
+ng C4244:         with [C:\Users\USER\llama.cpp\build\src\llama.vcxproj]
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\utility(274,54): warni
+ng C4244:         [ [C:\Users\USER\llama.cpp\build\src\llama.vcxproj]
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\utility(274,54): warni
+ng C4244:             _Ty=int64_t [C:\Users\USER\llama.cpp\build\src\llama.vcxproj]
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\utility(274,54): warni
+ng C4244:         ] [C:\Users\USER\llama.cpp\build\src\llama.vcxproj]
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\utility(274,54): warni
+ng C4244:         and [C:\Users\USER\llama.cpp\build\src\llama.vcxproj]
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\utility(274,54): warni
+ng C4244:         [ [C:\Users\USER\llama.cpp\build\src\llama.vcxproj]
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\utility(274,54): warni
+ng C4244:             _Ty2=uint32_t [C:\Users\USER\llama.cpp\build\src\llama.vcxproj]
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\utility(274,54): warni
+ng C4244:         ] [C:\Users\USER\llama.cpp\build\src\llama.vcxproj]
+  (compiling source file '../../src/llama-model.cpp')
+      C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\utility(274,54):
+      the template instantiation context (the oldest one first) is
+          C:\Users\USER\llama.cpp\src\llama-model.cpp(516,29):
+          see reference to function template instantiation 'std::pair<int64_t,uint32_t>::pair<const int64_t&,int64_t,0>
+  (_Other1,_Other2 &&) noexcept' being compiled
+          with
+          [
+              _Other1=const int64_t &,
+              _Other2=int64_t
+          ]
+              C:\Users\USER\llama.cpp\src\llama-model.cpp(516,21):
+              see the first reference to 'std::pair<int64_t,uint32_t>::pair' in 'llama_meta_device_get_split_state::<la
+  mbda_79cbacf86155111d34c359d7fe3d4983>::operator ()'
+
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\utility(274,54): warni
+ng C4244: 'initializing': conversion from 'const int64_t' to '_Ty2', possible loss of data [C:\Users\USER\llama.cpp\bui
+ld\src\llama.vcxproj]
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\utility(274,54): warni
+ng C4244:         with [C:\Users\USER\llama.cpp\build\src\llama.vcxproj]
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\utility(274,54): warni
+ng C4244:         [ [C:\Users\USER\llama.cpp\build\src\llama.vcxproj]
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\utility(274,54): warni
+ng C4244:             _Ty2=uint32_t [C:\Users\USER\llama.cpp\build\src\llama.vcxproj]
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\utility(274,54): warni
+ng C4244:         ] [C:\Users\USER\llama.cpp\build\src\llama.vcxproj]
+  (compiling source file '../../src/llama-model.cpp')
+      C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\utility(274,54):
+      the template instantiation context (the oldest one first) is
+          C:\Users\USER\llama.cpp\src\llama-model.cpp(519,29):
+          see reference to function template instantiation 'std::pair<int64_t,uint32_t>::pair<const int64_t&,const int6
+  4_t&,0>(_Other1,_Other2) noexcept' being compiled
+          with
+          [
+              _Other1=const int64_t &,
+              _Other2=const int64_t &
+          ]
+              C:\Users\USER\llama.cpp\src\llama-model.cpp(519,21):
+              see the first reference to 'std::pair<int64_t,uint32_t>::pair' in 'llama_meta_device_get_split_state::<la
+  mbda_79cbacf86155111d34c359d7fe3d4983>::operator ()'
+
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\type_traits(1680,98):
+warning C4244: 'argument': conversion from 'unsigned __int64' to 'int', possible loss of data [C:\Users\USER\llama.cpp\
+build\src\llama.vcxproj]
+  (compiling source file '../../src/llama-quant.cpp')
+      C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\type_traits(1680
+  ,98):
+      the template instantiation context (the oldest one first) is
+          C:\Users\USER\llama.cpp\src\llama-quant.cpp(276,17):
+          see reference to function template instantiation 'std::thread &std::vector<std::thread,std::allocator<std::th
+  read>>::emplace_back<llama_tensor_dequantize_impl::<lambda_99809f70a3686e6322ff64c5ea2ca728>&,ggml_type&,uint8_t*,flo
+  at*,size_t&>(llama_tensor_dequantize_impl::<lambda_99809f70a3686e6322ff64c5ea2ca728> &,ggml_type &,uint8_t *&&,float
+  *&&,size_t &)' being compiled
+              C:\Users\USER\llama.cpp\src\llama-quant.cpp(276,29):
+              see the first reference to 'std::vector<std::thread,std::allocator<std::thread>>::emplace_back' in 'llama
+  _tensor_dequantize_impl'
+          C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vector(924,2
+  4):
+          see reference to function template instantiation '_Ty &std::vector<_Ty,std::allocator<_Ty>>::_Emplace_one_at_
+  back<llama_tensor_dequantize_impl::<lambda_99809f70a3686e6322ff64c5ea2ca728>&,ggml_type&,unsigned char*,float*,size_t
+  &>(llama_tensor_dequantize_impl::<lambda_99809f70a3686e6322ff64c5ea2ca728> &,ggml_type &,unsigned char *&&,float *&&,
+  size_t &)' being compiled
+          with
+          [
+              _Ty=std::thread
+          ]
+          C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vector(845,2
+  0):
+          see reference to function template instantiation '_Ty &std::vector<_Ty,std::allocator<_Ty>>::_Emplace_back_wi
+  th_unused_capacity<llama_tensor_dequantize_impl::<lambda_99809f70a3686e6322ff64c5ea2ca728>&,ggml_type&,unsigned char*
+  ,float*,size_t&>(llama_tensor_dequantize_impl::<lambda_99809f70a3686e6322ff64c5ea2ca728> &,ggml_type &,unsigned char
+  *&&,float *&&,size_t &)' being compiled
+          with
+          [
+              _Ty=std::thread
+          ]
+          C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vector(863,2
+  7):
+          see reference to function template instantiation 'void std::_Default_allocator_traits<_Alloc>::construct<_Ty,
+  llama_tensor_dequantize_impl::<lambda_99809f70a3686e6322ff64c5ea2ca728>&,ggml_type&,unsigned char*,float*,size_t&>(_A
+  lloc &,_Objty *const ,llama_tensor_dequantize_impl::<lambda_99809f70a3686e6322ff64c5ea2ca728> &,ggml_type &,unsigned
+  char *&&,float *&&,size_t &)' being compiled
+          with
+          [
+              _Alloc=std::allocator<std::thread>,
+              _Ty=std::thread,
+              _Objty=std::thread
+          ]
+          C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\xmemory(732,
+  82):
+          see reference to function template instantiation 'std::thread::thread<llama_tensor_dequantize_impl::<lambda_9
+  9809f70a3686e6322ff64c5ea2ca728>&,ggml_type&,_T,float*,size_t&,0>(_Fn,ggml_type &,_T &&,float *&&,size_t &)' being co
+  mpiled
+          with
+          [
+              _T=uint8_t *,
+              _Fn=llama_tensor_dequantize_impl::<lambda_99809f70a3686e6322ff64c5ea2ca728> &
+          ]
+          C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\thread(93,9)
+  :
+          see reference to function template instantiation 'void std::thread::_Start<llama_tensor_dequantize_impl::<lam
+  bda_99809f70a3686e6322ff64c5ea2ca728>&,ggml_type&,_Ty,float*,size_t&>(_Fn,ggml_type &,_Ty &&,float *&&,size_t &)' bei
+  ng compiled
+          with
+          [
+              _Ty=uint8_t *,
+              _Fn=llama_tensor_dequantize_impl::<lambda_99809f70a3686e6322ff64c5ea2ca728> &
+          ]
+          C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\thread(76,40
+  ):
+          see reference to function template instantiation 'unsigned int (__cdecl *std::thread::_Get_invoke<std::thread
+  ::_Start::_Tuple,0,1,2,3,4>(std::integer_sequence<size_t,0,1,2,3,4>) noexcept)(void *) noexcept' being compiled
+          C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\thread(67,17
+  ):
+          see reference to function template instantiation 'unsigned int std::thread::_Invoke<_Tuple,0,1,2,3,4>(void *)
+   noexcept' being compiled
+          with
+          [
+              _Tuple=std::thread::_Start::_Tuple
+          ]
+          C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\thread(60,14
+  ):
+          see reference to function template instantiation 'void std::invoke<llama_tensor_dequantize_impl::<lambda_9980
+  9f70a3686e6322ff64c5ea2ca728>,ggml_type,uint8_t*,_Ty*,unsigned __int64>(_Callable &&,_Ty1 &&,uint8_t *&&,_Ty *&&,unsi
+  gned __int64 &&) noexcept(false)' being compiled
+          with
+          [
+              _Ty=float,
+              _Callable=llama_tensor_dequantize_impl::<lambda_99809f70a3686e6322ff64c5ea2ca728>,
+              _Ty1=ggml_type
+          ]
+
+  apertus.cpp
+  arcee.cpp
+  arctic.cpp
+  arwkv7.cpp
+  baichuan.cpp
+  bailingmoe.cpp
+  bailingmoe2.cpp
+  bert.cpp
+  bloom.cpp
+  bitnet.cpp
+  chameleon.cpp
+  chatglm.cpp
+  codeshell.cpp
+  cogvlm.cpp
+  cohere2.cpp
+  command-r.cpp
+  dbrx.cpp
+  deci.cpp
+  deepseek.cpp
+  deepseek2.cpp
+  deepseek2ocr.cpp
+  deepseek32.cpp
+  delta-net-base.cpp
+  dots1.cpp
+  dream.cpp
+  ernie4-5-moe.cpp
+  eurobert.cpp
+  ernie4-5.cpp
+  exaone-moe.cpp
+  exaone4.cpp
+  exaone.cpp
+  falcon-h1.cpp
+  falcon.cpp
+  gemma-embedding.cpp
+  gemma.cpp
+  gemma2.cpp
+  gemma3.cpp
+  gemma3n.cpp
+  gemma4-assistant.cpp
+  gemma4.cpp
+  glm-dsa.cpp
+  glm4-moe.cpp
+  glm4.cpp
+  gpt2.cpp
+  gptneox.cpp
+  granite-hybrid.cpp
+  granite-moe.cpp
+  granite.cpp
+  grok.cpp
+  grovemoe.cpp
+  hunyuan-dense.cpp
+  hunyuan-moe.cpp
+  hunyuan-vl.cpp
+  internlm2.cpp
+  jais.cpp
+  jais2.cpp
+  jamba.cpp
+  jina-bert-v2.cpp
+  jina-bert-v3.cpp
+  kimi-linear.cpp
+  lfm2.cpp
+  lfm2moe.cpp
+  llada-moe.cpp
+  llada.cpp
+  llama-embed.cpp
+  llama.cpp
+  llama4.cpp
+  mimo2.cpp
+  mamba2.cpp
+  mamba-base.cpp
+  maincoder.cpp
+  mellum.cpp
+  mamba.cpp
+  minicpm.cpp
+  minicpm3.cpp
+  minimax-m2.cpp
+  mistral3.cpp
+  mistral4.cpp
+  mpt.cpp
+  nemotron-h-moe.cpp
+  modern-bert.cpp
+  nemotron-h.cpp
+  nemotron.cpp
+  neo-bert.cpp
+  nomic-bert-moe.cpp
+  nomic-bert.cpp
+  olmo.cpp
+  olmo2.cpp
+  olmoe.cpp
+  openai-moe.cpp
+  orion.cpp
+  openelm.cpp
+  paddleocr.cpp
+  pangu-embed.cpp
+  phi2.cpp
+  phi3.cpp
+  phimoe.cpp
+  plamo.cpp
+  plamo2.cpp
+  plamo3.cpp
+  plm.cpp
+  qwen.cpp
+  qwen2moe.cpp
+  qwen2.cpp
+  qwen2vl.cpp
+  qwen3.cpp
+  qwen35.cpp
+  qwen3next.cpp
+  qwen35moe.cpp
+  refact.cpp
+  qwen3vlmoe.cpp
+  qwen3moe.cpp
+  qwen3vl.cpp
+  rnd1.cpp
+  rwkv6-base.cpp
+  rwkv6.cpp
+  rwkv6qwen2.cpp
+  rwkv7-base.cpp
+  rwkv7.cpp
+  seed-oss.cpp
+  smollm3.cpp
+  smallthinker.cpp
+  stablelm.cpp
+  starcoder2.cpp
+  starcoder.cpp
+  step35.cpp
+  t5.cpp
+  t5encoder.cpp
+  wavtokenizer-dec.cpp
+  talkie.cpp
+  xverse.cpp
+     Creating library C:/Users/USER/llama.cpp/build/src/Release/llama.lib and object C:/Users/USER/llama.cpp/build/src/
+  Release/llama.exp
+  llama.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\llama.dll
+  Building Custom Rule C:/Users/USER/llama.cpp/common/CMakeLists.txt
+  build-info.cpp
+  llama-common-base.vcxproj -> C:\Users\USER\llama.cpp\build\common\Release\llama-common-base.lib
+  Building Custom Rule C:/Users/USER/llama.cpp/common/CMakeLists.txt
+  chat-auto-parser-generator.cpp
+  common.cpp
+  chat-auto-parser-helpers.cpp
+  arg.cpp
+  chat.cpp
+  chat-diff-analyzer.cpp
+  console.cpp
+  chat-peg-parser.cpp
+  llguidance.cpp
+  fit.cpp
+  hf-cache.cpp
+  debug.cpp
+  imatrix-loader.cpp
+  json-schema-to-grammar.cpp
+  download.cpp
+  json-partial.cpp
+  log.cpp
+  ngram-cache.cpp
+  ngram-map.cpp
+  ngram-mod.cpp
+  preset.cpp
+  peg-parser.cpp
+  regex-partial.cpp
+  speculative.cpp
+  sampling.cpp
+  reasoning-budget.cpp
+  unicode.cpp
+  lexer.cpp
+  parser.cpp
+  runtime.cpp
+  value.cpp
+  string.cpp
+  caps.cpp
+  Auto build dll exports
+     Creating library C:/Users/USER/llama.cpp/build/common/Release/llama-common.lib and object C:/Users/USER/llama.cpp/
+  build/common/Release/llama-common.exp
+  llama-common.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\llama-common.dll
+  Building Custom Rule C:/Users/USER/llama.cpp/tests/CMakeLists.txt
+  export-graph-ops.cpp
+  export-graph-ops.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\export-graph-ops.exe
+  Building Custom Rule C:/Users/USER/llama.cpp/tools/batched-bench/CMakeLists.txt
+  batched-bench.cpp
+  Auto build dll exports
+     Creating library C:/Users/USER/llama.cpp/build/tools/batched-bench/Release/llama-batched-bench-impl.lib and object
+   C:/Users/USER/llama.cpp/build/tools/batched-bench/Release/llama-batched-bench-impl.exp
+  llama-batched-bench-impl.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\llama-batched-bench-impl.dll
+  Building Custom Rule C:/Users/USER/llama.cpp/tools/llama-bench/CMakeLists.txt
+  llama-bench.cpp
+  Auto build dll exports
+     Creating library C:/Users/USER/llama.cpp/build/tools/llama-bench/Release/llama-bench-impl.lib and object C:/Users/
+  USER/llama.cpp/build/tools/llama-bench/Release/llama-bench-impl.exp
+  llama-bench-impl.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\llama-bench-impl.dll
+  Building Custom Rule C:/Users/USER/llama.cpp/tools/mtmd/CMakeLists.txt
+  mtmd-helper.cpp
+  conformer.cpp
+  cogvlm.cpp
+  clip.cpp
+  mtmd-audio.cpp
+  dotsocr.cpp
+  mtmd.cpp
+  mtmd-image.cpp
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\xutility(5310,24): war
+ning C4244: '=': conversion from 'const _Ty' to 'float', possible loss of data [C:\Users\USER\llama.cpp\build\tools\mtm
+d\mtmd.vcxproj]
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\xutility(5310,24): war
+ning C4244:         with [C:\Users\USER\llama.cpp\build\tools\mtmd\mtmd.vcxproj]
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\xutility(5310,24): war
+ning C4244:         [ [C:\Users\USER\llama.cpp\build\tools\mtmd\mtmd.vcxproj]
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\xutility(5310,24): war
+ning C4244:             _Ty=double [C:\Users\USER\llama.cpp\build\tools\mtmd\mtmd.vcxproj]
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\xutility(5310,24): war
+ning C4244:         ] [C:\Users\USER\llama.cpp\build\tools\mtmd\mtmd.vcxproj]
+  (compiling source file '../../../tools/mtmd/mtmd-audio.cpp')
+      C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\xutility(5310,24
+  ):
+      the template instantiation context (the oldest one first) is
+          C:\Users\USER\llama.cpp\tools\mtmd\mtmd-audio.cpp(315,18):
+          see reference to function template instantiation 'void std::fill<std::_Vector_iterator<std::_Vector_val<std::
+  _Simple_types<_Ty>>>,double>(const _FwdIt,const _FwdIt,const double &)' being compiled
+          with
+          [
+              _Ty=float,
+              _FwdIt=std::_Vector_iterator<std::_Vector_val<std::_Simple_types<float>>>
+          ]
+
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\xutility(5310,24): war
+ning C4244: '=': conversion from 'const _Ty' to 'float', possible loss of data [C:\Users\USER\llama.cpp\build\tools\mtm
+d\mtmd.vcxproj]
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\xutility(5310,24): war
+ning C4244:         with [C:\Users\USER\llama.cpp\build\tools\mtmd\mtmd.vcxproj]
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\xutility(5310,24): war
+ning C4244:         [ [C:\Users\USER\llama.cpp\build\tools\mtmd\mtmd.vcxproj]
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\xutility(5310,24): war
+ning C4244:             _Ty=int [C:\Users\USER\llama.cpp\build\tools\mtmd\mtmd.vcxproj]
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\xutility(5310,24): war
+ning C4244:         ] [C:\Users\USER\llama.cpp\build\tools\mtmd\mtmd.vcxproj]
+  (compiling source file '../../../tools/mtmd/mtmd-audio.cpp')
+      C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\xutility(5310,24
+  ):
+      the template instantiation context (the oldest one first) is
+          C:\Users\USER\llama.cpp\tools\mtmd\mtmd-audio.cpp(399,14):
+          see reference to function template instantiation 'void std::fill<std::_Vector_iterator<std::_Vector_val<std::
+  _Simple_types<_Ty>>>,int>(const _FwdIt,const _FwdIt,const int &)' being compiled
+          with
+          [
+              _Ty=float,
+              _FwdIt=std::_Vector_iterator<std::_Vector_val<std::_Simple_types<float>>>
+          ]
+
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\xutility(5310,24): war
+ning C4244: '=': conversion from 'const _Ty' to 'float', possible loss of data [C:\Users\USER\llama.cpp\build\tools\mtm
+d\mtmd.vcxproj]
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\xutility(5310,24): war
+ning C4244:         with [C:\Users\USER\llama.cpp\build\tools\mtmd\mtmd.vcxproj]
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\xutility(5310,24): war
+ning C4244:         [ [C:\Users\USER\llama.cpp\build\tools\mtmd\mtmd.vcxproj]
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\xutility(5310,24): war
+ning C4244:             _Ty=double [C:\Users\USER\llama.cpp\build\tools\mtmd\mtmd.vcxproj]
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\xutility(5310,24): war
+ning C4244:         ] [C:\Users\USER\llama.cpp\build\tools\mtmd\mtmd.vcxproj]
+  (compiling source file '../../../tools/mtmd/clip.cpp')
+      C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\xutility(5310,24
+  ):
+      the template instantiation context (the oldest one first) is
+          C:\Users\USER\llama.cpp\tools\mtmd\clip.cpp(3874,38):
+          see reference to function template instantiation 'void std::fill<std::_Vector_iterator<std::_Vector_val<std::
+  _Simple_types<_Ty>>>,double>(const _FwdIt,const _FwdIt,const double &)' being compiled
+          with
+          [
+              _Ty=float,
+              _FwdIt=std::_Vector_iterator<std::_Vector_val<std::_Simple_types<float>>>
+          ]
+
+  gemma4v.cpp
+  exaone4_5.cpp
+  gemma4a.cpp
+  gemma4uv.cpp
+  gemma4ua.cpp
+  granite-speech.cpp
+  glm4v.cpp
+  granite4-vision.cpp
+  hunyuanvl.cpp
+  internvl.cpp
+  kimivl.cpp
+  kimik25.cpp
+  nemotron-v2-vl.cpp
+  llava.cpp
+  llama4.cpp
+  minicpmv.cpp
+  paddleocr.cpp
+  pixtral.cpp
+  qwen2vl.cpp
+  qwen3vl.cpp
+  mimovl.cpp
+  qwen3a.cpp
+  siglip.cpp
+  step3vl.cpp
+  whisper-enc.cpp
+  deepseekocr.cpp
+  deepseekocr2.cpp
+  mobilenetv5.cpp
+  youtuvl.cpp
+  yasa2.cpp
+     Creating library C:/Users/USER/llama.cpp/build/tools/mtmd/Release/mtmd.lib and object C:/Users/USER/llama.cpp/buil
+  d/tools/mtmd/Release/mtmd.exp
+  mtmd.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\mtmd.dll
+  Building Custom Rule C:/Users/USER/llama.cpp/tools/server/CMakeLists.txt
+  server-task.cpp
+  server-chat.cpp
+  server-queue.cpp
+  server-context.cpp
+  server-common.cpp
+  server-tools.cpp
+  server-context.vcxproj -> C:\Users\USER\llama.cpp\build\tools\server\Release\server-context.lib
+  Building Custom Rule C:/Users/USER/llama.cpp/tools/cli/CMakeLists.txt
+  cli.cpp
+  Auto build dll exports
+     Creating library C:/Users/USER/llama.cpp/build/tools/cli/Release/llama-cli-impl.lib and object C:/Users/USER/llama
+  .cpp/build/tools/cli/Release/llama-cli-impl.exp
+  llama-cli-impl.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\llama-cli-impl.dll
+  Building Custom Rule C:/Users/USER/llama.cpp/tools/completion/CMakeLists.txt
+  completion.cpp
+C:\Users\USER\llama.cpp\tools\completion\completion.cpp(427,19): warning C4804: '>': unsafe use of type 'bool' in opera
+tion [C:\Users\USER\llama.cpp\build\tools\completion\llama-completion-impl.vcxproj]
+  Auto build dll exports
+     Creating library C:/Users/USER/llama.cpp/build/tools/completion/Release/llama-completion-impl.lib and object C:/Us
+  ers/USER/llama.cpp/build/tools/completion/Release/llama-completion-impl.exp
+  llama-completion-impl.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\llama-completion-impl.dll
+  Building Custom Rule C:/Users/USER/llama.cpp/tools/fit-params/CMakeLists.txt
+  fit-params.cpp
+  Auto build dll exports
+     Creating library C:/Users/USER/llama.cpp/build/tools/fit-params/Release/llama-fit-params-impl.lib and object C:/Us
+  ers/USER/llama.cpp/build/tools/fit-params/Release/llama-fit-params-impl.exp
+  llama-fit-params-impl.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\llama-fit-params-impl.dll
+  Building Custom Rule C:/Users/USER/llama.cpp/tools/perplexity/CMakeLists.txt
+  perplexity.cpp
+  Auto build dll exports
+     Creating library C:/Users/USER/llama.cpp/build/tools/perplexity/Release/llama-perplexity-impl.lib and object C:/Us
+  ers/USER/llama.cpp/build/tools/perplexity/Release/llama-perplexity-impl.exp
+  llama-perplexity-impl.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\llama-perplexity-impl.dll
+  Building Custom Rule C:/Users/USER/llama.cpp/tools/quantize/CMakeLists.txt
+  quantize.cpp
+  Auto build dll exports
+     Creating library C:/Users/USER/llama.cpp/build/tools/quantize/Release/llama-quantize-impl.lib and object C:/Users/
+  USER/llama.cpp/build/tools/quantize/Release/llama-quantize-impl.exp
+  llama-quantize-impl.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\llama-quantize-impl.dll
+  Building Custom Rule C:/Users/USER/llama.cpp/tools/ui/CMakeLists.txt
+  ui.cpp
+  llama-ui.vcxproj -> C:\Users\USER\llama.cpp\build\tools\ui\Release\llama-ui.lib
+  Building Custom Rule C:/Users/USER/llama.cpp/tools/server/CMakeLists.txt
+  server-models.cpp
+  server.cpp
+  server-http.cpp
+  Auto build dll exports
+     Creating library C:/Users/USER/llama.cpp/build/tools/server/Release/llama-server-impl.lib and object C:/Users/USER
+  /llama.cpp/build/tools/server/Release/llama-server-impl.exp
+  llama-server-impl.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\llama-server-impl.dll
+  Building Custom Rule C:/Users/USER/llama.cpp/app/CMakeLists.txt
+  license.cpp
+  llama.cpp
+  llama-app.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\llama.exe
+  Building Custom Rule C:/Users/USER/llama.cpp/examples/batched/CMakeLists.txt
+  batched.cpp
+  llama-batched.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\llama-batched.exe
+  Building Custom Rule C:/Users/USER/llama.cpp/tools/batched-bench/CMakeLists.txt
+  main.cpp
+  llama-batched-bench.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\llama-batched-bench.exe
+  Building Custom Rule C:/Users/USER/llama.cpp/tools/llama-bench/CMakeLists.txt
+  main.cpp
+  llama-bench.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\llama-bench.exe
+  Building Custom Rule C:/Users/USER/llama.cpp/tools/cli/CMakeLists.txt
+  main.cpp
+  llama-cli.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\llama-cli.exe
+  Building Custom Rule C:/Users/USER/llama.cpp/tools/completion/CMakeLists.txt
+  main.cpp
+  llama-completion.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\llama-completion.exe
+  Building Custom Rule C:/Users/USER/llama.cpp/examples/convert-llama2c-to-ggml/CMakeLists.txt
+  convert-llama2c-to-ggml.cpp
+  llama-convert-llama2c-to-ggml.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\llama-convert-llama2c-to-ggml.exe
+  Building Custom Rule C:/Users/USER/llama.cpp/tools/cvector-generator/CMakeLists.txt
+  cvector-generator.cpp
+  llama-cvector-generator.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\llama-cvector-generator.exe
+  Building Custom Rule C:/Users/USER/llama.cpp/examples/debug/CMakeLists.txt
+  debug.cpp
+  llama-debug.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\llama-debug.exe
+  Building Custom Rule C:/Users/USER/llama.cpp/examples/diffusion/CMakeLists.txt
+  diffusion.cpp
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\utility(274,54): warni
+ng C4267: 'initializing': conversion from 'size_t' to '_Ty2', possible loss of data [C:\Users\USER\llama.cpp\build\exam
+ples\diffusion\llama-diffusion.vcxproj]
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\utility(274,54): warni
+ng C4267:         with [C:\Users\USER\llama.cpp\build\examples\diffusion\llama-diffusion.vcxproj]
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\utility(274,54): warni
+ng C4267:         [ [C:\Users\USER\llama.cpp\build\examples\diffusion\llama-diffusion.vcxproj]
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\utility(274,54): warni
+ng C4267:             _Ty2=int32_t [C:\Users\USER\llama.cpp\build\examples\diffusion\llama-diffusion.vcxproj]
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\utility(274,54): warni
+ng C4267:         ] [C:\Users\USER\llama.cpp\build\examples\diffusion\llama-diffusion.vcxproj]
+  (compiling source file '../../../examples/diffusion/diffusion.cpp')
+      C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\utility(274,54):
+      the template instantiation context (the oldest one first) is
+          C:\Users\USER\llama.cpp\examples\diffusion\diffusion.cpp(339,33):
+          see reference to function template instantiation 'std::pair<float,int32_t> &std::vector<std::pair<float,int32
+  _t>,std::allocator<std::pair<float,int32_t>>>::emplace_back<float&,size_t&>(float &,size_t &)' being compiled
+              C:\Users\USER\llama.cpp\examples\diffusion\diffusion.cpp(339,45):
+              see the first reference to 'std::vector<std::pair<float,int32_t>,std::allocator<std::pair<float,int32_t>>
+  >::emplace_back' in 'diffusion_generate'
+          C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vector(924,2
+  4):
+          see reference to function template instantiation '_Ty &std::vector<_Ty,std::allocator<_Ty>>::_Emplace_one_at_
+  back<float&,size_t&>(float &,size_t &)' being compiled
+          with
+          [
+              _Ty=std::pair<float,int32_t>
+          ]
+          C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vector(845,2
+  0):
+          see reference to function template instantiation '_Ty &std::vector<_Ty,std::allocator<_Ty>>::_Emplace_back_wi
+  th_unused_capacity<float&,size_t&>(float &,size_t &)' being compiled
+          with
+          [
+              _Ty=std::pair<float,int32_t>
+          ]
+          C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vector(860,1
+  8):
+          see reference to function template instantiation 'void std::_Construct_in_place<std::pair<float,int32_t>,floa
+  t&,size_t&>(_Ty &,float &,size_t &) noexcept' being compiled
+          with
+          [
+              _Ty=std::pair<float,int32_t>
+          ]
+          C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\xutility(476
+  ,61):
+          see reference to function template instantiation 'std::pair<float,int32_t>::pair<float&,size_t&,0>(_Other1,_O
+  ther2) noexcept' being compiled
+          with
+          [
+              _Other1=float &,
+              _Other2=size_t &
+          ]
+
+  llama-diffusion.vcxproj -> C:\Users\USER\llama.cpp\build\examples\diffusion\Release\llama-diffusion.lib
+  Building Custom Rule C:/Users/USER/llama.cpp/examples/diffusion/CMakeLists.txt
+  diffusion-cli.cpp
+  llama-diffusion-cli.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\llama-diffusion-cli.exe
+  Building Custom Rule C:/Users/USER/llama.cpp/examples/embedding/CMakeLists.txt
+  embedding.cpp
+  llama-embedding.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\llama-embedding.exe
+  Building Custom Rule C:/Users/USER/llama.cpp/examples/eval-callback/CMakeLists.txt
+  eval-callback.cpp
+  llama-eval-callback.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\llama-eval-callback.exe
+  Building Custom Rule C:/Users/USER/llama.cpp/tools/export-lora/CMakeLists.txt
+  export-lora.cpp
+  llama-export-lora.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\llama-export-lora.exe
+  Building Custom Rule C:/Users/USER/llama.cpp/examples/training/CMakeLists.txt
+  finetune.cpp
+  llama-finetune.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\llama-finetune.exe
+  Building Custom Rule C:/Users/USER/llama.cpp/tools/fit-params/CMakeLists.txt
+  main.cpp
+  llama-fit-params.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\llama-fit-params.exe
+  Building Custom Rule C:/Users/USER/llama.cpp/tools/mtmd/CMakeLists.txt
+  deprecation-warning.cpp
+  llama-gemma3-cli.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\llama-gemma3-cli.exe
+  Building Custom Rule C:/Users/USER/llama.cpp/examples/gen-docs/CMakeLists.txt
+  gen-docs.cpp
+  llama-gen-docs.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\llama-gen-docs.exe
+  Building Custom Rule C:/Users/USER/llama.cpp/examples/gguf/CMakeLists.txt
+  gguf.cpp
+  llama-gguf.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\llama-gguf.exe
+  Building Custom Rule C:/Users/USER/llama.cpp/examples/gguf-hash/CMakeLists.txt
+  gguf-hash.cpp
+  llama-gguf-hash.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\llama-gguf-hash.exe
+  Building Custom Rule C:/Users/USER/llama.cpp/tools/gguf-split/CMakeLists.txt
+  gguf-split.cpp
+  llama-gguf-split.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\llama-gguf-split.exe
+  Building Custom Rule C:/Users/USER/llama.cpp/examples/idle/CMakeLists.txt
+  idle.cpp
+  llama-idle.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\llama-idle.exe
+  Building Custom Rule C:/Users/USER/llama.cpp/tools/imatrix/CMakeLists.txt
+  imatrix.cpp
+  llama-imatrix.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\llama-imatrix.exe
+  Building Custom Rule C:/Users/USER/llama.cpp/tools/mtmd/CMakeLists.txt
+  deprecation-warning.cpp
+  llama-llava-cli.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\llama-llava-cli.exe
+  Building Custom Rule C:/Users/USER/llama.cpp/examples/lookahead/CMakeLists.txt
+  lookahead.cpp
+  llama-lookahead.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\llama-lookahead.exe
+  Building Custom Rule C:/Users/USER/llama.cpp/examples/lookup/CMakeLists.txt
+  lookup.cpp
+  llama-lookup.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\llama-lookup.exe
+  Building Custom Rule C:/Users/USER/llama.cpp/examples/lookup/CMakeLists.txt
+  lookup-create.cpp
+  llama-lookup-create.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\llama-lookup-create.exe
+  Building Custom Rule C:/Users/USER/llama.cpp/examples/lookup/CMakeLists.txt
+  lookup-merge.cpp
+  llama-lookup-merge.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\llama-lookup-merge.exe
+  Building Custom Rule C:/Users/USER/llama.cpp/examples/lookup/CMakeLists.txt
+  lookup-stats.cpp
+  llama-lookup-stats.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\llama-lookup-stats.exe
+  Building Custom Rule C:/Users/USER/llama.cpp/tools/mtmd/CMakeLists.txt
+  deprecation-warning.cpp
+  llama-minicpmv-cli.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\llama-minicpmv-cli.exe
+  Building Custom Rule C:/Users/USER/llama.cpp/tools/mtmd/CMakeLists.txt
+  mtmd-cli.cpp
+  llama-mtmd-cli.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\llama-mtmd-cli.exe
+  Building Custom Rule C:/Users/USER/llama.cpp/tools/mtmd/CMakeLists.txt
+  mtmd-debug.cpp
+  llama-mtmd-debug.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\llama-mtmd-debug.exe
+  Building Custom Rule C:/Users/USER/llama.cpp/examples/parallel/CMakeLists.txt
+  parallel.cpp
+  llama-parallel.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\llama-parallel.exe
+  Building Custom Rule C:/Users/USER/llama.cpp/examples/passkey/CMakeLists.txt
+  passkey.cpp
+  llama-passkey.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\llama-passkey.exe
+  Building Custom Rule C:/Users/USER/llama.cpp/tools/perplexity/CMakeLists.txt
+  main.cpp
+  llama-perplexity.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\llama-perplexity.exe
+  Building Custom Rule C:/Users/USER/llama.cpp/pocs/vdot/CMakeLists.txt
+  q8dot.cpp
+  llama-q8dot.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\llama-q8dot.exe
+  Building Custom Rule C:/Users/USER/llama.cpp/tools/quantize/CMakeLists.txt
+  main.cpp
+  llama-quantize.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\llama-quantize.exe
+  Building Custom Rule C:/Users/USER/llama.cpp/tools/mtmd/CMakeLists.txt
+  deprecation-warning.cpp
+  llama-qwen2vl-cli.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\llama-qwen2vl-cli.exe
+  Building Custom Rule C:/Users/USER/llama.cpp/tools/results/CMakeLists.txt
+  results.cpp
+  llama-results.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\llama-results.exe
+  Building Custom Rule C:/Users/USER/llama.cpp/examples/retrieval/CMakeLists.txt
+  retrieval.cpp
+  llama-retrieval.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\llama-retrieval.exe
+  Building Custom Rule C:/Users/USER/llama.cpp/tools/server/CMakeLists.txt
+  main.cpp
+  llama-server.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\llama-server.exe
+  Building Custom Rule C:/Users/USER/llama.cpp/examples/simple/CMakeLists.txt
+  simple.cpp
+  llama-simple.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\llama-simple.exe
+  Building Custom Rule C:/Users/USER/llama.cpp/examples/simple-chat/CMakeLists.txt
+  simple-chat.cpp
+  llama-simple-chat.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\llama-simple-chat.exe
+  Building Custom Rule C:/Users/USER/llama.cpp/examples/speculative/CMakeLists.txt
+  speculative.cpp
+  llama-speculative.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\llama-speculative.exe
+  Building Custom Rule C:/Users/USER/llama.cpp/examples/speculative-simple/CMakeLists.txt
+  speculative-simple.cpp
+  llama-speculative-simple.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\llama-speculative-simple.exe
+  Building Custom Rule C:/Users/USER/llama.cpp/tools/parser/CMakeLists.txt
+  template-analysis.cpp
+  llama-template-analysis.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\llama-template-analysis.exe
+  Building Custom Rule C:/Users/USER/llama.cpp/tools/tokenize/CMakeLists.txt
+  tokenize.cpp
+  llama-tokenize.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\llama-tokenize.exe
+  Building Custom Rule C:/Users/USER/llama.cpp/tools/tts/CMakeLists.txt
+  tts.cpp
+  llama-tts.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\llama-tts.exe
+  Building Custom Rule C:/Users/USER/llama.cpp/pocs/vdot/CMakeLists.txt
+  vdot.cpp
+  llama-vdot.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\llama-vdot.exe
+  Building Custom Rule C:/Users/USER/llama.cpp/tests/CMakeLists.txt
+  test-alloc.cpp
+  get-model.cpp
+  test-alloc.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\test-alloc.exe
+  Building Custom Rule C:/Users/USER/llama.cpp/tests/CMakeLists.txt
+  get-model.cpp
+  test-arg-parser.cpp
+  test-arg-parser.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\test-arg-parser.exe
+  Building Custom Rule C:/Users/USER/llama.cpp/tests/CMakeLists.txt
+  get-model.cpp
+  test-autorelease.cpp
+  test-autorelease.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\test-autorelease.exe
+  Building Custom Rule C:/Users/USER/llama.cpp/tests/CMakeLists.txt
+  get-model.cpp
+  test-backend-ops.cpp
+  test-backend-ops.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\test-backend-ops.exe
+  Building Custom Rule C:/Users/USER/llama.cpp/tests/CMakeLists.txt
+  get-model.cpp
+  test-backend-sampler.cpp
+  test-backend-sampler.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\test-backend-sampler.exe
+  Building Custom Rule C:/Users/USER/llama.cpp/tests/CMakeLists.txt
+  get-model.cpp
+  test-barrier.cpp
+  test-barrier.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\test-barrier.exe
+  Building Custom Rule C:/Users/USER/llama.cpp/tests/CMakeLists.txt
+  test-c.c
+  test-c.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\test-c.exe
+  Building Custom Rule C:/Users/USER/llama.cpp/tests/CMakeLists.txt
+  get-model.cpp
+  test-chat-auto-parser.cpp
+  test-chat-auto-parser.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\test-chat-auto-parser.exe
+  Building Custom Rule C:/Users/USER/llama.cpp/tests/CMakeLists.txt
+  simple-tokenize.cpp
+  get-model.cpp
+  test-chat-peg-parser.cpp
+  test-chat-peg-parser.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\test-chat-peg-parser.exe
+  Building Custom Rule C:/Users/USER/llama.cpp/tests/CMakeLists.txt
+  test-chat-template.cpp
+  get-model.cpp
+  test-chat-template.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\test-chat-template.exe
+  Building Custom Rule C:/Users/USER/llama.cpp/tests/CMakeLists.txt
+  get-model.cpp
+  test-col2im-1d.cpp
+  test-col2im-1d.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\test-col2im-1d.exe
+  Building Custom Rule C:/Users/USER/llama.cpp/tests/CMakeLists.txt
+  test-gguf.cpp
+  get-model.cpp
+C:\Users\USER\llama.cpp\tests\test-gguf.cpp(676,28): warning C4319: '~': zero extending 'uint32_t' to 'size_t' of great
+er size [C:\Users\USER\llama.cpp\build\tests\test-gguf.vcxproj]
+  test-gguf.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\test-gguf.exe
+  Building Custom Rule C:/Users/USER/llama.cpp/tests/CMakeLists.txt
+  get-model.cpp
+  test-jinja.cpp
+  test-jinja.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\test-jinja.exe
+  Building Custom Rule C:/Users/USER/llama.cpp/tests/CMakeLists.txt
+  get-model.cpp
+  test-json-partial.cpp
+  test-json-partial.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\test-json-partial.exe
+  Building Custom Rule C:/Users/USER/llama.cpp/tests/CMakeLists.txt
+  test-log.cpp
+  get-model.cpp
+  test-log.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\test-log.exe
+  Building Custom Rule C:/Users/USER/llama.cpp/tests/CMakeLists.txt
+  test-model-load-cancel.cpp
+  get-model.cpp
+  test-model-load-cancel.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\test-model-load-cancel.exe
+  Building Custom Rule C:/Users/USER/llama.cpp/tests/CMakeLists.txt
+  test-mtmd-c-api.c
+  get-model.cpp
+  test-mtmd-c-api.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\test-mtmd-c-api.exe
+  Building Custom Rule C:/Users/USER/llama.cpp/tests/CMakeLists.txt
+  test-opt.cpp
+  get-model.cpp
+  test-opt.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\test-opt.exe
+  Building Custom Rule C:/Users/USER/llama.cpp/tests/CMakeLists.txt
+  simple-tokenize.cpp
+  test-basic.cpp
+  test-unicode.cpp
+  test-gbnf-generation.cpp
+  test-python-dict-parser.cpp
+  test-json-parser.cpp
+  test-peg-parser.cpp
+  test-json-serialization.cpp
+  get-model.cpp
+  test-peg-parser.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\test-peg-parser.exe
+  Building Custom Rule C:/Users/USER/llama.cpp/tests/CMakeLists.txt
+  test-quantize-fns.cpp
+  get-model.cpp
+  test-quantize-fns.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\test-quantize-fns.exe
+  Building Custom Rule C:/Users/USER/llama.cpp/tests/CMakeLists.txt
+  get-model.cpp
+  test-quantize-perf.cpp
+  test-quantize-perf.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\test-quantize-perf.exe
+  Building Custom Rule C:/Users/USER/llama.cpp/tests/CMakeLists.txt
+  test-recurrent-state-rollback.cpp
+  get-model.cpp
+  test-recurrent-state-rollback.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\test-recurrent-state-rollback.exe
+  Building Custom Rule C:/Users/USER/llama.cpp/tests/CMakeLists.txt
+  test-regex-partial.cpp
+  get-model.cpp
+  test-regex-partial.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\test-regex-partial.exe
+  Building Custom Rule C:/Users/USER/llama.cpp/tests/CMakeLists.txt
+  get-model.cpp
+  test-rope.cpp
+  test-rope.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\test-rope.exe
+  Building Custom Rule C:/Users/USER/llama.cpp/tests/CMakeLists.txt
+  get-model.cpp
+  test-save-load-state.cpp
+  test-save-load-state.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\test-save-load-state.exe
+  Building Custom Rule C:/Users/USER/llama.cpp/tests/CMakeLists.txt
+  get-model.cpp
+  test-state-restore-fragmented.cpp
+  test-state-restore-fragmented.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\test-state-restore-fragmented.exe
+  Building Custom Rule C:/Users/USER/llama.cpp/tests/CMakeLists.txt
+  get-model.cpp
+  test-thread-safety.cpp
+  test-thread-safety.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\test-thread-safety.exe
+  Building Custom Rule C:/Users/USER/llama.cpp/tests/CMakeLists.txt
+  test-tokenizer-0.cpp
+  test-tokenizer-0.vcxproj -> C:\Users\USER\llama.cpp\build\bin\Release\test-tokenizer-0.exe
+  Building Custom Rule C:/Users/USER/llama.cpp/CMakeLists.txt
+PS C:\Users\USER\llama.cpp> dir build\bin\Release
+
+
+    Directory: C:\Users\USER\llama.cpp\build\bin\Release
+
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a----         6/11/2026   6:55 PM          62976 export-graph-ops.exe
+-a----         6/11/2026   6:52 PM         641536 ggml-base.dll
+-a----         6/11/2026   6:53 PM         989696 ggml-cpu.dll
+-a----         6/11/2026   6:53 PM          67072 ggml.dll
+-a----         6/11/2026   6:55 PM         125952 llama-batched-bench-impl.dll
+-a----         6/11/2026   6:56 PM          10752 llama-batched-bench.exe
+-a----         6/11/2026   6:56 PM          37888 llama-batched.exe
+-a----         6/11/2026   6:55 PM         820736 llama-bench-impl.dll
+-a----         6/11/2026   6:56 PM          10752 llama-bench.exe
+-a----         6/11/2026   6:56 PM        2028544 llama-cli-impl.dll
+-a----         6/11/2026   6:56 PM          10752 llama-cli.exe
+-a----         6/11/2026   6:55 PM        9053696 llama-common.dll
+-a----         6/11/2026   6:56 PM         244736 llama-completion-impl.dll
+-a----         6/11/2026   6:56 PM          10752 llama-completion.exe
+-a----         6/11/2026   6:56 PM          70656 llama-convert-llama2c-to-ggml.exe
+-a----         6/11/2026   6:56 PM          90624 llama-cvector-generator.exe
+-a----         6/11/2026   6:56 PM         127488 llama-debug.exe
+-a----         6/11/2026   6:56 PM          56832 llama-diffusion-cli.exe
+-a----         6/11/2026   6:56 PM          57344 llama-embedding.exe
+-a----         6/11/2026   6:56 PM          30720 llama-eval-callback.exe
+-a----         6/11/2026   6:56 PM          68096 llama-export-lora.exe
+-a----         6/11/2026   6:56 PM          31232 llama-finetune.exe
+-a----         6/11/2026   6:56 PM         101888 llama-fit-params-impl.dll
+-a----         6/11/2026   6:56 PM          10752 llama-fit-params.exe
+-a----         6/11/2026   6:56 PM          26624 llama-gemma3-cli.exe
+-a----         6/11/2026   6:56 PM          72192 llama-gen-docs.exe
+-a----         6/11/2026   6:56 PM          65536 llama-gguf-hash.exe
+-a----         6/11/2026   6:56 PM          49152 llama-gguf-split.exe
+-a----         6/11/2026   6:56 PM          29696 llama-gguf.exe
+-a----         6/11/2026   6:56 PM          31232 llama-idle.exe
+-a----         6/11/2026   6:57 PM         192000 llama-imatrix.exe
+-a----         6/11/2026   6:57 PM          26624 llama-llava-cli.exe
+-a----         6/11/2026   6:57 PM          42496 llama-lookahead.exe
+-a----         6/11/2026   6:57 PM          31744 llama-lookup-create.exe
+-a----         6/11/2026   6:57 PM          17920 llama-lookup-merge.exe
+-a----         6/11/2026   6:57 PM          36864 llama-lookup-stats.exe
+-a----         6/11/2026   6:57 PM          40960 llama-lookup.exe
+-a----         6/11/2026   6:57 PM          26624 llama-minicpmv-cli.exe
+-a----         6/11/2026   6:57 PM          64512 llama-mtmd-cli.exe
+-a----         6/11/2026   6:57 PM          44032 llama-mtmd-debug.exe
+-a----         6/11/2026   6:57 PM          74752 llama-parallel.exe
+-a----         6/11/2026   6:57 PM          39424 llama-passkey.exe
+-a----         6/11/2026   6:56 PM         341504 llama-perplexity-impl.dll
+-a----         6/11/2026   6:57 PM          10752 llama-perplexity.exe
+-a----         6/11/2026   6:57 PM          19456 llama-q8dot.exe
+-a----         6/11/2026   6:56 PM         331264 llama-quantize-impl.dll
+-a----         6/11/2026   6:57 PM          10752 llama-quantize.exe
+-a----         6/11/2026   6:57 PM          26624 llama-qwen2vl-cli.exe
+-a----         6/11/2026   6:57 PM          37376 llama-results.exe
+-a----         6/11/2026   6:57 PM          74240 llama-retrieval.exe
+-a----         6/11/2026   6:56 PM       12354560 llama-server-impl.dll
+-a----         6/11/2026   6:57 PM          10752 llama-server.exe
+-a----         6/11/2026   6:57 PM          27136 llama-simple-chat.exe
+-a----         6/11/2026   6:57 PM          24064 llama-simple.exe
+-a----         6/11/2026   6:57 PM          53248 llama-speculative-simple.exe
+-a----         6/11/2026   6:57 PM          62976 llama-speculative.exe
+-a----         6/11/2026   6:57 PM         179712 llama-template-analysis.exe
+-a----         6/11/2026   6:57 PM          46592 llama-tokenize.exe
+-a----         6/11/2026   6:57 PM         257024 llama-tts.exe
+-a----         6/11/2026   6:57 PM          25600 llama-vdot.exe
+-a----         6/11/2026   6:54 PM        2071552 llama.dll
+-a----         6/11/2026   6:56 PM          28672 llama.exe
+-a----         6/11/2026   6:55 PM         974336 mtmd.dll
+-a----         6/11/2026   6:57 PM          40448 test-alloc.exe
+-a----         6/11/2026   6:57 PM          60416 test-arg-parser.exe
+-a----         6/11/2026   6:57 PM          13824 test-autorelease.exe
+-a----         6/11/2026   6:57 PM         878592 test-backend-ops.exe
+-a----         6/11/2026   6:57 PM          81408 test-backend-sampler.exe
+-a----         6/11/2026   6:57 PM          21504 test-barrier.exe
+-a----         6/11/2026   6:57 PM          10240 test-c.exe
+-a----         6/11/2026   6:57 PM         457728 test-chat-auto-parser.exe
+-a----         6/11/2026   6:58 PM         363520 test-chat-peg-parser.exe
+-a----         6/11/2026   6:58 PM         323584 test-chat-template.exe
+-a----         6/11/2026   6:58 PM          17408 test-col2im-1d.exe
+-a----         6/11/2026   6:58 PM          58880 test-gguf.exe
+-a----         6/11/2026   6:58 PM         461824 test-jinja.exe
+-a----         6/11/2026   6:58 PM          68096 test-json-partial.exe
+-a----         6/11/2026   6:58 PM          15872 test-log.exe
+-a----         6/11/2026   6:58 PM          11776 test-model-load-cancel.exe
+-a----         6/11/2026   6:58 PM          11776 test-mtmd-c-api.exe
+-a----         6/11/2026   6:58 PM          42496 test-opt.exe
+-a----         6/11/2026   6:58 PM         511488 test-peg-parser.exe
+-a----         6/11/2026   6:58 PM          19968 test-quantize-fns.exe
+-a----         6/11/2026   6:58 PM          32768 test-quantize-perf.exe
+-a----         6/11/2026   6:58 PM          34304 test-recurrent-state-rollback.exe
+-a----         6/11/2026   6:58 PM          55808 test-regex-partial.exe
+-a----         6/11/2026   6:58 PM          17920 test-rope.exe
+-a----         6/11/2026   6:58 PM          40960 test-save-load-state.exe
+-a----         6/11/2026   6:58 PM          32256 test-state-restore-fragmented.exe
+-a----         6/11/2026   6:58 PM          36864 test-thread-safety.exe
+-a----         6/11/2026   6:58 PM          64000 test-tokenizer-0.exe
+
+
+PS C:\Users\USER\llama.cpp> .\build\bin\Release\llama-server.exe --help
+----- common params -----
+
+-h,    --help, --usage                  print usage and exit
+--version                               show version and build info
+-cl,   --cache-list                     show list of models in cache
+--completion-bash                       print source-able bash completion script for llama.cpp
+-t,    --threads N                      number of CPU threads to use during generation (default: -1)
+                                        (env: LLAMA_ARG_THREADS)
+-tb,   --threads-batch N                number of threads to use during batch and prompt processing (default:
+                                        same as --threads)
+-C,    --cpu-mask M                     CPU affinity mask: arbitrarily long hex. Complements cpu-range
+                                        (default: "")
+-Cr,   --cpu-range lo-hi                range of CPUs for affinity. Complements --cpu-mask
+--cpu-strict <0|1>                      use strict CPU placement (default: 0)
+--prio N                                set process/thread priority : low(-1), normal(0), medium(1), high(2),
+                                        realtime(3) (default: 0)
+--poll <0...100>                        use polling level to wait for work (0 - no polling, default: 50)
+-Cb,   --cpu-mask-batch M               CPU affinity mask: arbitrarily long hex. Complements cpu-range-batch
+                                        (default: same as --cpu-mask)
+-Crb,  --cpu-range-batch lo-hi          ranges of CPUs for affinity. Complements --cpu-mask-batch
+--cpu-strict-batch <0|1>                use strict CPU placement (default: same as --cpu-strict)
+--prio-batch N                          set process/thread priority : 0-normal, 1-medium, 2-high, 3-realtime
+                                        (default: 0)
+--poll-batch <0|1>                      use polling to wait for work (default: same as --poll)
+-c,    --ctx-size N                     size of the prompt context (default: 0, 0 = loaded from model)
+                                        (env: LLAMA_ARG_CTX_SIZE)
+-n,    --predict, --n-predict N         number of tokens to predict (default: -1, -1 = infinity)
+                                        (env: LLAMA_ARG_N_PREDICT)
+-b,    --batch-size N                   logical maximum batch size (default: 2048)
+                                        (env: LLAMA_ARG_BATCH)
+-ub,   --ubatch-size N                  physical maximum batch size (default: 512)
+                                        (env: LLAMA_ARG_UBATCH)
+--keep N                                number of tokens to keep from the initial prompt (default: 0, -1 =
+                                        all)
+--swa-full                              use full-size SWA cache (default: false)
+                                        [(more
+                                        info)](https://github.com/ggml-org/llama.cpp/pull/13194#issuecomment-2868343055)
+                                        (env: LLAMA_ARG_SWA_FULL)
+-fa,   --flash-attn [on|off|auto]       set Flash Attention use ('on', 'off', or 'auto', default: 'auto')
+                                        (env: LLAMA_ARG_FLASH_ATTN)
+--perf, --no-perf                       whether to enable internal libllama performance timings (default:
+                                        false)
+                                        (env: LLAMA_ARG_PERF)
+-e,    --escape, --no-escape            whether to process escapes sequences (\n, \r, \t, \', \", \\)
+                                        (default: true)
+--rope-scaling {none,linear,yarn}       RoPE frequency scaling method, defaults to linear unless specified by
+                                        the model
+                                        (env: LLAMA_ARG_ROPE_SCALING_TYPE)
+--rope-scale N                          RoPE context scaling factor, expands context by a factor of N
+                                        (env: LLAMA_ARG_ROPE_SCALE)
+--rope-freq-base N                      RoPE base frequency, used by NTK-aware scaling (default: loaded from
+                                        model)
+                                        (env: LLAMA_ARG_ROPE_FREQ_BASE)
+--rope-freq-scale N                     RoPE frequency scaling factor, expands context by a factor of 1/N
+                                        (env: LLAMA_ARG_ROPE_FREQ_SCALE)
+--yarn-orig-ctx N                       YaRN: original context size of model (default: 0 = model training
+                                        context size)
+                                        (env: LLAMA_ARG_YARN_ORIG_CTX)
+--yarn-ext-factor N                     YaRN: extrapolation mix factor (default: -1.00, 0.0 = full
+                                        interpolation)
+                                        (env: LLAMA_ARG_YARN_EXT_FACTOR)
+--yarn-attn-factor N                    YaRN: scale sqrt(t) or attention magnitude (default: -1.00)
+                                        (env: LLAMA_ARG_YARN_ATTN_FACTOR)
+--yarn-beta-slow N                      YaRN: high correction dim or alpha (default: -1.00)
+                                        (env: LLAMA_ARG_YARN_BETA_SLOW)
+--yarn-beta-fast N                      YaRN: low correction dim or beta (default: -1.00)
+                                        (env: LLAMA_ARG_YARN_BETA_FAST)
+-kvo,  --kv-offload, -nkvo, --no-kv-offload
+                                        whether to enable KV cache offloading (default: enabled)
+                                        (env: LLAMA_ARG_KV_OFFLOAD)
+--repack, -nr, --no-repack              whether to enable weight repacking (default: enabled)
+                                        (env: LLAMA_ARG_REPACK)
+--no-host                               bypass host buffer allowing extra buffers to be used
+                                        (env: LLAMA_ARG_NO_HOST)
+-ctk,  --cache-type-k TYPE              KV cache data type for K
+                                        allowed values: f32, f16, bf16, q8_0, q4_0, q4_1, iq4_nl, q5_0, q5_1
+                                        (default: f16)
+                                        (env: LLAMA_ARG_CACHE_TYPE_K)
+-ctv,  --cache-type-v TYPE              KV cache data type for V
+                                        allowed values: f32, f16, bf16, q8_0, q4_0, q4_1, iq4_nl, q5_0, q5_1
+                                        (default: f16)
+                                        (env: LLAMA_ARG_CACHE_TYPE_V)
+-dt,   --defrag-thold N                 KV cache defragmentation threshold (DEPRECATED)
+                                        (env: LLAMA_ARG_DEFRAG_THOLD)
+--mlock                                 force system to keep model in RAM rather than swapping or compressing
+                                        (env: LLAMA_ARG_MLOCK)
+--mmap, --no-mmap                       whether to memory-map model. (if mmap disabled, slower load but may
+                                        reduce pageouts if not using mlock) (default: enabled)
+                                        (env: LLAMA_ARG_MMAP)
+-dio,  --direct-io, -ndio, --no-direct-io
+                                        use DirectIO if available. (default: disabled)
+                                        (env: LLAMA_ARG_DIO)
+--numa TYPE                             attempt optimizations that help on some NUMA systems
+                                        - distribute: spread execution evenly over all nodes
+                                        - isolate: only spawn threads on CPUs on the node that execution
+                                        started on
+                                        - numactl: use the CPU map provided by numactl
+                                        if run without this previously, it is recommended to drop the system
+                                        page cache before using this
+                                        see https://github.com/ggml-org/llama.cpp/issues/1437
+                                        (env: LLAMA_ARG_NUMA)
+-dev,  --device <dev1,dev2,..>          comma-separated list of devices to use for offloading (none = don't
+                                        offload)
+                                        use --list-devices to see a list of available devices
+                                        (env: LLAMA_ARG_DEVICE)
+--list-devices                          print list of available devices and exit
+-ot,   --override-tensor <tensor name pattern>=<buffer type>,...
+                                        override tensor buffer type
+                                        (env: LLAMA_ARG_OVERRIDE_TENSOR)
+-cmoe, --cpu-moe                        keep all Mixture of Experts (MoE) weights in the CPU
+                                        (env: LLAMA_ARG_CPU_MOE)
+-ncmoe, --n-cpu-moe N                   keep the Mixture of Experts (MoE) weights of the first N layers in the
+                                        CPU
+                                        (env: LLAMA_ARG_N_CPU_MOE)
+-ngl,  --gpu-layers, --n-gpu-layers N   max. number of layers to store in VRAM, either an exact number,
+                                        'auto', or 'all' (default: auto)
+                                        (env: LLAMA_ARG_N_GPU_LAYERS)
+-sm,   --split-mode {none,layer,row,tensor}
+                                        how to split the model across multiple GPUs, one of:
+                                        - none: use one GPU only
+                                        - layer (default): split layers and KV across GPUs (pipelined)
+                                        - row: split weight across GPUs by rows (parallelized)
+                                        - tensor: split weights and KV across GPUs (parallelized,
+                                        EXPERIMENTAL)
+                                        (env: LLAMA_ARG_SPLIT_MODE)
+-ts,   --tensor-split N0,N1,N2,...      fraction of the model to offload to each GPU, comma-separated list of
+                                        proportions, e.g. 3,1
+                                        (env: LLAMA_ARG_TENSOR_SPLIT)
+-mg,   --main-gpu INDEX                 the GPU to use for the model (with split-mode = none), or for
+                                        intermediate results and KV (with split-mode = row) (default: 0)
+                                        (env: LLAMA_ARG_MAIN_GPU)
+-fit,  --fit [on|off]                   whether to adjust unset arguments to fit in device memory ('on' or
+                                        'off', default: 'on')
+                                        (env: LLAMA_ARG_FIT)
+-fitt, --fit-target MiB0,MiB1,MiB2,...
+                                        target margin per device for --fit, comma-separated list of values,
+                                        single value is broadcast across all devices, default: 1024
+                                        (env: LLAMA_ARG_FIT_TARGET)
+-fitc, --fit-ctx N                      minimum ctx size that can be set by --fit option, default: 4096
+                                        (env: LLAMA_ARG_FIT_CTX)
+--check-tensors                         check model tensor data for invalid values (default: false)
+--override-kv KEY=TYPE:VALUE,...        advanced option to override model metadata by key. to specify multiple
+                                        overrides, either use comma-separated values.
+                                        types: int, float, bool, str. example: --override-kv
+                                        tokenizer.ggml.add_bos_token=bool:false,tokenizer.ggml.add_eos_token=bool:false
+--op-offload, --no-op-offload           whether to offload host tensor operations to device (default: true)
+--lora FNAME                            path to LoRA adapter (use comma-separated values to load multiple
+                                        adapters)
+--lora-scaled FNAME:SCALE,...           path to LoRA adapter with user defined scaling (format:
+                                        FNAME:SCALE,...)
+                                        note: use comma-separated values
+--control-vector FNAME                  add a control vector
+                                        note: use comma-separated values to add multiple control vectors
+--control-vector-scaled FNAME:SCALE,...
+                                        add a control vector with user defined scaling SCALE
+                                        note: use comma-separated values (format: FNAME:SCALE,...)
+--control-vector-layer-range START END
+                                        layer range to apply the control vector(s) to, start and end inclusive
+-m,    --model FNAME                    model path to load
+                                        (env: LLAMA_ARG_MODEL)
+-mu,   --model-url MODEL_URL            model download url (default: unused)
+                                        (env: LLAMA_ARG_MODEL_URL)
+-dr,   --docker-repo [<repo>/]<model>[:quant]
+                                        Docker Hub model repository. repo is optional, default to ai/. quant
+                                        is optional, default to :latest.
+                                        example: gemma3
+                                        (default: unused)
+                                        (env: LLAMA_ARG_DOCKER_REPO)
+-hf,   -hfr, --hf-repo <user>/<model>[:quant]
+                                        Hugging Face model repository; quant is optional, case-insensitive,
+                                        default to Q4_K_M, or falls back to the first file in the repo if
+                                        Q4_K_M doesn't exist.
+                                        mmproj is also downloaded automatically if available. to disable, add
+                                        --no-mmproj
+                                        example: ggml-org/GLM-4.7-Flash-GGUF:Q4_K_M
+                                        (default: unused)
+                                        (env: LLAMA_ARG_HF_REPO)
+-hff,  --hf-file FILE                   Hugging Face model file. If specified, it will override the quant in
+                                        --hf-repo (default: unused)
+                                        (env: LLAMA_ARG_HF_FILE)
+-hfv,  -hfrv, --hf-repo-v <user>/<model>[:quant]
+                                        Hugging Face model repository for the vocoder model (default: unused)
+                                        (env: LLAMA_ARG_HF_REPO_V)
+-hffv, --hf-file-v FILE                 Hugging Face model file for the vocoder model (default: unused)
+                                        (env: LLAMA_ARG_HF_FILE_V)
+-hft,  --hf-token TOKEN                 Hugging Face access token (default: value from HF_TOKEN environment
+                                        variable)
+                                        (env: HF_TOKEN)
+--log-disable                           Log disable
+--log-file FNAME                        Log to file
+                                        (env: LLAMA_ARG_LOG_FILE)
+--log-colors [on|off|auto]              Set colored logging ('on', 'off', or 'auto', default: 'auto')
+                                        'auto' enables colors when output is to a terminal
+                                        (env: LLAMA_ARG_LOG_COLORS)
+-v,    --verbose, --log-verbose         Set verbosity level to infinity (i.e. log all messages, useful for
+                                        debugging)
+--offline                               Offline mode: forces use of cache, prevents network access
+                                        (env: LLAMA_ARG_OFFLINE)
+-lv,   --verbosity, --log-verbosity N   Set the verbosity threshold. Messages with a higher verbosity will be
+                                        ignored. Values:
+                                         - 0: generic output
+                                         - 1: error
+                                         - 2: warning
+                                         - 3: info
+                                         - 4: trace (more info)
+                                         - 5: debug
+                                        (default: 3)
+
+                                        (env: LLAMA_ARG_LOG_VERBOSITY)
+--log-prefix, --no-log-prefix           Enable prefix in log messages
+                                        (env: LLAMA_ARG_LOG_PREFIX)
+--log-timestamps, --no-log-timestamps   Enable timestamps in log messages
+                                        (env: LLAMA_ARG_LOG_TIMESTAMPS)
+--spec-draft-type-k, -ctkd, --cache-type-k-draft TYPE
+                                        KV cache data type for K for the draft model
+                                        allowed values: f32, f16, bf16, q8_0, q4_0, q4_1, iq4_nl, q5_0, q5_1
+                                        (default: f16)
+                                        (env: LLAMA_ARG_SPEC_DRAFT_CACHE_TYPE_K)
+--spec-draft-type-v, -ctvd, --cache-type-v-draft TYPE
+                                        KV cache data type for V for the draft model
+                                        allowed values: f32, f16, bf16, q8_0, q4_0, q4_1, iq4_nl, q5_0, q5_1
+                                        (default: f16)
+                                        (env: LLAMA_ARG_SPEC_DRAFT_CACHE_TYPE_V)
+
+
+----- sampling params -----
+
+--samplers SAMPLERS                     samplers that will be used for generation in the order, separated by
+                                        ';'
+                                        (default:
+                                        penalties;dry;top_n_sigma;top_k;typ_p;top_p;min_p;xtc;temperature)
+-s,    --seed SEED                      RNG seed (default: -1, use random seed for -1)
+--sampler-seq, --sampling-seq SEQUENCE
+                                        simplified sequence for samplers that will be used (default:
+                                        edskypmxt)
+--ignore-eos                            ignore end of stream token and continue generating (implies
+                                        --logit-bias EOS-inf)
+--temp, --temperature N                 temperature (default: 0.80)
+--top-k N                               top-k sampling (default: 40, 0 = disabled)
+                                        (env: LLAMA_ARG_TOP_K)
+--top-p N                               top-p sampling (default: 0.95, 1.0 = disabled)
+--min-p N                               min-p sampling (default: 0.05, 0.0 = disabled)
+--top-nsigma, --top-n-sigma N           top-n-sigma sampling (default: -1.00, -1.0 = disabled)
+--xtc-probability N                     xtc probability (default: 0.00, 0.0 = disabled)
+--xtc-threshold N                       xtc threshold (default: 0.10, 1.0 = disabled)
+--typical, --typical-p N                locally typical sampling, parameter p (default: 1.00, 1.0 = disabled)
+--repeat-last-n N                       last n tokens to consider for penalize (default: 64, 0 = disabled, -1
+                                        = ctx_size)
+--repeat-penalty N                      penalize repeat sequence of tokens (default: 1.00, 1.0 = disabled)
+--presence-penalty N                    repeat alpha presence penalty (default: 0.00, 0.0 = disabled)
+--frequency-penalty N                   repeat alpha frequency penalty (default: 0.00, 0.0 = disabled)
+--dry-multiplier N                      set DRY sampling multiplier (default: 0.00, 0.0 = disabled)
+--dry-base N                            set DRY sampling base value (default: 1.75)
+--dry-allowed-length N                  set allowed length for DRY sampling (default: 2)
+--dry-penalty-last-n N                  set DRY penalty for the last n tokens (default: -1, 0 = disable, -1 =
+                                        context size)
+--dry-sequence-breaker STRING           add sequence breaker for DRY sampling, clearing out default breakers
+                                        ('\n', ':', '"', '*') in the process; use "none" to not use any
+                                        sequence breakers
+--adaptive-target N                     adaptive-p: select tokens near this probability (valid range 0.0 to
+                                        1.0; negative = disabled) (default: -1.00)
+                                        [(more info)](https://github.com/ggml-org/llama.cpp/pull/17927)
+--adaptive-decay N                      adaptive-p: decay rate for target adaptation over time. lower values
+                                        are more reactive, higher values are more stable.
+                                        (valid range 0.0 to 0.99) (default: 0.90)
+--dynatemp-range N                      dynamic temperature range (default: 0.00, 0.0 = disabled)
+--dynatemp-exp N                        dynamic temperature exponent (default: 1.00)
+--mirostat N                            use Mirostat sampling.
+                                        Top K, Nucleus and Locally Typical samplers are ignored if used.
+                                        (default: 0, 0 = disabled, 1 = Mirostat, 2 = Mirostat 2.0)
+--mirostat-lr N                         Mirostat learning rate, parameter eta (default: 0.10)
+--mirostat-ent N                        Mirostat target entropy, parameter tau (default: 5.00)
+-l,    --logit-bias TOKEN_ID(+/-)BIAS   modifies the likelihood of token appearing in the completion,
+                                        i.e. `--logit-bias 15043+1` to increase likelihood of token ' Hello',
+                                        or `--logit-bias 15043-1` to decrease likelihood of token ' Hello'
+--grammar GRAMMAR                       BNF-like grammar to constrain generations (see samples in grammars/
+                                        dir)
+--grammar-file FNAME                    file to read grammar from
+-j,    --json-schema SCHEMA             JSON schema to constrain generations (https://json-schema.org/), e.g.
+                                        `{}` for any JSON object
+                                        For schemas w/ external $refs, use --grammar +
+                                        example/json_schema_to_grammar.py instead
+-jf,   --json-schema-file FILE          File containing a JSON schema to constrain generations
+                                        (https://json-schema.org/), e.g. `{}` for any JSON object
+                                        For schemas w/ external $refs, use --grammar +
+                                        example/json_schema_to_grammar.py instead
+-bs,   --backend-sampling               enable backend sampling (experimental) (default: disabled)
+                                        (env: LLAMA_ARG_BACKEND_SAMPLING)
+
+
+----- speculative params -----
+
+--spec-draft-hf, -hfd, -hfrd, --hf-repo-draft <user>/<model>[:quant]
+                                        Same as --hf-repo, but for the draft model (default: unused)
+                                        (env: LLAMA_ARG_SPEC_DRAFT_HF_REPO)
+--spec-draft-threads, -td, --threads-draft N
+                                        number of threads to use during generation (default: same as
+                                        --threads)
+--spec-draft-threads-batch, -tbd, --threads-batch-draft N
+                                        number of threads to use during batch and prompt processing (default:
+                                        same as --threads-draft)
+--spec-draft-cpu-mask, -Cd, --cpu-mask-draft M
+                                        Draft model CPU affinity mask. Complements cpu-range-draft (default:
+                                        same as --cpu-mask)
+--spec-draft-cpu-range, -Crd, --cpu-range-draft lo-hi
+                                        Ranges of CPUs for affinity. Complements --cpu-mask-draft
+--spec-draft-cpu-strict, --cpu-strict-draft <0|1>
+                                        Use strict CPU placement for draft model (default: same as
+                                        --cpu-strict)
+--spec-draft-prio, --prio-draft N       set draft process/thread priority : 0-normal, 1-medium, 2-high,
+                                        3-realtime (default: 0)
+--spec-draft-poll, --poll-draft <0|1>   Use polling to wait for draft model work (default: same as --poll)
+--spec-draft-cpu-mask-batch, -Cbd, --cpu-mask-batch-draft M
+                                        Draft model CPU affinity mask. Complements cpu-range-draft (default:
+                                        same as --cpu-mask)
+--spec-draft-cpu-strict-batch, --cpu-strict-batch-draft <0|1>
+                                        Use strict CPU placement for draft model (default: --cpu-strict-draft)
+--spec-draft-prio-batch, --prio-batch-draft N
+                                        set draft process/thread priority : 0-normal, 1-medium, 2-high,
+                                        3-realtime (default: 0)
+--spec-draft-poll-batch, --poll-batch-draft <0|1>
+                                        Use polling to wait for draft model work (default: --poll-draft)
+--spec-draft-override-tensor, -otd, --override-tensor-draft <tensor name pattern>=<buffer type>,...
+                                        override tensor buffer type for draft model
+--spec-draft-cpu-moe, -cmoed, --cpu-moe-draft
+                                        keep all Mixture of Experts (MoE) weights in the CPU for the draft
+                                        model
+                                        (env: LLAMA_ARG_SPEC_DRAFT_CPU_MOE)
+--spec-draft-n-cpu-moe, --spec-draft-ncmoe, -ncmoed, --n-cpu-moe-draft N
+                                        keep the Mixture of Experts (MoE) weights of the first N layers in the
+                                        CPU for the draft model
+                                        (env: LLAMA_ARG_SPEC_DRAFT_N_CPU_MOE)
+--spec-draft-n-max N                    number of tokens to draft for speculative decoding (default: 3)
+                                        (env: LLAMA_ARG_SPEC_DRAFT_N_MAX)
+--spec-draft-n-min N                    minimum number of draft tokens to use for speculative decoding
+                                        (default: 0)
+                                        (env: LLAMA_ARG_SPEC_DRAFT_N_MIN)
+--spec-draft-p-split, --draft-p-split P
+                                        speculative decoding split probability (default: 0.10)
+                                        (env: LLAMA_ARG_SPEC_DRAFT_P_SPLIT)
+--spec-draft-p-min, --draft-p-min P     minimum speculative decoding probability (greedy) (default: 0.00)
+                                        (env: LLAMA_ARG_SPEC_DRAFT_P_MIN)
+--spec-draft-backend-sampling, --no-spec-draft-backend-sampling
+                                        offload draft sampling to the backend (default: enabled)
+                                        (env: LLAMA_ARG_SPEC_DRAFT_BACKEND_SAMPLING)
+--spec-draft-device, -devd, --device-draft <dev1,dev2,..>
+                                        comma-separated list of devices to use for offloading the draft model
+                                        (none = don't offload)
+                                        use --list-devices to see a list of available devices
+--spec-draft-ngl, -ngld, --gpu-layers-draft, --n-gpu-layers-draft N
+                                        max. number of draft model layers to store in VRAM, either an exact
+                                        number, 'auto', or 'all' (default: auto)
+                                        (env: LLAMA_ARG_N_GPU_LAYERS_DRAFT)
+--spec-draft-model, -md, --model-draft FNAME
+                                        draft model for speculative decoding (default: unused)
+                                        (env: LLAMA_ARG_SPEC_DRAFT_MODEL)
+--spec-type none,draft-simple,draft-eagle3,draft-mtp,ngram-simple,ngram-map-k,ngram-map-k4v,ngram-mod,ngram-cache
+                                        comma-separated list of types of speculative decoding to use (default:
+                                        none)
+
+                                        (env: LLAMA_ARG_SPEC_TYPE)
+--spec-ngram-mod-n-min N                minimum number of ngram tokens to use for ngram-based speculative
+                                        decoding (default: 48)
+--spec-ngram-mod-n-max N                maximum number of ngram tokens to use for ngram-based speculative
+                                        decoding (default: 64)
+--spec-ngram-mod-n-match N              ngram-mod lookup length (default: 24)
+--spec-ngram-simple-size-n N            ngram size N for ngram-simple speculative decoding, length of lookup
+                                        n-gram (default: 12)
+--spec-ngram-simple-size-m N            ngram size M for ngram-simple speculative decoding, length of draft
+                                        m-gram (default: 48)
+--spec-ngram-simple-min-hits N          minimum hits for ngram-simple speculative decoding (default: 1)
+--spec-ngram-map-k-size-n N             ngram size N for ngram-map-k speculative decoding, length of lookup
+                                        n-gram (default: 12)
+--spec-ngram-map-k-size-m N             ngram size M for ngram-map-k speculative decoding, length of draft
+                                        m-gram (default: 48)
+--spec-ngram-map-k-min-hits N           minimum hits for ngram-map-k speculative decoding (default: 1)
+--spec-ngram-map-k4v-size-n N           ngram size N for ngram-map-k4v speculative decoding, length of lookup
+                                        n-gram (default: 12)
+--spec-ngram-map-k4v-size-m N           ngram size M for ngram-map-k4v speculative decoding, length of draft
+                                        m-gram (default: 48)
+--spec-ngram-map-k4v-min-hits N         minimum hits for ngram-map-k4v speculative decoding (default: 1)
+--draft, --draft-n, --draft-max N       the argument has been removed. use --spec-draft-n-max or
+                                        --spec-ngram-mod-n-max
+                                        (env: LLAMA_ARG_DRAFT_MAX)
+--draft-min, --draft-n-min N            the argument has been removed. use --spec-draft-n-min or
+                                        --spec-ngram-mod-n-min
+                                        (env: LLAMA_ARG_DRAFT_MIN)
+--spec-ngram-size-n N                   the argument has been removed. use the respective
+                                        --spec-ngram-*-size-n or --spec-ngram-mod-n-match
+--spec-ngram-size-m N                   the argument has been removed. use the respective
+                                        --spec-ngram-*-size-m
+--spec-ngram-min-hits N                 the argument has been removed. use the respective
+                                        --spec-ngram-*-min-hits
+
+
+----- example-specific params -----
+
+-lcs,  --lookup-cache-static FNAME      path to static lookup cache to use for lookup decoding (not updated by
+                                        generation)
+-lcd,  --lookup-cache-dynamic FNAME     path to dynamic lookup cache to use for lookup decoding (updated by
+                                        generation)
+-ctxcp, --ctx-checkpoints, --swa-checkpoints N
+                                        max number of context checkpoints to create per slot (default:
+                                        32)[(more info)](https://github.com/ggml-org/llama.cpp/pull/15293)
+                                        (env: LLAMA_ARG_CTX_CHECKPOINTS)
+-cms,  --checkpoint-min-step N          minimum spacing between context checkpoints in tokens (default: 256, 0
+                                        = no minimum)
+                                        (env: LLAMA_ARG_CHECKPOINT_MIN_SPACING_NT)
+-cram, --cache-ram N                    set the maximum cache size in MiB (default: 8192, -1 - no limit, 0 -
+                                        disable)[(more
+                                        info)](https://github.com/ggml-org/llama.cpp/pull/16391)
+                                        (env: LLAMA_ARG_CACHE_RAM)
+-kvu,  --kv-unified, -no-kvu, --no-kv-unified
+                                        use single unified KV buffer shared across all sequences (default:
+                                        enabled if number of slots is auto)
+                                        (env: LLAMA_ARG_KV_UNIFIED)
+--cache-idle-slots, --no-cache-idle-slots
+                                        save idle slots to the prompt cache on new task, and clear them when
+                                        using unified KV (default: enabled, requires cache-ram)
+                                        (env: LLAMA_ARG_CACHE_IDLE_SLOTS)
+--context-shift, --no-context-shift     whether to use context shift on infinite text generation (default:
+                                        disabled)
+                                        (env: LLAMA_ARG_CONTEXT_SHIFT)
+-r,    --reverse-prompt PROMPT          halt generation at PROMPT, return control in interactive mode
+-sp,   --special                        special tokens output enabled (default: false)
+--warmup, --no-warmup                   whether to perform warmup with an empty run (default: enabled)
+--spm-infill                            use Suffix/Prefix/Middle pattern for infill (instead of
+                                        Prefix/Suffix/Middle) as some models prefer this. (default: disabled)
+--pooling {none,mean,cls,last,rank}     pooling type for embeddings, use model default if unspecified
+                                        (env: LLAMA_ARG_POOLING)
+-np,   --parallel N                     number of server slots (default: -1, -1 = auto)
+                                        (env: LLAMA_ARG_N_PARALLEL)
+-cb,   --cont-batching, -nocb, --no-cont-batching
+                                        whether to enable continuous batching (a.k.a dynamic batching)
+                                        (default: enabled)
+                                        (env: LLAMA_ARG_CONT_BATCHING)
+-mm,   --mmproj FILE                    path to a multimodal projector file. see tools/mtmd/README.md
+                                        note: if -hf is used, this argument can be omitted
+                                        (env: LLAMA_ARG_MMPROJ)
+-mmu,  --mmproj-url URL                 URL to a multimodal projector file. see tools/mtmd/README.md
+                                        (env: LLAMA_ARG_MMPROJ_URL)
+--mmproj-auto, --no-mmproj, --no-mmproj-auto
+                                        whether to use multimodal projector file (if available), useful when
+                                        using -hf (default: enabled)
+                                        (env: LLAMA_ARG_MMPROJ_AUTO)
+--mmproj-offload, --no-mmproj-offload   whether to enable GPU offloading for multimodal projector (default:
+                                        enabled)
+                                        (env: LLAMA_ARG_MMPROJ_OFFLOAD)
+--image-min-tokens N                    minimum number of tokens each image can take, only used by vision
+                                        models with dynamic resolution (default: read from model)
+                                        (env: LLAMA_ARG_IMAGE_MIN_TOKENS)
+--image-max-tokens N                    maximum number of tokens each image can take, only used by vision
+                                        models with dynamic resolution (default: read from model)
+                                        (env: LLAMA_ARG_IMAGE_MAX_TOKENS)
+-a,    --alias STRING                   set model name aliases, comma-separated (to be used by API)
+                                        (env: LLAMA_ARG_ALIAS)
+--tags STRING                           set model tags, comma-separated (informational, not used for routing)
+                                        (env: LLAMA_ARG_TAGS)
+--embd-normalize N                      normalisation for embeddings (default: 2) (-1=none, 0=max absolute
+                                        int16, 1=taxicab, 2=euclidean, >2=p-norm)
+--host HOST                             ip address to listen, or bind to an UNIX socket if the address ends
+                                        with .sock (default: 127.0.0.1)
+                                        (env: LLAMA_ARG_HOST)
+--port PORT                             port to listen (default: 8080)
+                                        (env: LLAMA_ARG_PORT)
+--reuse-port                            allow multiple sockets to bind to the same port (default: disabled)
+                                        (env: LLAMA_ARG_REUSE_PORT)
+--path PATH                             path to serve static files from (default: )
+                                        (env: LLAMA_ARG_STATIC_PATH)
+--api-prefix PREFIX                     prefix path the server serves from, without the trailing slash
+                                        (default: )
+                                        (env: LLAMA_ARG_API_PREFIX)
+--webui-config JSON                     [DEPRECATED: use --ui-config] JSON that provides default WebUI
+                                        settings (overrides WebUI defaults)
+                                        (env: LLAMA_ARG_WEBUI_CONFIG)
+--ui-config JSON                        JSON that provides default UI settings (overrides UI defaults)
+                                        (env: LLAMA_ARG_UI_CONFIG)
+--webui-config-file PATH                [DEPRECATED: use --ui-config-file] JSON file that provides default
+                                        WebUI settings (overrides WebUI defaults)
+                                        (env: LLAMA_ARG_WEBUI_CONFIG_FILE)
+--ui-config-file PATH                   JSON file that provides default UI settings (overrides UI defaults)
+                                        (env: LLAMA_ARG_UI_CONFIG_FILE)
+--webui-mcp-proxy, --no-webui-mcp-proxy
+                                        [DEPRECATED: use --ui-mcp-proxy/--no-ui-mcp-proxy] experimental:
+                                        whether to enable MCP CORS proxy
+                                        (env: LLAMA_ARG_WEBUI_MCP_PROXY)
+--ui-mcp-proxy, --no-ui-mcp-proxy       experimental: whether to enable MCP CORS proxy - do not enable in
+                                        untrusted environments (default: disabled)
+                                        (env: LLAMA_ARG_UI_MCP_PROXY)
+--tools TOOL1,TOOL2,...                 experimental: whether to enable built-in tools for AI agents - do not
+                                        enable in untrusted environments (default: no tools)
+                                        specify "all" to enable all tools
+                                        available tools: read_file, file_glob_search, grep_search,
+                                        exec_shell_command, write_file, edit_file, apply_diff, get_datetime
+                                        (env: LLAMA_ARG_TOOLS)
+--webui, --no-webui                     [DEPRECATED: use --ui/--no-ui] whether to enable the Web UI
+                                        (env: LLAMA_ARG_WEBUI)
+--ui,  --no-ui                          whether to enable the Web UI (default: enabled)
+                                        (env: LLAMA_ARG_UI)
+--embedding, --embeddings               restrict to only support embedding use case; use only with dedicated
+                                        embedding models (default: disabled)
+                                        (env: LLAMA_ARG_EMBEDDINGS)
+--rerank, --reranking                   enable reranking endpoint on server (default: disabled)
+                                        (env: LLAMA_ARG_RERANKING)
+--api-key KEY                           API key to use for authentication, multiple keys can be provided as a
+                                        comma-separated list (default: none)
+                                        (env: LLAMA_API_KEY)
+--api-key-file FNAME                    path to file containing API keys (default: none)
+                                        (env: LLAMA_ARG_API_KEY_FILE)
+--ssl-key-file FNAME                    path to file a PEM-encoded SSL private key
+                                        (env: LLAMA_ARG_SSL_KEY_FILE)
+--ssl-cert-file FNAME                   path to file a PEM-encoded SSL certificate
+                                        (env: LLAMA_ARG_SSL_CERT_FILE)
+--chat-template-kwargs STRING           sets additional params for the json template parser, must be a valid
+                                        json object string, e.g. '{"key1":"value1","key2":"value2"}'
+                                        (env: LLAMA_ARG_CHAT_TEMPLATE_KWARGS)
+-to,   --timeout N                      server read/write timeout in seconds (default: 3600)
+                                        (env: LLAMA_ARG_TIMEOUT)
+--sse-ping-interval N                   server SSE ping interval in seconds (-1 = disabled, default: 30)
+                                        (env: LLAMA_ARG_SSE_PING_INTERVAL)
+--threads-http N                        number of threads used to process HTTP requests (default: -1)
+                                        (env: LLAMA_ARG_THREADS_HTTP)
+--cache-prompt, --no-cache-prompt       whether to enable prompt caching (default: enabled)
+                                        (env: LLAMA_ARG_CACHE_PROMPT)
+--cache-reuse N                         min chunk size to attempt reusing from the cache via KV shifting,
+                                        requires prompt caching to be enabled (default: 0)
+                                        [(card)](https://ggml.ai/f0.png)
+                                        (env: LLAMA_ARG_CACHE_REUSE)
+--metrics                               enable prometheus compatible metrics endpoint (default: disabled)
+                                        (env: LLAMA_ARG_ENDPOINT_METRICS)
+--props                                 enable changing global properties via POST /props (default: disabled)
+                                        (env: LLAMA_ARG_ENDPOINT_PROPS)
+--slots, --no-slots                     expose slots monitoring endpoint (default: enabled)
+                                        (env: LLAMA_ARG_ENDPOINT_SLOTS)
+--slot-save-path PATH                   path to save slot kv cache (default: disabled)
+--media-path PATH                       directory for loading local media files; files can be accessed via
+                                        file:// URLs using relative paths (default: disabled)
+--models-dir PATH                       directory containing models for the router server (default: disabled)
+                                        (env: LLAMA_ARG_MODELS_DIR)
+--models-preset PATH                    path to INI file containing model presets for the router server
+                                        (default: disabled)
+                                        (env: LLAMA_ARG_MODELS_PRESET)
+--models-max N                          for router server, maximum number of models to load simultaneously
+                                        (default: 4, 0 = unlimited)
+                                        (env: LLAMA_ARG_MODELS_MAX)
+--models-autoload, --no-models-autoload
+                                        for router server, whether to automatically load models (default:
+                                        enabled)
+                                        (env: LLAMA_ARG_MODELS_AUTOLOAD)
+--jinja, --no-jinja                     whether to use jinja template engine for chat (default: enabled)
+                                        (env: LLAMA_ARG_JINJA)
+--reasoning-format FORMAT               controls whether thought tags are allowed and/or extracted from the
+                                        response, and in which format they're returned; one of:
+                                        - none: leaves thoughts unparsed in `message.content`
+                                        - deepseek: puts thoughts in `message.reasoning_content`
+                                        - deepseek-legacy: keeps `<think>` tags in `message.content` while
+                                        also populating `message.reasoning_content`
+                                        (default: auto)
+                                        (env: LLAMA_ARG_THINK)
+-rea,  --reasoning [on|off|auto]        Use reasoning/thinking in the chat ('on', 'off', or 'auto', default:
+                                        'auto' (detect from template))
+                                        (env: LLAMA_ARG_REASONING)
+--reasoning-budget N                    token budget for thinking: -1 for unrestricted, 0 for immediate end,
+                                        N>0 for token budget (default: -1)
+                                        (env: LLAMA_ARG_THINK_BUDGET)
+--reasoning-budget-message MESSAGE      message injected before the end-of-thinking tag when reasoning budget
+                                        is exhausted (default: none)
+                                        (env: LLAMA_ARG_THINK_BUDGET_MESSAGE)
+--chat-template JINJA_TEMPLATE          set custom jinja chat template (default: template taken from model's
+                                        metadata)
+                                        if suffix/prefix are specified, template will be disabled
+                                        only commonly used templates are accepted (unless --jinja is set
+                                        before this flag):
+                                        list of built-in templates:
+                                        bailing, bailing-think, bailing2, chatglm3, chatglm4, chatml,
+                                        command-r, deepseek, deepseek-ocr, deepseek2, deepseek3, exaone-moe,
+                                        exaone3, exaone4, falcon3, gemma, gigachat, glmedge, gpt-oss, granite,
+                                        granite-4.0, granite-4.1, grok-2, hunyuan-dense, hunyuan-moe,
+                                        hunyuan-vl, kimi-k2, llama2, llama2-sys, llama2-sys-bos,
+                                        llama2-sys-strip, llama3, llama4, megrez, minicpm, mistral-v1,
+                                        mistral-v3, mistral-v3-tekken, mistral-v7, mistral-v7-tekken, monarch,
+                                        openchat, orion, pangu-embedded, phi3, phi4, rwkv-world, seed_oss,
+                                        smolvlm, solar-open, vicuna, vicuna-orca, yandex, zephyr
+                                        (env: LLAMA_ARG_CHAT_TEMPLATE)
+--chat-template-file JINJA_TEMPLATE_FILE
+                                        set custom jinja chat template file (default: template taken from
+                                        model's metadata)
+                                        if suffix/prefix are specified, template will be disabled
+                                        only commonly used templates are accepted (unless --jinja is set
+                                        before this flag):
+                                        list of built-in templates:
+                                        bailing, bailing-think, bailing2, chatglm3, chatglm4, chatml,
+                                        command-r, deepseek, deepseek-ocr, deepseek2, deepseek3, exaone-moe,
+                                        exaone3, exaone4, falcon3, gemma, gigachat, glmedge, gpt-oss, granite,
+                                        granite-4.0, granite-4.1, grok-2, hunyuan-dense, hunyuan-moe,
+                                        hunyuan-vl, kimi-k2, llama2, llama2-sys, llama2-sys-bos,
+                                        llama2-sys-strip, llama3, llama4, megrez, minicpm, mistral-v1,
+                                        mistral-v3, mistral-v3-tekken, mistral-v7, mistral-v7-tekken, monarch,
+                                        openchat, orion, pangu-embedded, phi3, phi4, rwkv-world, seed_oss,
+                                        smolvlm, solar-open, vicuna, vicuna-orca, yandex, zephyr
+                                        (env: LLAMA_ARG_CHAT_TEMPLATE_FILE)
+--skip-chat-parsing, --no-skip-chat-parsing
+                                        force a pure content parser, even if a Jinja template is specified;
+                                        model will output everything in the content section, including any
+                                        reasoning and/or tool calls (default: disabled)
+                                        (env: LLAMA_ARG_SKIP_CHAT_PARSING)
+--prefill-assistant, --no-prefill-assistant
+                                        whether to prefill the assistant's response if the last message is an
+                                        assistant message (default: prefill enabled)
+                                        when this flag is set, if the last message is an assistant message
+                                        then it will be treated as a full message and not prefilled
+
+                                        (env: LLAMA_ARG_PREFILL_ASSISTANT)
+-sps,  --slot-prompt-similarity SIMILARITY
+                                        how much the prompt of a request must match the prompt of a slot in
+                                        order to use that slot (default: 0.10, 0.0 = disabled)
+--lora-init-without-apply               load LoRA adapters without applying them (apply later via POST
+                                        /lora-adapters) (default: disabled)
+--sleep-idle-seconds SECONDS            number of seconds of idleness after which the server will sleep
+                                        (default: -1; -1 = disabled)
+--log-prompts-dir PATH                  Log prompts to directory (only used for debugging, default: disabled)
+-mv,   --model-vocoder FNAME            vocoder model for audio generation (default: unused)
+--tts-use-guide-tokens                  Use guide tokens to improve TTS word recall
+--embd-gemma-default                    use default EmbeddingGemma model (note: can download weights from the
+                                        internet)
+--fim-qwen-1.5b-default                 use default Qwen 2.5 Coder 1.5B (note: can download weights from the
+                                        internet)
+--fim-qwen-3b-default                   use default Qwen 2.5 Coder 3B (note: can download weights from the
+                                        internet)
+--fim-qwen-7b-default                   use default Qwen 2.5 Coder 7B (note: can download weights from the
+                                        internet)
+--fim-qwen-7b-spec                      use Qwen 2.5 Coder 7B + 0.5B draft for speculative decoding (note: can
+                                        download weights from the internet)
+--fim-qwen-14b-spec                     use Qwen 2.5 Coder 14B + 0.5B draft for speculative decoding (note:
+                                        can download weights from the internet)
+--fim-qwen-30b-default                  use default Qwen 3 Coder 30B A3B Instruct (note: can download weights
+                                        from the internet)
+--gpt-oss-20b-default                   use gpt-oss-20b (note: can download weights from the internet)
+--gpt-oss-120b-default                  use gpt-oss-120b (note: can download weights from the internet)
+--vision-gemma-4b-default               use Gemma 3 4B QAT (note: can download weights from the internet)
+--vision-gemma-12b-default              use Gemma 3 12B QAT (note: can download weights from the internet)
+--spec-default                          enable default speculative decoding config
+PS C:\Users\USER\llama.cpp> .\build\bin\Release\llama-server.exe --list-devices
+Available devices:
+PS C:\Users\USER\llama.cpp> Get-CimInstance Win32_VideoController | Select-Object Name
+
+Name
+----
+NVIDIA GeForce MX350
+Intel(R) Iris(R) Xe Graphics
+
+
+PS C:\Users\USER\llama.cpp> .\build\bin\Release\llama-server.exe -hf ggml-org/gemma-3-4b-it-GGUF
+HTTPS is not supported. Please rebuild with one of:
+  -DLLAMA_BUILD_BORINGSSL=ON
+  -DLLAMA_BUILD_LIBRESSL=ON
+  -DLLAMA_OPENSSL=ON (default, requires OpenSSL dev files installed)
+PS C:\Users\USER\llama.cpp> llama-server -hf google/gemma-3-4b-it-qat-q4_0-gguf:Q4_0
+llama-server : The term 'llama-server' is not recognized as the name of a cmdlet, function, script file, or operable program. Check the spelling of the name, or if a path was included,
+verify that the path is correct and try again.
+At line:1 char:1
++ llama-server -hf google/gemma-3-4b-it-qat-q4_0-gguf:Q4_0
++ ~~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (llama-server:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+PS C:\Users\USER\llama.cpp>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
