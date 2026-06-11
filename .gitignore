@@ -55,3 +55,6 @@ Thumbs.db
 
 # Uploaded files / Docker volumes
 uploads/
+
+# Local dev process logs (api/web/agent/seed stdout+stderr)
+*.log

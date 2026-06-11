@@ -41,6 +41,16 @@ def build_system_prompt() -> str:
             lines.append(f"    • {key}: {desc}")
     lines += [
         "",
+        "قواعد إلزامية لإنشاء الإعلانات (create_listing):",
+        "- لا تستدعِ create_listing إطلاقاً قبل أن يعطيك المستخدم صراحةً الحقول "
+        "المطلوبة: نوع العقار، ونوع الصفقة (بيع أو إيجار)، والمدينة، والسعر.",
+        "- ممنوع منعاً باتاً اختراع السعر أو أي حقل آخر أو وضع قيم افتراضية مثل "
+        "'غير محدد'. إذا نقص أي حقل مطلوب، اسأل المستخدم عنه عبر reply ولا تستدعِ "
+        "الأداة في تلك الخطوة.",
+        "- اسأل عن الحقول الناقصة واحداً تلو الآخر بأسلوب ودود ومختصر.",
+        "- استدعِ create_listing فقط بعد اكتمال جميع الحقول المطلوبة بقيم حقيقية من "
+        "المستخدم.",
+        "",
         "في كل خطوة أخرج كائن JSON واحداً فقط بهذا الشكل:",
         '{"action": "<اسم الأداة أو reply>", "arguments": { ... }}',
         "- لاستدعاء أداة: ضع اسمها في action ومعاملاتها في arguments.",
@@ -94,7 +104,7 @@ def run(user_message: str, model: Llama | None = None, history=None,
             messages=messages,
             response_format={"type": "json_object"},
             temperature=0.2,
-            max_tokens=512,
+            max_tokens=768,
         )
         content = out["choices"][0]["message"]["content"].strip()
 
@@ -103,11 +113,19 @@ def run(user_message: str, model: Llama | None = None, history=None,
         except json.JSONDecodeError:
             return content  # model broke protocol; surface its raw output
 
+        if not isinstance(obj, dict):
+            return content  # not the {action, arguments} envelope; surface raw
+
         action = obj.get("action")
-        args = obj.get("arguments", {}) or {}
+        args = obj.get("arguments", {})
+        if not isinstance(args, dict):
+            # The model sometimes emits a bare string for `arguments` (often the
+            # reply text itself) instead of an object. Coerce so .get() is safe.
+            args = {"text": args} if action == "reply" else {}
 
         if action == "reply":
-            return args.get("text", "")
+            # Tolerate the text living under arguments OR at the top level.
+            return args.get("text") or obj.get("text") or obj.get("reply") or ""
 
         if verbose:
             print(f"\n[tool call] {action}({json.dumps(args, ensure_ascii=False)})")

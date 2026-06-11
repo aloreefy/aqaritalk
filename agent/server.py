@@ -66,11 +66,13 @@ def health():
 @app.post("/chat", response_model=ChatResponse)
 def chat(req: ChatRequest):
     history = [{"role": t.role, "content": t.content} for t in req.history]
+    print(f"\n[chat] user: {req.message}", flush=True)
     try:
-        reply = agent_mod.run(req.message, model=_llm, history=history, verbose=False)
+        reply = agent_mod.run(req.message, model=_llm, history=history, verbose=True)
     except Exception as exc:  # noqa: BLE001 — surface as 500, Node renders the user fallback
         logger.exception("agent.run failed")
         raise HTTPException(status_code=500, detail="agent error") from exc
+    print(f"[chat] reply: {reply}", flush=True)
     return ChatResponse(reply=reply)
 
 

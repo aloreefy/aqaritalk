@@ -18,6 +18,8 @@ import { toApiProperty } from "../lib/property-mapper";
 const router: IRouter = Router();
 
 const AGENT_URL = process.env.AGENT_URL ?? "http://host.docker.internal:8000";
+// How many recent turns to send the agent (sliding memory window).
+const AGENT_HISTORY_TURNS = 8;
 
 type Message = { role: "user" | "assistant"; content: string; timestamp: string };
 
@@ -157,11 +159,16 @@ router.post(
     }
 
     // --- Build history for the agent (drop timestamps) ---
+    // Only the last AGENT_HISTORY_TURNS turns are sent: local CPU inference
+    // slows as the prompt grows, and the model's context is small (4096),
+    // so a sliding window keeps each reply fast and within budget.
     const existingMessages = (convo.messages as Message[]) ?? [];
-    const history = existingMessages.map((m) => ({
-      role: m.role,
-      content: m.content,
-    }));
+    const history = existingMessages
+      .slice(-AGENT_HISTORY_TURNS)
+      .map((m) => ({
+        role: m.role,
+        content: m.content,
+      }));
 
     const userMsg: Message = {
       role: "user",
@@ -170,11 +177,11 @@ router.post(
     };
 
     // --- Call the Python broker-agent sidecar ---
-    // 60s timeout: generous for local Gemma inference, but bounds the worst
-    // case so a stalled sidecar can't hang the request indefinitely.
+    // 180s timeout: local Gemma on CPU can take 30s-2min per multi-step reply.
+    // Still bounds the worst case so a stalled sidecar can't hang forever.
     let aiText = "";
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 60_000);
+    const timer = setTimeout(() => controller.abort(), 180_000);
     try {
       const resp = await fetch(`${AGENT_URL}/chat`, {
         method: "POST",
