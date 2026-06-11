@@ -1,6 +1,9 @@
-FROM node:24-alpine AS base
+# Debian/glibc base (not alpine/musl): pnpm-workspace.yaml keeps only the
+# `-gnu` native binaries (e.g. @rollup/rollup-linux-x64-gnu) and strips the
+# musl ones, so Vite/rollup can't load on alpine. glibc matches the kept set.
+FROM node:24-slim AS base
 
-RUN corepack enable && corepack prepare pnpm@latest --activate
+RUN corepack enable
 
 WORKDIR /app
 

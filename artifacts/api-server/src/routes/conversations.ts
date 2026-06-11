@@ -1,5 +1,5 @@
 import { Router, type IRouter } from "express";
-import { db, conversationsTable, propertiesTable } from "@workspace/db";
+import { db, conversationsTable, propertiesTable, propertyImagesTable } from "@workspace/db";
 import { eq, and } from "drizzle-orm";
 import {
   CreateConversationBody,
@@ -11,20 +11,15 @@ import {
   GetPropertyResponse,
 } from "@workspace/api-zod";
 import { authenticate } from "../middleware/authenticate";
-import { createChat, type ChatHistory } from "../services/ai/client";
 import { isOffTopic, OFF_TOPIC_RESPONSE_AR } from "../services/ai/guardrails";
-import { buildSystemPrompt } from "../services/ai/context-builder";
-import { extractBuyerCriteria, extractSellerData, isSubmitIntent } from "../services/ai/extraction";
-import {
-  advanceBuyerState,
-  advanceSellerState,
-  type BuyerState,
-  type SellerState,
-  type BuyerCriteria,
-  type SellerData,
-} from "../services/ai/state-machine";
+import type { SellerData } from "../services/ai/state-machine";
+import { toApiProperty } from "../lib/property-mapper";
 
 const router: IRouter = Router();
+
+const AGENT_URL = process.env.AGENT_URL ?? "http://host.docker.internal:8000";
+// How many recent turns to send the agent (sliding memory window).
+const AGENT_HISTORY_TURNS = 8;
 
 type Message = { role: "user" | "assistant"; content: string; timestamp: string };
 
@@ -163,30 +158,17 @@ router.post(
       return;
     }
 
-    // --- Extract & advance state ---
-    const existingData = (convo.extractedData ?? {}) as BuyerCriteria | SellerData;
-    const currentState = convo.currentState as BuyerState | SellerState;
-    const market = convo.market ?? "JO";
-
-    let newData: BuyerCriteria | SellerData;
-    let newState: BuyerState | SellerState;
-
-    if (convo.type === "buyer_search") {
-      newData = extractBuyerCriteria(userText, existingData as BuyerCriteria);
-      newState = advanceBuyerState(currentState as BuyerState, newData as BuyerCriteria);
-    } else {
-      newData = extractSellerData(userText, existingData as SellerData);
-      newState = advanceSellerState(currentState as SellerState, newData as SellerData);
-
-      const LATE_SELLER_STATES: SellerState[] = ["details_collection", "guidance_review", "submit_ready"];
-      if (isSubmitIntent(userText) && LATE_SELLER_STATES.includes(currentState as SellerState)) {
-        newState = "submit_ready";
-      }
-    }
-
-    // --- Build Gemini history ---
+    // --- Build history for the agent (drop timestamps) ---
+    // Only the last AGENT_HISTORY_TURNS turns are sent: local CPU inference
+    // slows as the prompt grows, and the model's context is small (4096),
+    // so a sliding window keeps each reply fast and within budget.
     const existingMessages = (convo.messages as Message[]) ?? [];
-    const systemPrompt = buildSystemPrompt(convo.type, newState, newData, market);
+    const history = existingMessages
+      .slice(-AGENT_HISTORY_TURNS)
+      .map((m) => ({
+        role: m.role,
+        content: m.content,
+      }));
 
     const userMsg: Message = {
       role: "user",
@@ -194,33 +176,28 @@ router.post(
       timestamp: new Date().toISOString(),
     };
 
-    // --- Call Gemini ---
+    // --- Call the Python broker-agent sidecar ---
+    // 180s timeout: local Gemma on CPU can take 30s-2min per multi-step reply.
+    // Still bounds the worst case so a stalled sidecar can't hang forever.
     let aiText = "";
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 180_000);
     try {
-      // Build history: strip leading model messages (chat must start with user turn).
-      const mapped: ChatHistory = existingMessages.map((m) => ({
-        role: m.role === "assistant" ? ("model" as const) : ("user" as const),
-        parts: [{ text: m.content }],
-      }));
-      const firstUserIdx = mapped.findIndex((h) => h.role === "user");
-      const history = firstUserIdx >= 0 ? mapped.slice(firstUserIdx) : [];
-
-      const chat = createChat(systemPrompt, history);
-      const result = await chat.sendMessage({ message: userText });
-      aiText = (result.text ?? "").trim();
-      // Strip any leaked chain-of-thought blocks (fallback guard)
-      aiText = aiText.replace(/^(THOUGHT|THINKING):[\s\S]*?\n\n/i, "").trim();
+      const resp = await fetch(`${AGENT_URL}/chat`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: userText, history }),
+        signal: controller.signal,
+      });
+      if (!resp.ok) throw new Error(`agent sidecar HTTP ${resp.status}`);
+      const data = (await resp.json()) as { reply?: string };
+      aiText = (data.reply ?? "").trim();
       if (!aiText) aiText = "أعد المحاولة من فضلك.";
     } catch (err) {
-      req.log.error({ err }, "Gemini call failed");
-      const errMsg = String((err as { message?: string })?.message ?? "");
-      const isQuota =
-        (err as { status?: number })?.status === 429 ||
-        errMsg.includes("RESOURCE_EXHAUSTED") ||
-        errMsg.includes("quota");
-      aiText = isQuota
-        ? "عذراً، تم الوصول إلى الحد اليومي لطلبات الذكاء الاصطناعي. يرجى المحاولة لاحقاً."
-        : "عذراً، حدث خطأ تقني. يرجى المحاولة مرة أخرى.";
+      req.log.error({ err }, "Agent sidecar call failed");
+      aiText = "عذراً، حدث خطأ تقني. يرجى المحاولة مرة أخرى.";
+    } finally {
+      clearTimeout(timer);
     }
 
     const aiMsg: Message = {
@@ -235,8 +212,6 @@ router.post(
       .update(conversationsTable)
       .set({
         messages: updatedMessages,
-        extractedData: newData,
-        currentState: newState,
         updatedAt: new Date(),
       })
       .where(eq(conversationsTable.id, convo.id))
