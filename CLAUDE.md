@@ -36,9 +36,21 @@ docker compose up
 
 There is **no test runner configured** in this repo — `typecheck` and `build` are the verification gates.
 
+## Running the broker agent (Python sidecar)
+
+The chat flow routes through the Python agent (`agent/server.py`) on `:8000`, which loads a **local GGUF model (~3GB) that is NOT in the repo** — obtain it separately. The model path is read from the `MODEL_PATH` env var (the code's default is one developer's machine path, so set your own). The agent reads **real environment variables and does not load `.env`** — export them in the shell.
+
+```bash
+pip install -r agent/requirements.txt
+# from agent/, with Postgres running:
+MODEL_PATH="/your/path/gemma-4-E2B-it-Q4_K_M.gguf" python server.py   # serves :8000
+```
+
+Only the machine that runs the agent needs the GGUF. Others can skip it and point the Node API's `AGENT_URL` at a shared instance (`http://<host>:8000`). The seeder (`seed/seed.py`) uses the same model via `GEMMA_PATH`, or `--no-llm` to skip it. See `.env.example` for `AGENT_URL` / `MODEL_PATH` / `GEMMA_PATH`.
+
 ## Required environment
 
-`DATABASE_URL` (Postgres), `GEMINI_API_KEY` (Google AI Studio), `SESSION_SECRET` (JWT signing). Copy `.env.example` to `.env`. Docker Compose pre-wires `DATABASE_URL`. `VITE_MAPBOX_TOKEN` is needed for map rendering and is not yet configured.
+`DATABASE_URL` (Postgres), `GEMINI_API_KEY` (Google AI Studio), `SESSION_SECRET` (JWT signing). Copy `.env.example` to `.env`. Docker Compose pre-wires `DATABASE_URL`. `VITE_MAPBOX_TOKEN` is needed for map rendering and is not yet configured. The Python agent additionally needs `MODEL_PATH` (and `GEMMA_PATH` for the seeder) set in its shell — see "Running the broker agent" above.
 
 ## Architecture
 
