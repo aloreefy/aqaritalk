@@ -27,6 +27,9 @@ services:
       DATABASE_URL: postgresql://aqaritalk:aqaritalk_dev@postgres:5432/aqaritalk
       GEMINI_API_KEY: ${GEMINI_API_KEY}
       SESSION_SECRET: ${SESSION_SECRET}
+      AGENT_URL: ${AGENT_URL:-http://host.docker.internal:8000}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     depends_on:
       postgres:
         condition: service_healthy
