@@ -38,5 +38,5 @@ channel = "stable-25_05"
 [userenv]
 
 [userenv.shared]
-AGENT_URL = "https://rushy-cherubic-giovani.ngrok-free.dev"
+AGENT_URL = "https://resupply-illusion-snowiness.ngrok-free.dev"
 INTERNAL_API_KEY = "aqari-094d112de8069d24728a28c201a555a03c843b36"
