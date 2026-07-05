@@ -15,45 +15,56 @@ export default function WizardProgress({ currentStep }: WizardProgressProps) {
     t("wizard.step4"),
   ];
 
+  // Progress line fill: from step 1 up to the active step
+  const fillPct = ((currentStep - 1) / (steps.length - 1)) * 100;
+
   return (
-    <div className="bg-white border-b border-gray-100 px-4 pt-3 pb-3">
-      <div className="flex items-start justify-between">
+    <div className="bg-card border-b border-border px-6 pt-5 pb-4">
+      <div className="relative flex items-center justify-between mb-2">
+        {/* Base track */}
+        <div className="absolute inset-x-0 top-3 h-0.5 bg-muted -z-0" aria-hidden />
+        {/* Emerald progress fill (RTL-aware: pin to the right) */}
+        <div
+          className="absolute right-0 top-3 h-0.5 bg-primary -z-0 transition-all duration-300"
+          style={{ width: `${fillPct}%` }}
+          aria-hidden
+        />
+
         {steps.map((label, i) => {
           const step = (i + 1) as 1 | 2 | 3 | 4;
           const isActive = step === currentStep;
           const isDone = step < currentStep;
-          const isLast = step === 4;
           return (
-            <div key={step} className="flex flex-col items-center flex-1 relative">
-              {!isLast && (
-                <div
-                  className={`absolute top-3.5 right-0 left-1/2 h-[2px] -z-0 transition-colors ${
-                    isDone ? "bg-green-400" : "bg-gray-200"
-                  }`}
-                />
-              )}
+            <div key={step} className="flex flex-col items-center gap-1 z-10">
               <div
-                className={`relative z-10 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold mb-1 transition-colors ${
-                  isActive
-                    ? "bg-primary text-white shadow-md"
-                    : isDone
-                      ? "bg-green-500 text-white"
-                      : "bg-gray-200 text-gray-400"
+                className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
+                  isDone
+                    ? "bg-primary text-primary-foreground"
+                    : isActive
+                      ? "bg-primary text-primary-foreground outline outline-2 outline-offset-2 outline-primary"
+                      : "bg-muted text-muted-foreground"
                 }`}
               >
-                {isDone ? <Check size={12} strokeWidth={3} /> : step}
+                {isDone ? <Check size={13} strokeWidth={3} /> : step}
               </div>
-              <p
-                className={`text-[10px] text-center leading-tight transition-colors ${
-                  isActive ? "text-primary font-semibold" : isDone ? "text-green-600" : "text-gray-400"
+              <span
+                className={`text-[11px] text-center leading-tight transition-colors ${
+                  isActive
+                    ? "text-primary font-bold"
+                    : isDone
+                      ? "text-primary"
+                      : "text-muted-foreground"
                 }`}
               >
                 {label}
-              </p>
+              </span>
             </div>
           );
         })}
       </div>
+      <p className="text-center text-xs text-muted-foreground mt-2">
+        الخطوة {currentStep} من {steps.length}
+      </p>
     </div>
   );
 }

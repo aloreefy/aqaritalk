@@ -1,16 +1,28 @@
 import { useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { useLocation } from "wouter";
-import { Search, SlidersHorizontal, List, Map, MessageCircle } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import {
+  Search,
+  SlidersHorizontal,
+  Mic,
+  List,
+  Map,
+  Bot,
+  ArrowLeft,
+  MapPin,
+  ChevronDown,
+  Bell,
+} from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useListProperties } from "@workspace/api-client-react";
+import { useAuth } from "@/contexts/auth";
 import PropertyCard from "./PropertyCard";
 import MapView from "@/components/map/MapView";
 
 type FilterChip = { label: string; key: string };
 
 const FILTER_CHIPS: FilterChip[] = [
+  { label: "الكل", key: "" },
   { label: "شقق", key: "apartment" },
   { label: "فلل", key: "villa" },
   { label: "للبيع", key: "sale" },
@@ -21,9 +33,10 @@ const FILTER_CHIPS: FilterChip[] = [
 export default function HomePage() {
   const { t } = useTranslation();
   const [, navigate] = useLocation();
+  const { user } = useAuth();
   const [viewMode, setViewMode] = useState<"list" | "map">("list");
   const [query, setQuery] = useState("");
-  const [activeFilter, setActiveFilter] = useState<string | null>(null);
+  const [activeFilter, setActiveFilter] = useState<string>("");
   const [mapCenter, setMapCenter] = useState({ lat: 31.9539, lng: 35.9106 });
 
   const { data, isLoading, refetch } = useListProperties({
@@ -49,102 +62,184 @@ export default function HomePage() {
     [refetch],
   );
 
+  const goToAi = () => navigate("/chat/new?type=buyer_search");
+  const firstName = user?.name?.split(" ")[0];
+
   return (
-    <div className="flex flex-col h-screen overflow-hidden">
-      {/* Sticky header */}
-      <div className="sticky top-0 z-30 bg-white border-b border-gray-100 px-4 pt-3 pb-2 space-y-2">
-        {/* Search + filters button */}
-        <div className="flex items-center gap-2">
-          <div className="relative flex-1">
+    <div className="flex flex-col h-screen overflow-hidden bg-background">
+      {/* Greeting header — Stitch style */}
+      <header className="shrink-0 bg-card border-b border-border px-4 h-16 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-primary/30 bg-secondary flex items-center justify-center text-primary shrink-0">
+            {user?.name ? (
+              <span className="font-bold text-sm">{user.name.charAt(0)}</span>
+            ) : (
+              <span className="text-lg">👤</span>
+            )}
+          </div>
+          <div className="flex flex-col">
+            <span className="text-muted-foreground text-xs">
+              {firstName ? `مرحباً، ${firstName}` : "مرحباً بك"}
+            </span>
+            <div className="flex items-center gap-1 text-foreground">
+              <MapPin size={14} className="text-primary" fill="currentColor" />
+              <span className="font-semibold text-sm">عمّان، الأردن</span>
+              <ChevronDown size={14} className="text-muted-foreground" />
+            </div>
+          </div>
+        </div>
+        <button
+          type="button"
+          className="w-10 h-10 rounded-full flex items-center justify-center text-muted-foreground hover:bg-muted transition-colors relative"
+          aria-label={t("nav.notifications", { defaultValue: "الإشعارات" })}
+        >
+          <Bell size={20} />
+          <span className="absolute top-2 end-2 w-2 h-2 bg-destructive rounded-full" />
+        </button>
+      </header>
+
+      {/* Scroll area */}
+      <div className="flex-1 overflow-y-auto">
+        {/* Search */}
+        <div className="px-4 pt-4">
+          <div className="relative">
             <Search
-              size={16}
-              className="absolute top-1/2 -translate-y-1/2 start-3 text-gray-400"
+              size={18}
+              className="absolute top-1/2 -translate-y-1/2 start-4 text-muted-foreground pointer-events-none"
             />
             <Input
-              className="ps-9 h-10 text-sm bg-gray-50 border-gray-200"
+              className="ps-11 pe-24 h-12 text-sm bg-card border-border rounded-2xl shadow-sm"
               placeholder={t("home.searchPlaceholder")}
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               dir="auto"
             />
+            <div className="absolute inset-y-0 end-2 flex items-center gap-1">
+              <button
+                type="button"
+                onClick={goToAi}
+                aria-label="بحث صوتي"
+                className="p-2 rounded-xl text-primary bg-primary/10 hover:bg-primary/20 transition-colors"
+              >
+                <Mic size={18} />
+              </button>
+              <button
+                type="button"
+                aria-label="فلترة"
+                className="p-2 rounded-xl text-muted-foreground hover:bg-muted transition-colors"
+              >
+                <SlidersHorizontal size={18} />
+              </button>
+            </div>
           </div>
-          <Button variant="outline" size="icon" className="h-10 w-10 shrink-0">
-            <SlidersHorizontal size={16} />
-          </Button>
         </div>
 
-        {/* Filter chips */}
-        <div className="flex gap-2 overflow-x-auto scrollbar-none pb-0.5">
-          {FILTER_CHIPS.map((chip) => (
-            <button
-              key={chip.key}
-              onClick={() =>
-                setActiveFilter(activeFilter === chip.key ? null : chip.key)
-              }
-              className={`shrink-0 text-xs px-3 py-1.5 rounded-full border transition-colors ${
-                activeFilter === chip.key
-                  ? "bg-primary text-white border-primary"
-                  : "bg-white text-gray-600 border-gray-200"
-              }`}
-              type="button"
-            >
-              {chip.label}
-            </button>
-          ))}
+        {/* Category chips */}
+        <div className="mt-4 overflow-x-auto scrollbar-none px-4">
+          <div className="flex items-center gap-2 min-w-max pb-1">
+            {FILTER_CHIPS.map((chip) => {
+              const active = activeFilter === chip.key;
+              return (
+                <button
+                  key={chip.key || "all"}
+                  onClick={() => setActiveFilter(chip.key)}
+                  type="button"
+                  className={`shrink-0 px-5 py-2 rounded-full text-sm font-semibold transition-all ${
+                    active
+                      ? "bg-primary text-primary-foreground shadow-md"
+                      : "bg-card text-foreground border border-border hover:bg-muted"
+                  }`}
+                >
+                  {chip.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
 
-          {/* Spacer + view toggle */}
-          <div className="flex-1" />
-          <div className="flex items-center gap-1 shrink-0">
+        {/* Hero AI CTA */}
+        <div className="px-4 mt-5">
+          <button
+            type="button"
+            onClick={goToAi}
+            className="w-full text-start relative overflow-hidden rounded-3xl bg-primary shadow-lg group active:scale-[0.99] transition-transform"
+          >
+            <div
+              className="absolute inset-0 opacity-10"
+              style={{
+                backgroundImage:
+                  "radial-gradient(circle at 100% 100%, #ffffff 0, #ffffff 3px, transparent 3px)",
+                backgroundSize: "20px 20px",
+              }}
+            />
+            <div className="relative z-10 p-6 flex items-center justify-between gap-4">
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-2 text-primary-foreground/80">
+                  <Bot size={18} />
+                  <span className="font-bold text-xs tracking-widest">
+                    الذكاء الاصطناعي
+                  </span>
+                </div>
+                <h2 className="text-primary-foreground font-extrabold text-xl mb-1">
+                  تحدث مع وكيلك العقاري الذكي
+                </h2>
+                <p className="text-primary-foreground/80 text-sm">
+                  صِف ما تبحث عنه بالصوت أو النص، وسأجد لك الأنسب فوراً.
+                </p>
+              </div>
+              <div className="w-12 h-12 rounded-full bg-primary-foreground text-primary flex items-center justify-center shrink-0 shadow-md group-hover:scale-110 transition-transform">
+                <ArrowLeft size={22} className="rtl:rotate-180" />
+              </div>
+            </div>
+          </button>
+        </div>
+
+        {/* Section header + view toggle */}
+        <div className="px-4 mt-6 flex items-center justify-between">
+          <h3 className="font-bold text-lg text-foreground">عقارات مميزة</h3>
+          <div className="flex items-center gap-1">
             <button
               onClick={() => setViewMode("list")}
-              className={`p-1.5 rounded-md transition-colors ${
-                viewMode === "list"
-                  ? "bg-primary/10 text-primary"
-                  : "text-gray-400"
-              }`}
               type="button"
+              aria-label="قائمة"
+              className={`p-2 rounded-lg transition-colors ${
+                viewMode === "list" ? "bg-primary/10 text-primary" : "text-muted-foreground"
+              }`}
             >
-              <List size={16} />
+              <List size={18} />
             </button>
             <button
               onClick={() => setViewMode("map")}
-              className={`p-1.5 rounded-md transition-colors ${
-                viewMode === "map"
-                  ? "bg-primary/10 text-primary"
-                  : "text-gray-400"
-              }`}
               type="button"
+              aria-label="خريطة"
+              className={`p-2 rounded-lg transition-colors ${
+                viewMode === "map" ? "bg-primary/10 text-primary" : "text-muted-foreground"
+              }`}
             >
-              <Map size={16} />
+              <Map size={18} />
             </button>
           </div>
         </div>
-      </div>
 
-      {/* Content area */}
-      <div className="flex-1 overflow-hidden relative">
+        {/* Content */}
         {viewMode === "map" ? (
-          <div className="absolute inset-0">
-            <MapView
-              properties={properties}
-              onBoundsChange={handleBoundsChange}
-            />
-            {/* Floating property count */}
-            <div className="absolute top-3 left-1/2 -translate-x-1/2 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-md text-xs font-medium text-gray-700">
+          <div className="mx-4 mt-3 mb-6 relative h-[60vh] rounded-3xl overflow-hidden border border-border">
+            <MapView properties={properties} onBoundsChange={handleBoundsChange} />
+            <div className="absolute top-3 left-1/2 -translate-x-1/2 bg-card/90 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-md text-xs font-medium text-foreground">
               {isLoading
                 ? "جاري البحث..."
                 : `${properties.length} عقار${properties.length !== 1 ? "ات" : ""}`}
             </div>
           </div>
         ) : (
-          <div className="h-full overflow-y-auto p-4 space-y-3">
+          <div className="px-4 mt-3 pb-6 space-y-4">
             {isLoading && (
-              <p className="text-center text-sm text-gray-400 py-8">
+              <p className="text-center text-sm text-muted-foreground py-8">
                 {t("common.loading")}
               </p>
             )}
             {!isLoading && !properties.length && (
-              <p className="text-center text-sm text-gray-400 py-8">
+              <p className="text-center text-sm text-muted-foreground py-8">
                 {t("home.noResults")}
               </p>
             )}
@@ -154,16 +249,6 @@ export default function HomePage() {
           </div>
         )}
       </div>
-
-      {/* AI search FAB */}
-      <button
-        onClick={() => navigate("/chat/new?type=buyer_search")}
-        className="fixed bottom-20 end-4 z-40 bg-primary text-white rounded-full w-14 h-14 flex items-center justify-center shadow-xl"
-        type="button"
-        aria-label="بحث بالذكاء الاصطناعي"
-      >
-        <MessageCircle size={22} />
-      </button>
     </div>
   );
 }

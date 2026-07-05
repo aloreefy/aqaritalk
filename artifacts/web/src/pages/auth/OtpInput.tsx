@@ -1,5 +1,4 @@
-import { useRef, KeyboardEvent, ClipboardEvent } from "react";
-import { Button } from "@/components/ui/button";
+import { useRef, KeyboardEvent, ClipboardEvent, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 interface Props {
@@ -12,9 +11,15 @@ export default function OtpInput({ length, onComplete, loading }: Props) {
   const { t } = useTranslation();
   const inputs = useRef<(HTMLInputElement | null)[]>([]);
   const values = useRef<string[]>(Array(length).fill(""));
+  const [filled, setFilled] = useState(0);
+
+  function recount() {
+    setFilled(values.current.filter(Boolean).length);
+  }
 
   function update(index: number, val: string) {
     values.current[index] = val;
+    recount();
     const code = values.current.join("");
     if (code.length === length) {
       onComplete(code);
@@ -45,35 +50,44 @@ export default function OtpInput({ length, onComplete, loading }: Props) {
       values.current[i] = ch;
       if (inputs.current[i]) inputs.current[i]!.value = ch;
     });
+    recount();
     inputs.current[Math.min(text.length, length - 1)]?.focus();
     if (text.length === length) onComplete(text);
   }
 
+  const complete = filled === length;
+
   return (
-    <div className="space-y-4">
-      <div className="flex gap-2 justify-center" dir="ltr">
+    <div className="space-y-8">
+      {/* OTP boxes — Stitch style */}
+      <div className="flex justify-between items-center gap-2" dir="ltr">
         {Array.from({ length }).map((_, i) => (
           <input
             key={i}
-            ref={(el) => { inputs.current[i] = el; }}
-            type="tel"
+            ref={(el) => {
+              inputs.current[i] = el;
+            }}
+            autoFocus={i === 0}
+            type="text"
             maxLength={1}
-            className="w-11 h-14 border-2 border-gray-200 rounded-lg text-center text-xl font-bold focus:border-primary focus:outline-none transition-colors"
+            inputMode="numeric"
+            className="w-12 h-14 text-center text-xl font-bold rounded-xl border border-input bg-card text-foreground outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/20"
             onKeyDown={(e) => handleKey(e, i)}
             onChange={(e) => handleInput(e, i)}
             onPaste={handlePaste}
-            inputMode="numeric"
           />
         ))}
       </div>
-      <Button
-        className="w-full h-12 text-base"
-        disabled={loading}
+
+      {/* Primary action */}
+      <button
+        className="w-full h-14 bg-primary text-primary-foreground font-semibold text-lg rounded-xl shadow-sm active:scale-[0.98] transition-all flex items-center justify-center disabled:opacity-50 disabled:pointer-events-none"
+        disabled={loading || !complete}
         onClick={() => onComplete(values.current.join(""))}
         type="button"
       >
         {loading ? t("common.loading") : t("auth.verify")}
-      </Button>
+      </button>
     </div>
   );
 }

@@ -373,6 +373,8 @@ export interface ConversationMessage {
   role: ConversationMessageRole;
   content: string;
   timestamp: string;
+  /** Property listings the agent found for this message, rendered as cards in the chat. Present only on assistant messages that returned search results. */
+  properties?: Property[];
 }
 
 export interface Conversation {

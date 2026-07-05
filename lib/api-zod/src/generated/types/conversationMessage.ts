@@ -6,9 +6,12 @@
  * OpenAPI spec version: 0.1.0
  */
 import type { ConversationMessageRole } from './conversationMessageRole';
+import type { Property } from './property';
 
 export interface ConversationMessage {
   role: ConversationMessageRole;
   content: string;
   timestamp: Date;
+  /** Property listings the agent found for this message, rendered as cards in the chat. Present only on assistant messages that returned search results. */
+  properties?: Property[];
 }

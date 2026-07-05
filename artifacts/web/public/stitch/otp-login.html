@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+
+<html dir="rtl" lang="ar"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AqariTalk - OTP Verification</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary-container": "#cee9dc",
+                        "surface-container-highest": "#dae5de",
+                        "primary-fixed": "#aef0d6",
+                        "inverse-on-surface": "#999e9a",
+                        "on-secondary-fixed-variant": "#496057",
+                        "inverse-surface": "#0b0f0d",
+                        "inverse-primary": "#bcffe4",
+                        "on-surface-variant": "#57615c",
+                        "on-error": "#fff7f6",
+                        "tertiary-dim": "#205b65",
+                        "on-primary": "#e5fff2",
+                        "primary": "#296a55",
+                        "error-dim": "#67040d",
+                        "tertiary-container": "#b9f2fe",
+                        "surface-container-low": "#eff5f0",
+                        "secondary": "#4c645a",
+                        "surface-container": "#e8f0ea",
+                        "background": "#f6faf6",
+                        "on-primary-container": "#185c49",
+                        "on-secondary-fixed": "#2d443b",
+                        "secondary-fixed-dim": "#c0dace",
+                        "primary-dim": "#1a5e4a",
+                        "secondary-fixed": "#cee9dc",
+                        "tertiary-fixed": "#b9f2fe",
+                        "on-error-container": "#6e0a12",
+                        "on-primary-fixed-variant": "#246652",
+                        "tertiary": "#2e6771",
+                        "on-tertiary": "#edfcff",
+                        "outline": "#737d78",
+                        "on-tertiary-fixed-variant": "#2e6771",
+                        "error": "#a83836",
+                        "surface": "#f6faf6",
+                        "surface-container-lowest": "#ffffff",
+                        "primary-fixed-dim": "#a0e2c8",
+                        "tertiary-fixed-dim": "#abe3ef",
+                        "on-tertiary-fixed": "#064a54",
+                        "surface-dim": "#d2ddd6",
+                        "error-container": "#fa746f",
+                        "surface-tint": "#296a55",
+                        "secondary-dim": "#40584e",
+                        "on-tertiary-container": "#225d67",
+                        "surface-bright": "#f6faf6",
+                        "on-secondary": "#e5fff2",
+                        "on-background": "#2b3530",
+                        "on-secondary-container": "#3f574d",
+                        "surface-variant": "#dae5de",
+                        "primary-container": "#aef0d6",
+                        "on-surface": "#2b3530",
+                        "surface-container-high": "#e1eae4",
+                        "outline-variant": "#aab4ae",
+                        "on-primary-fixed": "#004937"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Plus Jakarta Sans"],
+                        "display": ["Plus Jakarta Sans"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3, h4, h5, h6, .font-headline { font-family: 'Plus Jakarta Sans', sans-serif; }
+        
+        .otp-input::-webkit-outer-spin-button,
+        .otp-input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        .otp-input[type=number] {
+            -moz-appearance: textfield;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col antialiased">
+<!-- TopAppBar -->
+<header class="bg-background dark:bg-inverse-surface shadow-sm fixed top-0 w-full z-50">
+<div class="flex flex-row-reverse items-center justify-between px-4 h-16 w-full max-w-md mx-auto">
+<button aria-label="Back" class="p-2 -mr-2 text-primary hover:bg-surface-container-high transition-colors active:scale-95 transition-transform rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">arrow_forward</span>
+</button>
+<div class="flex-1 flex justify-center">
+<img alt="AqariTalk Logo" class="h-8 object-contain" src="https://lh3.googleusercontent.com/aida/AP1WRLvIK3QfKsTYREUvNeqbZl7-MW-uvFGOF3iG9rbewXRhqpmhgd0MwxgI8faPx18Ay3LwpqDD2XdRYzNOKyaHWdUq6BZNUJZhtqF-i4AtUXJRy7F8ji3WM650f1cr4IhZ3khBCNp6mdekuQEqnJp711lUmy3jdndH_JP2y3D065oVS8ly0MjzhyAc5SkAc5LK54f6D9FiEUWqRsfv-6YDoodYDuvaDBixSrhTuv6H9resm2z-4tAPPuLH0Bzr"/>
+</div>
+<div class="w-10"></div> <!-- Spacer for centering -->
+</div>
+</header>
+<!-- Main Content -->
+<main class="flex-1 flex flex-col justify-center px-6 pt-24 pb-12 w-full max-w-md mx-auto">
+<div class="mb-10 text-center">
+<h1 class="font-headline text-2xl font-bold text-on-background mb-3">أدخل رمز التحقق</h1>
+<p class="font-body text-sm text-on-surface-variant leading-relaxed">
+                أرسلنا رمزاً مكوناً من ٦ أرقام إلى رقمك<br/>
+<span class="font-medium text-on-background mt-1 inline-block" dir="ltr">+962 79 123 4567</span>
+</p>
+</div>
+<form class="flex flex-col space-y-8" onsubmit="event.preventDefault();">
+<!-- OTP Inputs -->
+<div class="flex justify-between items-center gap-2" dir="ltr">
+<input class="otp-input w-12 h-14 text-center text-xl font-headline font-bold rounded-xl border border-outline-variant bg-surface-container-lowest text-on-background focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" inputmode="numeric" maxlength="1" readonly="" type="text" value="1"/>
+<input class="otp-input w-12 h-14 text-center text-xl font-headline font-bold rounded-xl border border-outline-variant bg-surface-container-lowest text-on-background focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" inputmode="numeric" maxlength="1" readonly="" type="text" value="2"/>
+<input class="otp-input w-12 h-14 text-center text-xl font-headline font-bold rounded-xl border border-outline-variant bg-surface-container-lowest text-on-background focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" inputmode="numeric" maxlength="1" readonly="" type="text" value="3"/>
+<input autofocus="" class="otp-input w-12 h-14 text-center text-xl font-headline font-bold rounded-xl border-2 border-[#0F7A5F] bg-surface-container-lowest text-on-background focus:outline-none shadow-[0_0_0_2px_rgba(15,122,95,0.2)] transition-all" inputmode="numeric" maxlength="1" type="text"/>
+<input class="otp-input w-12 h-14 text-center text-xl font-headline font-bold rounded-xl border border-outline-variant bg-surface-container-lowest text-on-background focus:border-[#0F7A5F] focus:ring-1 focus:ring-[#0F7A5F] outline-none transition-all" inputmode="numeric" maxlength="1" type="text"/>
+<input class="otp-input w-12 h-14 text-center text-xl font-headline font-bold rounded-xl border border-outline-variant bg-surface-container-lowest text-on-background focus:border-[#0F7A5F] focus:ring-1 focus:ring-[#0F7A5F] outline-none transition-all" inputmode="numeric" maxlength="1" type="text"/>
+</div>
+<!-- Primary Action -->
+<button class="w-full h-14 bg-[#0F7A5F] hover:bg-primary-dim text-white font-headline font-semibold text-lg rounded-xl shadow-sm active:scale-[0.98] transition-all flex items-center justify-center" type="submit">
+                تحقق
+            </button>
+</form>
+<!-- Resend Section -->
+<div class="mt-8 text-center font-body text-sm">
+<span class="text-on-surface-variant">لم يصلك الرمز؟</span>
+<button class="text-[#0F7A5F] font-semibold hover:underline mr-1 focus:outline-none">
+                إعادة الإرسال
+            </button>
+<span class="text-on-surface-variant mr-1" dir="ltr">خلال 0:30</span>
+</div>
+</main>
+<!-- Footer Disclaimer -->
+<footer class="mt-auto py-6 text-center px-6 w-full max-w-md mx-auto">
+<p class="font-body text-xs text-outline">
+            بتسجيلك أنت توافق على <a class="text-primary hover:underline" href="#">الشروط والأحكام</a>
+</p>
+</footer>
+<script>
+        // Simple logic to move focus between OTP inputs
+        const inputs = document.querySelectorAll('.otp-input');
+        inputs.forEach((input, index) => {
+            input.addEventListener('input', (e) => {
+                if (e.target.value.length === 1 && index < inputs.length - 1) {
+                    inputs[index + 1].focus();
+                }
+            });
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Backspace' && e.target.value.length === 0 && index > 0) {
+                    inputs[index - 1].focus();
+                }
+            });
+        });
+    </script>
+</body></html>
