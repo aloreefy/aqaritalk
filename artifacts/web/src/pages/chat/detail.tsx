@@ -14,6 +14,7 @@ import { useAuth } from "@/contexts/auth";
 import { useToast } from "@/hooks/use-toast";
 import { useSpeechInput } from "@/hooks/useSpeechInput";
 import type { ConversationMessage } from "@workspace/api-client-react";
+import PropertyCard from "@/pages/home/PropertyCard";
 
 // ── Criteria chip helpers ─────────────────────────────────────────────────────
 
@@ -211,7 +212,7 @@ export default function ChatDetailPage() {
     : t("chat.placeholder");
 
   return (
-    <div className="flex flex-col h-screen bg-gray-50">
+    <div className="flex flex-col h-screen bg-muted/40">
       {/* Header */}
       <div className="sticky top-0 z-10 bg-white border-b border-gray-100 px-4 py-3 flex items-center gap-3">
         <button onClick={() => navigate("/chat")} type="button">
@@ -242,11 +243,11 @@ export default function ChatDetailPage() {
         ))}
         {isLoading && (
           <div className="flex justify-start">
-            <div className="bg-white border border-gray-100 rounded-2xl px-4 py-3 max-w-[80%]">
+            <div className="bg-card border border-border rounded-2xl px-4 py-3 max-w-[80%] shadow-sm">
               <span className="flex gap-1">
-                <span className="w-2 h-2 bg-gray-300 rounded-full animate-bounce [animation-delay:0ms]" />
-                <span className="w-2 h-2 bg-gray-300 rounded-full animate-bounce [animation-delay:150ms]" />
-                <span className="w-2 h-2 bg-gray-300 rounded-full animate-bounce [animation-delay:300ms]" />
+                <span className="w-2 h-2 bg-muted-foreground/40 rounded-full animate-bounce [animation-delay:0ms]" />
+                <span className="w-2 h-2 bg-muted-foreground/40 rounded-full animate-bounce [animation-delay:150ms]" />
+                <span className="w-2 h-2 bg-muted-foreground/40 rounded-full animate-bounce [animation-delay:300ms]" />
               </span>
             </div>
           </div>
@@ -362,18 +363,32 @@ export default function ChatDetailPage() {
 
 function MessageBubble({ message }: { message: ConversationMessage }) {
   const isUser = message.role === "user";
+  const cards = message.properties ?? [];
   return (
-    <div className={`flex ${isUser ? "justify-end" : "justify-start"}`}>
+    <div className={`flex flex-col ${isUser ? "items-end" : "items-start"} gap-2`}>
       <div
-        className={`max-w-[82%] px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${
+        className={`max-w-[82%] px-4 py-2.5 text-sm leading-relaxed whitespace-pre-wrap shadow-sm ${
           isUser
-            ? "bg-primary text-white rounded-br-sm"
-            : "bg-white border border-gray-100 text-gray-800 rounded-bl-sm"
+            ? "bg-primary text-primary-foreground rounded-t-2xl rounded-br-2xl rounded-bl-md"
+            : "bg-card border border-border text-foreground rounded-t-2xl rounded-bl-2xl rounded-br-md"
         }`}
         dir="auto"
       >
         {message.content}
       </div>
+
+      {/* Clickable result cards — horizontal carousel, each links to /property/:id */}
+      {cards.length > 0 && (
+        <div className="w-full overflow-x-auto pb-1 -mx-1 px-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <div className="flex gap-3 min-w-min snap-x snap-mandatory">
+            {cards.map((property) => (
+              <div key={property.id} className="w-[240px] shrink-0 snap-start">
+                <PropertyCard property={property} />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>AqariTalk — Stitch Designs</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet" />
+<style>
+  :root { --emerald: #006948; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #f8f9fa; color: #191c1d; font-family: 'Tajawal','Cairo',sans-serif; }
+  header { background: var(--emerald); color: #fff; padding: 24px 20px; }
+  header h1 { margin: 0; font-family: 'Cairo',sans-serif; font-size: 22px; }
+  header p { margin: 6px 0 0; opacity: .85; font-size: 14px; }
+  main { max-width: 720px; margin: 0 auto; padding: 20px; display: grid; gap: 14px; }
+  a.card { display: flex; align-items: center; justify-content: space-between; gap: 12px;
+           background: #fff; border: 1px solid #e1e3e4; border-radius: 16px; padding: 18px 20px;
+           text-decoration: none; color: inherit; box-shadow: 0 4px 12px rgba(15,23,42,.05); transition: .15s; }
+  a.card:hover { box-shadow: 0 8px 24px rgba(15,23,42,.10); transform: translateY(-1px); }
+  a.card .name { font-family: 'Cairo',sans-serif; font-weight: 700; font-size: 16px; }
+  a.card .sub { color: #565e74; font-size: 13px; margin-top: 2px; }
+  a.card .arrow { color: var(--emerald); font-size: 22px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>عقاري توك — تصاميم Stitch</h1>
+  <p>الكود المُصدَّر من Stitch (Gemini 3.1). صفحات ثابتة للمرجع.</p>
+</header>
+<main>
+  <a class="card" href="/stitch/chat.html"><div><div class="name">محادثة الذكاء الاصطناعي</div><div class="sub">AI Chat + بطاقات العقارات</div></div><span class="arrow">‹</span></a>
+  <a class="card" href="/stitch/home.html"><div><div class="name">الرئيسية</div><div class="sub">Home / الاكتشاف</div></div><span class="arrow">‹</span></a>
+  <a class="card" href="/stitch/property-detail.html"><div><div class="name">تفاصيل العقار</div><div class="sub">Property Detail</div></div><span class="arrow">‹</span></a>
+  <a class="card" href="/stitch/otp-login.html"><div><div class="name">تسجيل الدخول</div><div class="sub">OTP Verification</div></div><span class="arrow">‹</span></a>
+  <a class="card" href="/stitch/seller-wizard.html"><div><div class="name">إضافة عقار</div><div class="sub">Seller Wizard — التسعير</div></div><span class="arrow">‹</span></a>
+</main>
+</body>
+</html>

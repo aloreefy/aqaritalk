@@ -1,6 +1,6 @@
 import { Router, type IRouter } from "express";
 import { db, conversationsTable, propertiesTable, propertyImagesTable } from "@workspace/db";
-import { eq, and } from "drizzle-orm";
+import { eq, and, inArray } from "drizzle-orm";
 import {
   CreateConversationBody,
   GetConversationParams,
@@ -21,7 +21,41 @@ const AGENT_URL = process.env.AGENT_URL ?? "http://host.docker.internal:8000";
 // How many recent turns to send the agent (sliding memory window).
 const AGENT_HISTORY_TURNS = 8;
 
-type Message = { role: "user" | "assistant"; content: string; timestamp: string };
+type ApiProperty = ReturnType<typeof toApiProperty>;
+type Message = {
+  role: "user" | "assistant";
+  content: string;
+  timestamp: string;
+  properties?: ApiProperty[];
+};
+
+// Given the ids the agent found, load the full Property records (+images) and
+// return them in the SAME order the agent presented them, so the chat cards
+// match the reply text.
+async function hydrateProperties(ids: string[]): Promise<ApiProperty[]> {
+  if (ids.length === 0) return [];
+  const rows = await db
+    .select()
+    .from(propertiesTable)
+    .where(inArray(propertiesTable.id, ids));
+  const images = await db
+    .select()
+    .from(propertyImagesTable)
+    .where(inArray(propertyImagesTable.propertyId, ids));
+
+  const imagesByProperty = new Map<string, typeof images>();
+  for (const img of images) {
+    const list = imagesByProperty.get(img.propertyId) ?? [];
+    list.push(img);
+    imagesByProperty.set(img.propertyId, list);
+  }
+
+  const byId = new Map(
+    rows.map((r) => [r.id, toApiProperty(r, imagesByProperty.get(r.id) ?? [])]),
+  );
+  // Preserve the agent's ordering; drop any id that no longer resolves.
+  return ids.map((id) => byId.get(id)).filter((p): p is ApiProperty => p != null);
+}
 
 const GREETING: Record<string, string> = {
   buyer_search: "مرحباً! أنا مساعدك العقاري في AqariTalk. أخبرني، ما نوع العقار الذي تبحث عنه؟ 🏠",
@@ -180,6 +214,7 @@ router.post(
     // 180s timeout: local Gemma on CPU can take 30s-2min per multi-step reply.
     // Still bounds the worst case so a stalled sidecar can't hang forever.
     let aiText = "";
+    let propertyIds: string[] = [];
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 180_000);
     try {
@@ -192,9 +227,10 @@ router.post(
       if (!resp.ok) throw new Error(`agent sidecar HTTP ${resp.status}`);
       // Cast is safe: a body without `reply` falls through to the "" fallback;
       // a non-object body throws here and is handled by the catch below.
-      const data = (await resp.json()) as { reply?: string };
+      const data = (await resp.json()) as { reply?: string; propertyIds?: string[] };
       aiText = (data.reply ?? "").trim();
       if (!aiText) aiText = "أعد المحاولة من فضلك.";
+      propertyIds = Array.isArray(data.propertyIds) ? data.propertyIds.map(String) : [];
     } catch (err) {
       req.log.error({ err }, "Agent sidecar call failed");
       aiText = "عذراً، حدث خطأ تقني. يرجى المحاولة مرة أخرى.";
@@ -202,10 +238,20 @@ router.post(
       clearTimeout(timer);
     }
 
+    // Turn the ids the agent found into full property records so the web can
+    // render them as cards. A hydration failure must not break the reply.
+    let properties: ApiProperty[] = [];
+    try {
+      properties = await hydrateProperties(propertyIds);
+    } catch (err) {
+      req.log.error({ err }, "Property hydration failed");
+    }
+
     const aiMsg: Message = {
       role: "assistant",
       content: aiText,
       timestamp: new Date().toISOString(),
+      ...(properties.length > 0 ? { properties } : {}),
     };
 
     const updatedMessages = [...existingMessages, userMsg, aiMsg];

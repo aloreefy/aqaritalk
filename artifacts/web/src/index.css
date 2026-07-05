@@ -74,8 +74,8 @@
   --elevate-1: rgba(0, 0, 0, 0.03);
   --elevate-2: rgba(0, 0, 0, 0.08);
 
-  /* AqariTalk brand — rich teal */
-  --primary:            197 71% 43%;   /* hsl(197,71%,43%) — deep teal */
+  /* AqariTalk brand — Stitch emerald (#006948) */
+  --primary:            161 100% 21%;  /* deep emerald */
   --primary-foreground: 0   0%  100%;  /* white on primary */
 
   --background:         0   0%  100%;  /* white */
@@ -83,7 +83,7 @@
 
   --border:             220 13%  91%;  /* light gray */
   --input:              220 13%  91%;  /* same */
-  --ring:               197 71%  43%;  /* teal focus ring */
+  --ring:               161 100% 21%;  /* emerald focus ring */
 
   --card:               0   0%  100%;
   --card-foreground:    222 47%  11%;
@@ -99,13 +99,13 @@
   --muted:              210 40%  96%;
   --muted-foreground:   215 16%  47%;
 
-  --accent:             197 71%  95%;  /* very light teal tint */
-  --accent-foreground:  197 71%  25%;
+  --accent:             161 60%  94%;  /* very light emerald tint */
+  --accent-foreground:  161 100% 18%;
 
   --destructive:        0   84%  60%;
   --destructive-foreground: 0 0% 100%;
 
-  --chart-1:  197 71%  43%;
+  --chart-1:  161 100% 21%;
   --chart-2:  160 60%  45%;
   --chart-3:  38  92%  50%;
   --chart-4:  280 65%  60%;
@@ -114,13 +114,13 @@
   --sidebar:               0   0%  98%;
   --sidebar-foreground:    222 47%  11%;
   --sidebar-border:        220 13%  91%;
-  --sidebar-primary:       197 71%  43%;
+  --sidebar-primary:       161 100% 21%;
   --sidebar-primary-foreground: 0 0% 100%;
   --sidebar-accent:        210 40%  96%;
   --sidebar-accent-foreground: 222 47% 11%;
-  --sidebar-ring:          197 71%  43%;
+  --sidebar-ring:          161 100% 21%;
 
-  --app-font-sans: 'Inter', 'Noto Sans Arabic', sans-serif;
+  --app-font-sans: 'Tajawal', 'Cairo', 'Inter', 'Noto Sans Arabic', sans-serif;
   --app-font-serif: Georgia, serif;
   --app-font-mono: Menlo, monospace;
   --radius: 0.5rem;
@@ -153,15 +153,15 @@
   --elevate-1: rgba(255, 255, 255, 0.04);
   --elevate-2: rgba(255, 255, 255, 0.09);
 
-  --primary:            197 71%  52%;   /* brighter teal for dark bg */
-  --primary-foreground: 0   0%  100%;
+  --primary:            158 55%  55%;   /* brighter emerald for dark bg */
+  --primary-foreground: 161 100% 10%;
 
   --background:         222 47%   8%;
   --foreground:         210 40%  98%;
 
   --border:             217 33%  18%;
   --input:              217 33%  18%;
-  --ring:               197 71%  52%;
+  --ring:               158 55%  55%;
 
   --card:               222 47%  11%;
   --card-foreground:    210 40%  98%;
@@ -177,13 +177,13 @@
   --muted:              217 33%  18%;
   --muted-foreground:   215 20%  65%;
 
-  --accent:             197 40%  20%;
-  --accent-foreground:  197 71%  80%;
+  --accent:             160 40%  20%;
+  --accent-foreground:  158 60%  80%;
 
   --destructive:        0   62%  30%;
   --destructive-foreground: 210 40% 98%;
 
-  --chart-1:  197 71%  52%;
+  --chart-1:  158 55%  55%;
   --chart-2:  160 60%  50%;
   --chart-3:  38  92%  55%;
   --chart-4:  280 65%  65%;
@@ -192,11 +192,11 @@
   --sidebar:               222 47%   6%;
   --sidebar-foreground:    210 40%  98%;
   --sidebar-border:        217 33%  18%;
-  --sidebar-primary:       197 71%  52%;
-  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-primary:       158 55%  55%;
+  --sidebar-primary-foreground: 161 100% 10%;
   --sidebar-accent:        217 33%  18%;
   --sidebar-accent-foreground: 210 40% 98%;
-  --sidebar-ring:          197 71%  52%;
+  --sidebar-ring:          158 55%  55%;
 
   --shadow-2xs: 0 1px 2px 0 rgba(0,0,0,.2);
   --shadow-xs:  0 1px 3px 0 rgba(0,0,0,.3);
