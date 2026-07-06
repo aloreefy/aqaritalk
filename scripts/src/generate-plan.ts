@@ -12,7 +12,6 @@ import {
   BorderStyle,
   ShadingType,
   PageBreak,
-  NumberingLevel,
   convertInchesToTwip,
 } from "docx";
 import { writeFileSync } from "fs";
@@ -131,8 +130,8 @@ function makeTable(headers: string[], rows: string[][]): Table {
       bottom: { style: BorderStyle.SINGLE, size: 1, color: "CCCCCC" },
       left: { style: BorderStyle.SINGLE, size: 1, color: "CCCCCC" },
       right: { style: BorderStyle.SINGLE, size: 1, color: "CCCCCC" },
-      insideH: { style: BorderStyle.SINGLE, size: 1, color: "CCCCCC" },
-      insideV: { style: BorderStyle.SINGLE, size: 1, color: "CCCCCC" },
+      insideHorizontal: { style: BorderStyle.SINGLE, size: 1, color: "CCCCCC" },
+      insideVertical: { style: BorderStyle.SINGLE, size: 1, color: "CCCCCC" },
     },
   });
 }
