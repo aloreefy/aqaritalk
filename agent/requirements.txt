@@ -1,4 +1,4 @@
-llama-cpp-python
+openai
 fastapi
 uvicorn
 psycopg[binary]
