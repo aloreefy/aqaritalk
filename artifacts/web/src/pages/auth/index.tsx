@@ -1,188 +1,193 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useLocation } from "wouter";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { useToast } from "@/hooks/use-toast";
+import {
+  useGetAdminStats,
+  useAdminListUsers,
+  useAdminListProperties,
+  useAdminUpdateUser,
+  useAdminUpdatePropertyStatus,
+} from "@workspace/api-client-react";
 import { useAuth } from "@/contexts/auth";
-import { useRequestOtp, useVerifyOtp, useUpdateMe } from "@workspace/api-client-react";
-import OtpInput from "./OtpInput";
-import RoleSelect from "./RoleSelect";
+import { Button } from "@/components/ui/button";
+import { useQueryClient } from "@tanstack/react-query";
+import { getAdminListPropertiesQueryKey, getAdminListUsersQueryKey } from "@workspace/api-client-react";
 
-type Step = "phone" | "otp" | "role" | "name";
+type Tab = "stats" | "users" | "properties";
 
-export default function AuthPage() {
+export default function AdminPage() {
   const { t } = useTranslation();
+  const { user, isAuthenticated } = useAuth();
   const [, navigate] = useLocation();
-  const { login, updateUser } = useAuth();
-  const { toast } = useToast();
+  const [tab, setTab] = useState<Tab>("stats");
 
-  const [step, setStep] = useState<Step>("phone");
-  const [phone, setPhone] = useState("");
-  const [role, setRole] = useState<"buyer" | "seller" | "broker">("buyer");
-  const [name, setName] = useState("");
-  const [devCode, setDevCode] = useState<string | null>(null);
-
-  const requestOtp = useRequestOtp();
-  const verifyOtp = useVerifyOtp();
-  const updateMe = useUpdateMe();
-
-  async function handlePhoneSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setDevCode(null);
-    try {
-      const res = await requestOtp.mutateAsync({ data: { phone } });
-      if (res.devCode) setDevCode(res.devCode);
-      setStep("otp");
-    } catch {
-      toast({ title: t("common.error"), variant: "destructive" });
-    }
-  }
-
-  async function handleOtpSubmit(otp: string) {
-    try {
-      const res = await verifyOtp.mutateAsync({ data: { phone, code: otp } });
-      login(res.token, res.user);
-      if (res.isNewUser) {
-        setStep("role");
-      } else {
-        navigate("/");
-      }
-    } catch {
-      toast({ title: t("common.error"), variant: "destructive" });
-    }
-  }
-
-  async function handleRoleSubmit() {
-    setStep("name");
-  }
-
-  async function handleNameSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    try {
-      const updated = await updateMe.mutateAsync({ data: { name, role } });
-      updateUser(updated);
-      navigate("/");
-    } catch {
-      toast({ title: t("common.error"), variant: "destructive" });
-    }
+  if (!isAuthenticated || user?.role !== "admin") {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center p-8 text-center gap-4">
+        <p className="text-gray-500 text-sm">{t("common.loginRequired")}</p>
+        <Button onClick={() => navigate("/auth")}>{t("auth.sendCode")}</Button>
+      </div>
+    );
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-white">
-      {/* Header */}
-      <div className="bg-primary px-6 pt-16 pb-10 text-white">
-        <h1 className="text-3xl font-bold">{t("app.name")}</h1>
-        <p className="mt-1 text-sm opacity-80">{t("app.tagline")}</p>
-      </div>
-
-      <div className="flex-1 px-6 py-8">
-        {step === "phone" && (
-          <form onSubmit={handlePhoneSubmit} className="space-y-6">
-            <div>
-              <h2 className="text-xl font-bold text-gray-900">{t("auth.title")}</h2>
-              <p className="text-sm text-gray-500 mt-1">{t("auth.subtitle")}</p>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="phone">{t("auth.phoneLabel")}</Label>
-              <Input
-                id="phone"
-                type="tel"
-                placeholder={t("auth.phonePlaceholder")}
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                required
-                dir="ltr"
-                className="text-base h-12"
-              />
-            </div>
-            <Button
-              type="submit"
-              className="w-full h-12 text-base"
-              disabled={requestOtp.isPending || phone.length < 7}
-            >
-              {requestOtp.isPending ? t("common.loading") : t("auth.sendCode")}
-            </Button>
-          </form>
-        )}
-
-        {step === "otp" && (
-          <div className="space-y-6">
-            <div>
-              <h2 className="text-xl font-bold text-gray-900">{t("auth.otpTitle")}</h2>
-              <p className="text-sm text-gray-500 mt-1">
-                {t("auth.otpSubtitle", { phone })}
-              </p>
-            </div>
-
-            {/* Dev-mode OTP hint — only shown in development */}
-            {devCode && (
-              <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 flex items-center gap-3">
-                <span className="text-amber-600 text-lg">🔑</span>
-                <div>
-                  <p className="text-xs text-amber-700 font-medium">رمز التطوير</p>
-                  <p className="text-2xl font-mono font-bold tracking-widest text-amber-900">
-                    {devCode}
-                  </p>
-                </div>
-              </div>
-            )}
-
-            <OtpInput
-              length={6}
-              onComplete={handleOtpSubmit}
-              loading={verifyOtp.isPending}
-            />
+    <div className="min-h-screen bg-gray-50">
+      <div className="sticky top-0 z-10 bg-white border-b border-gray-100 px-4 py-4">
+        <h1 className="text-lg font-bold text-gray-900">{t("admin.title")}</h1>
+        <div className="flex gap-1 mt-3">
+          {(["stats", "users", "properties"] as Tab[]).map((t2) => (
             <button
-              className="text-sm text-primary underline"
-              onClick={() => setStep("phone")}
+              key={t2}
               type="button"
+              onClick={() => setTab(t2)}
+              className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                tab === t2
+                  ? "bg-primary text-white"
+                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+              }`}
             >
-              {t("common.back")}
+              {t(`admin.${t2}`)}
             </button>
-          </div>
-        )}
-
-        {step === "role" && (
-          <div className="space-y-6">
-            <div>
-              <h2 className="text-xl font-bold text-gray-900">{t("auth.roleTitle")}</h2>
-            </div>
-            <RoleSelect value={role} onChange={setRole} />
-            <Button className="w-full h-12 text-base" onClick={handleRoleSubmit}>
-              {t("auth.continue")}
-            </Button>
-          </div>
-        )}
-
-        {step === "name" && (
-          <form onSubmit={handleNameSubmit} className="space-y-6">
-            <div>
-              <h2 className="text-xl font-bold text-gray-900">{t("auth.nameLabel")}</h2>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="name">{t("auth.nameLabel")}</Label>
-              <Input
-                id="name"
-                placeholder={t("auth.namePlaceholder")}
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-                dir="auto"
-                className="text-base h-12"
-              />
-            </div>
-            <Button
-              type="submit"
-              className="w-full h-12 text-base"
-              disabled={updateMe.isPending || !name.trim()}
-            >
-              {updateMe.isPending ? t("common.loading") : t("auth.continue")}
-            </Button>
-          </form>
-        )}
+          ))}
+        </div>
       </div>
+
+      <div className="p-4">
+        {tab === "stats" && <StatsTab />}
+        {tab === "users" && <UsersTab />}
+        {tab === "properties" && <PropertiesTab />}
+      </div>
+    </div>
+  );
+}
+
+function StatsTab() {
+  const { t } = useTranslation();
+  const { data, isLoading } = useGetAdminStats();
+
+  if (isLoading)
+    return <p className="text-center text-sm text-gray-400 py-8">{t("common.loading")}</p>;
+
+  return (
+    <div className="grid grid-cols-2 gap-3">
+      <StatCard label={t("admin.totalUsers")} value={data?.totalUsers ?? 0} color="text-blue-600" />
+      <StatCard label={t("admin.activeListings")} value={data?.activeListings ?? 0} color="text-green-600" />
+      <StatCard label={t("admin.contactsThisMonth")} value={data?.contactReleasesThisMonth ?? 0} color="text-purple-600" />
+      <StatCard label={t("admin.pendingReview")} value={data?.pendingReview ?? 0} color="text-amber-600" />
+    </div>
+  );
+}
+
+function StatCard({ label, value, color }: { label: string; value: number; color: string }) {
+  return (
+    <div className="bg-white rounded-xl border border-gray-100 p-4">
+      <p className={`text-3xl font-bold ${color}`}>{value.toLocaleString()}</p>
+      <p className="text-xs text-gray-500 mt-1">{label}</p>
+    </div>
+  );
+}
+
+function UsersTab() {
+  const { t } = useTranslation();
+  const { data, isLoading } = useAdminListUsers();
+  const updateUser = useAdminUpdateUser();
+  const queryClient = useQueryClient();
+
+  async function handleSuspend(id: string, currentStatus: string) {
+    const newStatus = currentStatus === "active" ? "suspended" : "active";
+    await updateUser.mutateAsync({ id, data: { status: newStatus as "active" | "suspended" } });
+    queryClient.invalidateQueries({ queryKey: getAdminListUsersQueryKey() });
+  }
+
+  if (isLoading)
+    return <p className="text-center text-sm text-gray-400 py-8">{t("common.loading")}</p>;
+
+  return (
+    <div className="space-y-2">
+      {data?.map((u) => (
+        <div key={u.id} className="bg-white rounded-xl border border-gray-100 p-4">
+          <div className="flex items-start justify-between gap-2">
+            <div>
+              <p className="font-medium text-sm text-gray-900">{u.name ?? "—"}</p>
+              <p className="text-xs text-gray-500 dir-ltr">{u.phone}</p>
+              <p className="text-xs text-gray-400">{u.role}</p>
+            </div>
+            <div className="flex flex-col gap-1 items-end">
+              <span
+                className={`text-[10px] px-2 py-0.5 rounded-full ${
+                  u.status === "active" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-600"
+                }`}
+              >
+                {u.status}
+              </span>
+              <button
+                type="button"
+                onClick={() => handleSuspend(u.id, u.status)}
+                className="text-[11px] text-primary underline"
+              >
+                {u.status === "active" ? t("admin.suspend") : t("admin.activate")}
+              </button>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function PropertiesTab() {
+  const { t } = useTranslation();
+  const { data, isLoading } = useAdminListProperties({ status: "pending_review" });
+  const updateStatus = useAdminUpdatePropertyStatus();
+  const queryClient = useQueryClient();
+
+  async function handle(id: string, status: "active" | "rejected") {
+    await updateStatus.mutateAsync({ id, data: { status } });
+    queryClient.invalidateQueries({ queryKey: getAdminListPropertiesQueryKey() });
+  }
+
+  if (isLoading)
+    return <p className="text-center text-sm text-gray-400 py-8">{t("common.loading")}</p>;
+
+  return (
+    <div className="space-y-2">
+      {!data?.items?.length && (
+        <p className="text-center text-sm text-gray-400 py-8">{t("common.noData")}</p>
+      )}
+      {data?.items?.map((p) => (
+        <div key={p.id} className="bg-white rounded-xl border border-gray-100 p-4 space-y-2">
+          <div className="flex items-center justify-between">
+            <p className="font-medium text-sm text-gray-900">
+              {t(`property.types.${p.propertyType}`, { defaultValue: p.propertyType })}
+            </p>
+            <span className="text-xs text-amber-600 bg-amber-100 px-2 py-0.5 rounded-full">
+              {t("property.status.pending_review")}
+            </span>
+          </div>
+          {(p.city || p.district) && (
+            <p className="text-xs text-gray-500">
+              {[p.district, p.city].filter(Boolean).join("، ")}
+            </p>
+          )}
+          <div className="flex gap-2 pt-1">
+            <Button
+              size="sm"
+              className="flex-1 h-8 text-xs"
+              onClick={() => handle(p.id, "active")}
+            >
+              {t("admin.approve")}
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              className="flex-1 h-8 text-xs text-red-600 border-red-200"
+              onClick={() => handle(p.id, "rejected")}
+            >
+              {t("admin.reject")}
+            </Button>
+          </div>
+        </div>
+      ))}
     </div>
   );
 }

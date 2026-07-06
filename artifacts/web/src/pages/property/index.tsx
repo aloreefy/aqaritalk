@@ -1,184 +1,193 @@
-import { useParams, useLocation } from "wouter";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { ArrowRight, MapPin, Bed, Bath, Maximize2, Phone, Share2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { useLocation } from "wouter";
 import {
-  useGetProperty,
-  useGetContactReleaseByProperty,
-  getGetContactReleaseByPropertyQueryKey,
+  useGetAdminStats,
+  useAdminListUsers,
+  useAdminListProperties,
+  useAdminUpdateUser,
+  useAdminUpdatePropertyStatus,
 } from "@workspace/api-client-react";
 import { useAuth } from "@/contexts/auth";
+import { Button } from "@/components/ui/button";
+import { useQueryClient } from "@tanstack/react-query";
+import { getAdminListPropertiesQueryKey, getAdminListUsersQueryKey } from "@workspace/api-client-react";
 
-export default function PropertyPage() {
-  const { id } = useParams<{ id: string }>();
-  const [, navigate] = useLocation();
+type Tab = "stats" | "users" | "properties";
+
+export default function AdminPage() {
   const { t } = useTranslation();
-  const { isAuthenticated } = useAuth();
+  const { user, isAuthenticated } = useAuth();
+  const [, navigate] = useLocation();
+  const [tab, setTab] = useState<Tab>("stats");
 
-  const { data: property, isLoading } = useGetProperty(id);
-  const { data: release } = useGetContactReleaseByProperty(id, {
-    query: {
-      enabled: isAuthenticated,
-      queryKey: getGetContactReleaseByPropertyQueryKey(id),
-    },
-  });
-
-  if (isLoading) {
+  if (!isAuthenticated || user?.role !== "admin") {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-gray-400 text-sm">{t("common.loading")}</p>
+      <div className="min-h-screen flex flex-col items-center justify-center p-8 text-center gap-4">
+        <p className="text-gray-500 text-sm">{t("common.loginRequired")}</p>
+        <Button onClick={() => navigate("/auth")}>{t("auth.sendCode")}</Button>
       </div>
     );
   }
-
-  if (!property) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-gray-400 text-sm">{t("common.noData")}</p>
-      </div>
-    );
-  }
-
-  const typeLabel = t(`property.types.${property.propertyType}`, {
-    defaultValue: property.propertyType,
-  });
-  const txLabel =
-    property.transactionMode === "sale"
-      ? t("property.sale")
-      : property.transactionMode === "rent"
-        ? t("property.rent")
-        : t("property.lease");
-
-  const isReleased = release && "status" in release && release.status === "released";
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* Header */}
-      <div className="sticky top-0 z-10 bg-white border-b border-gray-100 px-4 py-3 flex items-center gap-3">
-        <button onClick={() => window.history.back()} type="button">
-          <ArrowRight size={20} className="text-gray-600 rtl:rotate-180" />
-        </button>
-        <h1 className="flex-1 font-semibold text-sm text-gray-900 truncate">{typeLabel}</h1>
-        <button type="button">
-          <Share2 size={18} className="text-gray-500" />
-        </button>
-      </div>
-
-      {/* Images */}
-      <div className="h-56 bg-gray-100 flex items-center justify-center overflow-hidden">
-        {property.images && property.images.length > 0 ? (
-          <img
-            src={property.images[0].path}
-            alt={typeLabel}
-            className="w-full h-full object-cover"
-          />
-        ) : (
-          <span className="text-6xl">🏠</span>
-        )}
-      </div>
-
-      <div className="p-4 space-y-5">
-        {/* Price + badges */}
-        <div className="space-y-2">
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="bg-primary text-white text-xs font-semibold px-2.5 py-1 rounded-full">
-              {txLabel}
-            </span>
-            {property.verified && (
-              <span className="bg-green-100 text-green-700 text-xs px-2.5 py-1 rounded-full">
-                ✓ {t("property.verifiedListing")}
-              </span>
-            )}
-          </div>
-          {property.price && (
-            <p className="text-2xl font-bold text-gray-900">
-              {Number(property.price).toLocaleString()}{" "}
-              <span className="text-base font-normal text-gray-500">
-                {property.priceCurrency}
-              </span>
-            </p>
-          )}
-          {property.priceNegotiable && (
-            <p className="text-xs text-gray-500">{t("property.negotiable")}</p>
-          )}
-        </div>
-
-        {/* Type + Location */}
-        <div className="space-y-1">
-          <p className="font-semibold text-gray-800">{typeLabel}</p>
-          {(property.city || property.district) && (
-            <div className="flex items-center gap-1.5 text-sm text-gray-500">
-              <MapPin size={14} />
-              <span>
-                {[property.district, property.city].filter(Boolean).join("، ")}
-              </span>
-            </div>
-          )}
-        </div>
-
-        {/* Key stats */}
-        <div className="grid grid-cols-3 gap-3">
-          {property.rooms != null && (
-            <Stat icon={<Bed size={18} />} label={t("property.bedrooms", { count: property.rooms })} />
-          )}
-          {property.bathrooms != null && (
-            <Stat icon={<Bath size={18} />} label={t("property.bathrooms", { count: property.bathrooms })} />
-          )}
-          {property.areaSqm != null && (
-            <Stat icon={<Maximize2 size={18} />} label={t("property.area", { size: Number(property.areaSqm).toLocaleString() })} />
-          )}
-        </div>
-
-        {/* Description */}
-        {property.description && (
-          <div className="space-y-2">
-            <p className="font-semibold text-sm text-gray-900">{t("property.description")}</p>
-            <p className="text-sm text-gray-600 leading-relaxed" dir="auto">
-              {property.description}
-            </p>
-          </div>
-        )}
-
-        {/* Contact CTA */}
-        <div className="pb-4">
-          {isReleased ? (
-            <div className="bg-green-50 border border-green-200 rounded-xl p-4">
-              <p className="text-sm font-semibold text-green-700 mb-1">
-                {t("contactRelease.released")}
-              </p>
-              {release.sellerPhone && (
-                <a
-                  href={`tel:${release.sellerPhone}`}
-                  className="flex items-center gap-2 text-sm text-green-700"
-                >
-                  <Phone size={14} />
-                  {release.sellerPhone}
-                </a>
-              )}
-            </div>
-          ) : (
-            <Button
-              className="w-full h-12 text-base"
-              onClick={() =>
-                isAuthenticated
-                  ? navigate(`/contact-release/${id}`)
-                  : navigate("/auth")
-              }
+    <div className="min-h-screen bg-gray-50">
+      <div className="sticky top-0 z-10 bg-white border-b border-gray-100 px-4 py-4">
+        <h1 className="text-lg font-bold text-gray-900">{t("admin.title")}</h1>
+        <div className="flex gap-1 mt-3">
+          {(["stats", "users", "properties"] as Tab[]).map((t2) => (
+            <button
+              key={t2}
+              type="button"
+              onClick={() => setTab(t2)}
+              className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                tab === t2
+                  ? "bg-primary text-white"
+                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+              }`}
             >
-              {t("property.requestContact")}
-            </Button>
-          )}
+              {t(`admin.${t2}`)}
+            </button>
+          ))}
         </div>
+      </div>
+
+      <div className="p-4">
+        {tab === "stats" && <StatsTab />}
+        {tab === "users" && <UsersTab />}
+        {tab === "properties" && <PropertiesTab />}
       </div>
     </div>
   );
 }
 
-function Stat({ icon, label }: { icon: React.ReactNode; label: string }) {
+function StatsTab() {
+  const { t } = useTranslation();
+  const { data, isLoading } = useGetAdminStats();
+
+  if (isLoading)
+    return <p className="text-center text-sm text-gray-400 py-8">{t("common.loading")}</p>;
+
   return (
-    <div className="bg-gray-50 rounded-xl p-3 flex flex-col items-center gap-1.5">
-      <span className="text-primary">{icon}</span>
-      <span className="text-xs text-gray-600 text-center">{label}</span>
+    <div className="grid grid-cols-2 gap-3">
+      <StatCard label={t("admin.totalUsers")} value={data?.totalUsers ?? 0} color="text-blue-600" />
+      <StatCard label={t("admin.activeListings")} value={data?.activeListings ?? 0} color="text-green-600" />
+      <StatCard label={t("admin.contactsThisMonth")} value={data?.contactReleasesThisMonth ?? 0} color="text-purple-600" />
+      <StatCard label={t("admin.pendingReview")} value={data?.pendingReview ?? 0} color="text-amber-600" />
+    </div>
+  );
+}
+
+function StatCard({ label, value, color }: { label: string; value: number; color: string }) {
+  return (
+    <div className="bg-white rounded-xl border border-gray-100 p-4">
+      <p className={`text-3xl font-bold ${color}`}>{value.toLocaleString()}</p>
+      <p className="text-xs text-gray-500 mt-1">{label}</p>
+    </div>
+  );
+}
+
+function UsersTab() {
+  const { t } = useTranslation();
+  const { data, isLoading } = useAdminListUsers();
+  const updateUser = useAdminUpdateUser();
+  const queryClient = useQueryClient();
+
+  async function handleSuspend(id: string, currentStatus: string) {
+    const newStatus = currentStatus === "active" ? "suspended" : "active";
+    await updateUser.mutateAsync({ id, data: { status: newStatus as "active" | "suspended" } });
+    queryClient.invalidateQueries({ queryKey: getAdminListUsersQueryKey() });
+  }
+
+  if (isLoading)
+    return <p className="text-center text-sm text-gray-400 py-8">{t("common.loading")}</p>;
+
+  return (
+    <div className="space-y-2">
+      {data?.map((u) => (
+        <div key={u.id} className="bg-white rounded-xl border border-gray-100 p-4">
+          <div className="flex items-start justify-between gap-2">
+            <div>
+              <p className="font-medium text-sm text-gray-900">{u.name ?? "—"}</p>
+              <p className="text-xs text-gray-500 dir-ltr">{u.phone}</p>
+              <p className="text-xs text-gray-400">{u.role}</p>
+            </div>
+            <div className="flex flex-col gap-1 items-end">
+              <span
+                className={`text-[10px] px-2 py-0.5 rounded-full ${
+                  u.status === "active" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-600"
+                }`}
+              >
+                {u.status}
+              </span>
+              <button
+                type="button"
+                onClick={() => handleSuspend(u.id, u.status)}
+                className="text-[11px] text-primary underline"
+              >
+                {u.status === "active" ? t("admin.suspend") : t("admin.activate")}
+              </button>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function PropertiesTab() {
+  const { t } = useTranslation();
+  const { data, isLoading } = useAdminListProperties({ status: "pending_review" });
+  const updateStatus = useAdminUpdatePropertyStatus();
+  const queryClient = useQueryClient();
+
+  async function handle(id: string, status: "active" | "rejected") {
+    await updateStatus.mutateAsync({ id, data: { status } });
+    queryClient.invalidateQueries({ queryKey: getAdminListPropertiesQueryKey() });
+  }
+
+  if (isLoading)
+    return <p className="text-center text-sm text-gray-400 py-8">{t("common.loading")}</p>;
+
+  return (
+    <div className="space-y-2">
+      {!data?.items?.length && (
+        <p className="text-center text-sm text-gray-400 py-8">{t("common.noData")}</p>
+      )}
+      {data?.items?.map((p) => (
+        <div key={p.id} className="bg-white rounded-xl border border-gray-100 p-4 space-y-2">
+          <div className="flex items-center justify-between">
+            <p className="font-medium text-sm text-gray-900">
+              {t(`property.types.${p.propertyType}`, { defaultValue: p.propertyType })}
+            </p>
+            <span className="text-xs text-amber-600 bg-amber-100 px-2 py-0.5 rounded-full">
+              {t("property.status.pending_review")}
+            </span>
+          </div>
+          {(p.city || p.district) && (
+            <p className="text-xs text-gray-500">
+              {[p.district, p.city].filter(Boolean).join("، ")}
+            </p>
+          )}
+          <div className="flex gap-2 pt-1">
+            <Button
+              size="sm"
+              className="flex-1 h-8 text-xs"
+              onClick={() => handle(p.id, "active")}
+            >
+              {t("admin.approve")}
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              className="flex-1 h-8 text-xs text-red-600 border-red-200"
+              onClick={() => handle(p.id, "rejected")}
+            >
+              {t("admin.reject")}
+            </Button>
+          </div>
+        </div>
+      ))}
     </div>
   );
 }
