@@ -8,7 +8,6 @@ import contactReleaseRouter from "./contact-release";
 import commissionRouter from "./commission";
 import notificationsRouter from "./notifications";
 import adminRouter from "./admin";
-import internalRouter from "./internal";
 
 const router: IRouter = Router();
 
@@ -21,6 +20,5 @@ router.use(contactReleaseRouter);
 router.use(commissionRouter);
 router.use(notificationsRouter);
 router.use(adminRouter);
-router.use(internalRouter);
 
 export default router;
