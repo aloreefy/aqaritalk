@@ -46,3 +46,18 @@ def test_rejects_missing_run():
 def test_rejects_syntax_error():
     with pytest.raises(ValidationError):
         validate_generated_source("def run(:\n  pass")
+
+def test_rejects_from_helpers_import_db():
+    src = 'METADATA={"name":"x","description":"","params":{}}\nfrom helpers import db\ndef run():\n    return {}'
+    with pytest.raises(ValidationError):
+        validate_generated_source(src)
+
+def test_rejects_plain_import_helpers():
+    src = 'METADATA={"name":"x","description":"","params":{}}\nimport helpers\ndef run():\n    return {}'
+    with pytest.raises(ValidationError):
+        validate_generated_source(src)
+
+def test_rejects_star_import_from_helpers():
+    src = 'METADATA={"name":"x","description":"","params":{}}\nfrom helpers import *\ndef run():\n    return {}'
+    with pytest.raises(ValidationError):
+        validate_generated_source(src)

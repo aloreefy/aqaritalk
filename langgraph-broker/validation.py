@@ -7,6 +7,8 @@ dunder-attribute escape hatches.
 from __future__ import annotations
 import ast
 
+from helpers import ALLOWED_HELPERS
+
 FORBIDDEN_NAMES = {"eval", "exec", "open", "__import__", "compile", "globals", "locals", "vars", "getattr", "setattr"}
 
 
@@ -24,14 +26,19 @@ def validate_generated_source(source: str) -> None:
     has_run = False
 
     for node in ast.walk(tree):
-        # Only `import helpers` / `from helpers import ...` are allowed.
+        # Plain `import ...` is never allowed — `import helpers` would expose
+        # `helpers.db` (and any other module-scope name) via attribute
+        # traversal, reopening the sandbox escape. Only the canonical
+        # `from helpers import <vetted name>` form is permitted.
         if isinstance(node, ast.Import):
             for alias in node.names:
-                if alias.name != "helpers":
-                    raise ValidationError(f"disallowed import: {alias.name}")
+                raise ValidationError(f"disallowed import: {alias.name}")
         elif isinstance(node, ast.ImportFrom):
             if node.module != "helpers":
                 raise ValidationError(f"disallowed import from: {node.module}")
+            for alias in node.names:
+                if alias.name not in ALLOWED_HELPERS:
+                    raise ValidationError(f"disallowed helpers import: {alias.name}")
         # No dangerous builtins by name.
         elif isinstance(node, ast.Name) and node.id in FORBIDDEN_NAMES:
             raise ValidationError(f"disallowed name: {node.id}")
