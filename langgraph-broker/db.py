@@ -157,3 +157,62 @@ def create_listing(
         "status": "pending_review",
         "message": "تم إنشاء الإعلان بنجاح وهو الآن قيد المراجعة.",
     }
+
+
+def get_property(property_id: str) -> Optional[dict]:
+    with _connect() as conn, conn.cursor() as cur:
+        cur.execute(
+            "SELECT id, listing_name, property_type, transaction_mode, city, "
+            "district, price, rooms, area_sqm, description, created_by "
+            "FROM properties WHERE id = %s AND deleted_at IS NULL",
+            [property_id],
+        )
+        row = cur.fetchone()
+    if not row:
+        return None
+    row["id"] = str(row["id"])
+    if row.get("created_by") is not None:
+        row["created_by"] = str(row["created_by"])
+    if row.get("price") is not None:
+        row["price"] = float(row["price"])
+    return row
+
+
+def get_owner_contact(property_id: str) -> Optional[dict]:
+    with _connect() as conn, conn.cursor() as cur:
+        cur.execute(
+            "SELECT u.id, u.name, u.phone "
+            "FROM properties p JOIN users u ON u.id = p.created_by "
+            "WHERE p.id = %s AND p.deleted_at IS NULL",
+            [property_id],
+        )
+        row = cur.fetchone()
+    if not row:
+        return None
+    return {"id": str(row["id"]), "name": row.get("name"), "phone": row.get("phone")}
+
+
+def insert_notification(user_id: str, message: str) -> dict:
+    # NOTE: the live `notifications` table has no `message` column (it isn't
+    # what the task brief assumed). Real columns are `user_id`, `type`,
+    # `title_ar`/`title_en`, `body_ar`/`body_en` (all NOT NULL, no defaults),
+    # `read_at`, `created_at`. We map the single `message` string into both
+    # locales' body and use a generic title, since this helper doesn't do
+    # translation.
+    with _connect() as conn, conn.cursor() as cur:
+        cur.execute(
+            "INSERT INTO notifications "
+            "(user_id, type, title_ar, title_en, body_ar, body_en) "
+            "VALUES (%s, %s, %s, %s, %s, %s) RETURNING id",
+            [
+                user_id,
+                "broker_message",
+                "رسالة جديدة",
+                "New message",
+                message,
+                message,
+            ],
+        )
+        new_id = cur.fetchone()["id"]
+        conn.commit()
+    return {"id": str(new_id), "status": "sent"}
