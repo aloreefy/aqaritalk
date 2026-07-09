@@ -1,8 +1,10 @@
 fastapi
 uvicorn
-langgraph
-langchain-core
-langchain-openai
-python-dotenv
-psycopg[binary]
 pydantic
+langchain>=1.0
+langgraph>=0.2
+langchain-openai>=0.2
+langchain-core>=0.3
+psycopg[binary]>=3.1
+python-dotenv>=1.0
+pytest>=8.0
