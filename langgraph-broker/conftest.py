@@ -6,3 +6,6 @@ import sys
 ROOT = os.path.dirname(__file__)
 if ROOT not in sys.path:
     sys.path.insert(0, ROOT)
+
+from dotenv import load_dotenv
+load_dotenv(os.path.join(ROOT, ".env"))  # OPENAI_API_KEY / DATABASE_URL for tests
