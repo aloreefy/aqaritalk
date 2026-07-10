@@ -9,7 +9,15 @@ import ast
 
 from helpers import ALLOWED_HELPERS
 
-FORBIDDEN_NAMES = {"eval", "exec", "open", "__import__", "compile", "globals", "locals", "vars", "getattr", "setattr"}
+FORBIDDEN_NAMES = {
+    "eval", "exec", "open", "__import__", "compile", "globals", "locals",
+    "vars", "getattr", "setattr", "delattr", "__builtins__", "__loader__",
+    "__spec__", "input", "breakpoint",
+}
+
+
+def _is_dunder(s: str) -> bool:
+    return len(s) > 4 and s.startswith("__") and s.endswith("__")
 
 
 class ValidationError(Exception):
@@ -39,12 +47,18 @@ def validate_generated_source(source: str) -> None:
             for alias in node.names:
                 if alias.name not in ALLOWED_HELPERS:
                     raise ValidationError(f"disallowed helpers import: {alias.name}")
-        # No dangerous builtins by name.
-        elif isinstance(node, ast.Name) and node.id in FORBIDDEN_NAMES:
+        # No dangerous builtins by name, and no bare dunder name at all
+        # (blocks `__builtins__["__import__"]("os")` — the module's real
+        # builtins dict is reachable by that bare name at runtime).
+        elif isinstance(node, ast.Name) and (node.id in FORBIDDEN_NAMES or _is_dunder(node.id)):
             raise ValidationError(f"disallowed name: {node.id}")
         # No dunder attribute access (blocks .__class__.__bases__ tricks).
-        elif isinstance(node, ast.Attribute) and node.attr.startswith("__") and node.attr.endswith("__"):
+        elif isinstance(node, ast.Attribute) and _is_dunder(node.attr):
             raise ValidationError(f"disallowed dunder access: {node.attr}")
+        # No subscript by a dunder string constant (blocks foo["__globals__"]
+        # and any residual `__builtins__["eval"]`-style access).
+        elif isinstance(node, ast.Constant) and isinstance(node.value, str) and _is_dunder(node.value):
+            raise ValidationError(f"disallowed dunder string: {node.value}")
         # Track required top-level definitions.
         if isinstance(node, ast.Assign):
             for target in node.targets:
