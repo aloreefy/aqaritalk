@@ -19,9 +19,24 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 from langchain_core.messages import HumanMessage, AIMessage, BaseMessage
 
-from broker_graph import graph, log   # the compiled graph + the tracing logger
+from broker_graph import log   # the tracing logger (graph itself is retired; see run_broker)
+from orchestrator import build_orchestrator
 
 app = FastAPI(title="AqariTalk LangGraph Broker")
+
+_orchestrator = build_orchestrator()
+
+
+def run_broker(messages: list) -> dict:
+    """Invoke the orchestrator with a list of messages and normalize its output.
+
+    `messages` may be LangChain BaseMessage objects or role/content dicts — the
+    orchestrator (create_agent's AgentState) accepts either.
+    """
+    result = _orchestrator.invoke({"messages": messages})
+    msgs = result.get("messages") or []
+    reply = (getattr(msgs[-1], "content", "") if msgs else "") or "تم."
+    return {"reply": reply, "property_ids": result.get("property_ids") or []}
 
 
 class Turn(BaseModel):
@@ -63,12 +78,12 @@ def health() -> dict:
 @app.post("/chat", response_model=ChatResponse)
 def chat(req: ChatRequest) -> ChatResponse:
     # NOTE: sync `def` (not async) so FastAPI runs this in a threadpool and the
-    # blocking graph.invoke() doesn't freeze the event loop.
+    # blocking run_broker() call doesn't freeze the event loop.
     log("=" * 60)
     log(f"HTTP /chat — message: «{req.message}»  (history: {len(req.history)} turns)")
     property_ids: list[str] = []
     try:
-        result = graph.invoke({"messages": to_messages(req)})
+        result = run_broker(to_messages(req))
         reply = result.get("reply") or "عذراً، لم أتمكن من معالجة طلبك."
         property_ids = result.get("property_ids") or []
     except Exception as e:  # never crash the app's chat; return a safe message
