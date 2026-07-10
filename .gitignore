@@ -58,3 +58,8 @@ uploads/
 
 # Local dev process logs (api/web/agent/seed stdout+stderr)
 *.log
+
+# Local dev artifacts / dumps (not part of the app)
+/api.out
+/aqaritalk_data.sql
+/agent/
