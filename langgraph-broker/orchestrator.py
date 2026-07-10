@@ -5,6 +5,7 @@ dispatcher pair (list/run generated tools). property_ids surface from the search
 subagent up to orchestrator state via Command, preserving the app's cards.
 """
 from __future__ import annotations
+import json
 from typing import Annotated, Optional
 
 from langchain.agents import create_agent, AgentState
@@ -49,11 +50,9 @@ def call_search(
 
 
 def _extract_ids(result: dict) -> list[str]:
-    import json
-    from langchain_core.messages import ToolMessage as TM
     ids: list[str] = []
     for m in result.get("messages", []):
-        if isinstance(m, TM):
+        if isinstance(m, ToolMessage):
             try:
                 data = json.loads(m.content) if isinstance(m.content, str) else m.content
                 found = [str(r["id"]) for r in data.get("results", []) if r.get("id")]
@@ -82,16 +81,13 @@ def list_generated_tools_tool() -> list[dict]:
     return dispatcher.list_generated_tools()
 
 
+# NOTE: the param is `tool_args`, not `args`. Naming a @tool param literally
+# "args" collides with pydantic's legacy ALT_V_ARGS ('v__args' in
+# pydantic.deprecated.decorator), which renames any "args" param internally and
+# makes the call fail with `TypeError: got an unexpected keyword argument 'v__args'`.
 @tool
 def run_generated_tool_tool(name: str, tool_args: dict) -> dict:
-    """شغّل أداة مُنشأة بالاسم name مع الوسائط tool_args.
-
-    ملاحظة: المعامل يُسمّى tool_args لا args — تسمية معامل بالحرفية "args" في
-    أداة مبنية بـ langchain_core.tools.tool تصطدم بآلية pydantic القديمة
-    (ALT_V_ARGS = 'v__args' في pydantic.deprecated.decorator) التي تُعيد
-    تسمية أي معامل باسم "args" داخلياً، فيفشل الاستدعاء بـ
-    TypeError: got an unexpected keyword argument 'v__args'.
-    """
+    """شغّل أداة مُنشأة بالاسم name مع الوسائط tool_args."""
     return dispatcher.run_generated_tool(name, tool_args)
 
 
