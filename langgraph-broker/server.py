@@ -42,7 +42,7 @@ class ChatResponse(BaseModel):
 def to_messages(req: ChatRequest) -> list[BaseMessage]:
     """Turn AqariTalk's {message, history} into LangChain messages.
 
-    The current `message` goes LAST so the graph's `classify` node (which reads
+    The current `message` goes LAST so the agent (which reads
     messages[-1]) sees the user's newest question.
     """
     msgs: list[BaseMessage] = []

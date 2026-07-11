@@ -1,10 +1,14 @@
 """
 broker_graph.py — AqariTalk real-estate broker, built with LangGraph.
 
-Flow:
-    START -> classify -> (buy/sell -> agent ; unknown -> respond)
-    agent -> (model called a tool? -> tools -> back to agent ; else -> respond)
+Flow (single unified agent — no classifier):
+    START -> agent -> (model called a tool? -> tools -> back to agent ; else -> respond)
     respond -> END
+
+One system prompt covers buyers, sellers, and small talk; the model decides
+what to do by choosing which tool to call (or none). A hard cap of
+MAX_TOOL_ROUNDS tool rounds per user turn keeps the agent<->tools loop from
+running away.
 
 Run:  python broker_graph.py
 Needs: pip install langgraph langchain-openai python-dotenv psycopg
@@ -20,7 +24,13 @@ from typing import TypedDict, Literal, Optional, Annotated
 from dotenv import load_dotenv
 load_dotenv()   # reads .env so OPENAI_API_KEY / DATABASE_URL are in the environment
 
-from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage, ToolMessage
+from langchain_core.messages import (
+    AIMessage,
+    BaseMessage,
+    HumanMessage,
+    SystemMessage,
+    ToolMessage,
+)
 from langchain_core.tools import tool
 from langchain_openai import ChatOpenAI
 from langgraph.graph import StateGraph, START, END      # the START/END sentinels
@@ -40,15 +50,44 @@ LOG_FILE = os.path.join(LOG_DIR, "broker.log")
 
 def log(msg: str) -> None:
     print(f"   [graph] {msg}", file=sys.stderr, flush=True)
-    stamp = datetime.now().strftime("%H:%M:%S")
+    stamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     with open(LOG_FILE, "a", encoding="utf-8") as f:
         f.write(f"{stamp} {msg}\n")
 
 
+def _fmt(obj, limit: int = 1500) -> str:
+    """JSON-render any value for the log, truncated so one huge result can't flood it."""
+    try:
+        s = json.dumps(obj, ensure_ascii=False, default=str)
+    except Exception:
+        s = repr(obj)
+    return s if len(s) <= limit else s[:limit] + f"… (+{len(s) - limit} chars truncated)"
+
+
+def _describe_messages(msgs: list) -> str:
+    """One line per message: who said what (truncated), so the LLM's exact input is visible."""
+    lines = []
+    for m in msgs:
+        role = type(m).__name__.replace("Message", "")
+        content = str(m.content).replace("\n", " ")
+        if len(content) > 200:
+            content = content[:200] + "…"
+        lines.append(f"      [{role}] {content}")
+    return "\n".join(lines)
+
+
 # ============================== 1. THE MODEL ==============================
 # gpt-4o-mini (cloud). The API key is read from OPENAI_API_KEY in .env — not
-# hardcoded here.
-llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
+# hardcoded here. temperature=0.3 keeps tool calls reliable while letting the
+# Arabic replies sound natural; max_tokens/timeout/max_retries bound cost and
+# keep a hung OpenAI call from hanging the chat request.
+llm = ChatOpenAI(
+    model="gpt-4o-mini",
+    temperature=0.3,
+    max_tokens=1024,
+    timeout=30,
+    max_retries=2,
+)
 
 
 # ============================== 2. THE TOOLS ==============================
@@ -66,10 +105,12 @@ def search_properties(
     limit: int = 5,
 ) -> dict:
     """ابحث عن العقارات النشطة المطابقة لمعايير المشتري."""
-    log(
-        f"🔧 TOOL search_properties(city={city!r}, type={property_type!r}, "
-        f"mode={transaction_mode!r}, max_price={max_price!r})"
-    )
+    args = {
+        "city": city, "property_type": property_type,
+        "transaction_mode": transaction_mode, "min_price": min_price,
+        "max_price": max_price, "min_rooms": min_rooms, "limit": limit,
+    }
+    log(f"🔧 TOOL search_properties INPUT  ← {_fmt(args)}")
     result = db.search_properties(
         city=city,
         property_type=property_type,
@@ -79,7 +120,7 @@ def search_properties(
         min_rooms=min_rooms,
         limit=limit,
     )
-    log(f"🔧 TOOL search_properties → found {result.get('count', 0)} listing(s)")
+    log(f"🔧 TOOL search_properties OUTPUT → {result.get('count', 0)} listing(s): {_fmt(result)}")
     return result
 
 
@@ -95,10 +136,12 @@ def create_listing(
     description: Optional[str] = None,
 ) -> dict:
     """أنشئ إعلان عقار جديد. الحقول property_type و transaction_mode و city و price مطلوبة."""
-    log(
-        f"🔧 TOOL create_listing(type={property_type!r}, mode={transaction_mode!r}, "
-        f"city={city!r}, price={price!r})"
-    )
+    args = {
+        "property_type": property_type, "transaction_mode": transaction_mode,
+        "city": city, "price": price, "district": district,
+        "rooms": rooms, "area_sqm": area_sqm, "description": description,
+    }
+    log(f"🔧 TOOL create_listing INPUT  ← {_fmt(args)}")
     result = db.create_listing(
         property_type=property_type,
         transaction_mode=transaction_mode,
@@ -109,7 +152,7 @@ def create_listing(
         area_sqm=area_sqm,
         description=description,
     )
-    log(f"🔧 TOOL create_listing → {result}")
+    log(f"🔧 TOOL create_listing OUTPUT → {_fmt(result)}")
     return result
 
 
@@ -121,80 +164,65 @@ llm_with_tools = llm.bind_tools(tools)   # gives the model the tool schemas
 # This is the TypedDict every node reads and writes.
 class AgentState(TypedDict):
     messages: Annotated[list[BaseMessage], add_messages]  # append, don't overwrite
-    intent: Optional[Literal["buy", "sell", "unknown"]]
     reply: Optional[str]
     property_ids: Optional[list[str]]   # ids of the listings the search actually found
 
 
-# ============================== 4. THE NODES ==============================
+# ============================ 4. THE SYSTEM PROMPT ========================
+# One prompt for everything: buyer search, seller listing, and small talk.
+# The model routes itself by choosing a tool (or none) — no classifier node.
+AGENT_PROMPT = (
+    "أنت «وكيل عقاري توك»، وكيل عقارات محترف وودود يخدم العملاء بالعربية.\n"
+    "\n"
+    "قواعد سلوكك:\n"
+    "1. عميل يريد الشراء أو الاستئجار: بمجرد أن تعرف المدينة أو نوع الصفقة "
+    "(بيع/إيجار)، استدعِ أداة search_properties فوراً بما لديك من معايير — "
+    "لا تُكثر من الأسئلة. إذا قال العميل «أي شيء» أو لم يحدد تفضيلاً، ابحث بما "
+    "هو متوفر لديك دون طلب مزيد من التفاصيل. بعد الحصول على النتائج، لخّصها "
+    "بالعربية بشكل واضح.\n"
+    "2. عميل يريد عرض عقار للبيع أو التأجير: لا تستدعِ create_listing قبل أن "
+    "تعرف نوع العقار ونوع الصفقة والمدينة والسعر بقيم حقيقية من العميل — "
+    "اسأل عن الناقص فقط.\n"
+    "3. رد على التحية والدردشة القصيرة بشكل طبيعي وودود، وقدّم نفسك كوكيل "
+    "عقاري، ثم وجّه الحديث نحو احتياج العميل العقاري.\n"
+    "4. مجالك العقارات فقط: إذا سأل العميل عن أي موضوع آخر، اعتذر بلطف "
+    "وأعد توجيه الحديث إلى العقارات."
+)
+
+# Circuit breaker: max agent->tools laps per user turn before we force an exit.
+MAX_TOOL_ROUNDS = 5
+
+FALLBACK_REPLY = "عذراً، لم أتمكن من إكمال الطلب. حاول مرة أخرى أو أعد صياغة سؤالك."
+
+
+# ============================== 5. THE NODES ==============================
 # A node = a function (state) -> partial state. Return ONLY the keys you
 # changed; LangGraph merges them in (using each key's reducer).
 
-def classify(state: AgentState) -> dict:
-    """Classify the intent using the WHOLE conversation, not just the last line.
-
-    A short follow-up like «اي شي» has no intent on its own — it inherits the
-    intent of the conversation so far. So we hand the model a transcript of the
-    last few turns and ask for one word.
-    """
-    msgs = state["messages"]
-    last_text = msgs[-1].content if msgs else ""
-    log(
-        f"🧭 NODE classify: reading conversation "
-        f"({len(msgs)} msg, last «{last_text}»)"
-    )
-
-    # Build a small transcript of the last 6 turns, labelled by speaker.
-    lines = []
-    for m in msgs[-6:]:
-        who = "العميل" if isinstance(m, HumanMessage) else "الوكيل"
-        lines.append(f"{who}: {m.content}")
-    transcript = "\n".join(lines)
-
-    verdict = llm.invoke([
-        SystemMessage(
-            "صنّف نية العميل بالنظر إلى المحادثة كاملةً، بكلمة واحدة فقط:\n"
-            "buy إذا كان يريد الشراء أو الاستئجار،\n"
-            "sell إذا كان يريد عرض عقار للبيع/الإيجار،\n"
-            "unknown لأي شيء آخر (تحية أو سؤال عام).\n"
-            "ملاحظة: الردود القصيرة مثل «اي شي» أو «ما بفرق» تتبع نية المحادثة "
-            "السابقة، فلا تصنّفها unknown إذا كان السياق واضحاً.\n"
-            "أعد الكلمة فقط."
-        ),
-        HumanMessage(transcript),
-    ]).content.strip().lower()
-
-    intent = "buy" if "buy" in verdict else "sell" if "sell" in verdict else "unknown"
-    log(f"🧭 NODE classify: model said «{verdict}» → intent = {intent}")
-    return {"intent": intent}
-
-
-SEARCH_PROMPT = (
-    "أنت وكيل عقاري محترف. العميل يريد الشراء أو الاستئجار. "
-    "بمجرد أن تعرف المدينة أو نوع الصفقة (بيع/إيجار)، استدعِ أداة search_properties "
-    "فوراً بما لديك من معايير — لا تُكثر من الأسئلة. "
-    "إذا قال العميل «أي شيء» أو لم يحدّد تفضيلاً، ابحث بما هو متوفر لديك بدون "
-    "طلب مزيد من التفاصيل. بعد الحصول على النتائج، لخّصها بالعربية بشكل واضح."
-)
-CREATE_PROMPT = (
-    "أنت وكيل عقاري. العميل يريد عرض عقار. لا تستدعِ create_listing "
-    "قبل أن تعرف نوع العقار ونوع الصفقة والمدينة والسعر بقيم حقيقية."
-)
-
-
 def agent(state: AgentState) -> dict:
-    """The reasoning step. Intent decides which system prompt steers the model."""
-    log(f"🤖 NODE agent: thinking (intent={state.get('intent')})...")
-    system = SEARCH_PROMPT if state["intent"] == "buy" else CREATE_PROMPT
-    response = llm_with_tools.invoke([SystemMessage(system), *state["messages"]])
+    """The one reasoning step: sees the full history, decides tool vs. answer."""
+    log(f"🤖 NODE agent: LLM INPUT ({len(state['messages'])} messages + system prompt):\n"
+        f"{_describe_messages(state['messages'])}")
+    response = llm_with_tools.invoke([SystemMessage(AGENT_PROMPT), *state["messages"]])
 
     calls = getattr(response, "tool_calls", None)
     if calls:
-        c = calls[0]
-        log(f"🤖 NODE agent: decided to CALL {c['name']} with {c['args']}")
+        for c in calls:
+            log(f"🤖 NODE agent: LLM OUTPUT → CALL {c['name']} with args {_fmt(c['args'])}")
     else:
-        log("🤖 NODE agent: produced a final answer (no tool needed)")
+        log(f"🤖 NODE agent: LLM OUTPUT → final answer (no tool needed): «{_fmt(response.content, 600)}»")
     return {"messages": [response]}   # append the model's reply (maybe with tool_calls)
+
+
+def _tool_rounds_this_turn(messages: list[BaseMessage]) -> int:
+    """Count agent->tools laps since the latest user message."""
+    rounds = 0
+    for m in reversed(messages):
+        if isinstance(m, HumanMessage):
+            break
+        if isinstance(m, AIMessage) and getattr(m, "tool_calls", None):
+            rounds += 1
+    return rounds
 
 
 def _collect_property_ids(messages: list[BaseMessage]) -> list[str]:
@@ -216,48 +244,49 @@ def _collect_property_ids(messages: list[BaseMessage]) -> list[str]:
     return ids
 
 
+def _last_ai_text(messages: list[BaseMessage]) -> str:
+    """Newest AI message that actually contains text (skips tool-call-only ones)."""
+    for m in reversed(messages):
+        if isinstance(m, AIMessage) and m.content:
+            return str(m.content)
+    return ""
+
+
 def respond(state: AgentState) -> dict:
-    """Produce the final Arabic text the app returns."""
-    if state.get("intent") == "unknown":
-        text = "مرحباً! أنا وكيل عقاري توك. بتدوّر على عقار للشراء/الإيجار، أو بدك تعرض عقار؟"
-    else:
-        text = state["messages"][-1].content or "تم."
+    """Produce the final Arabic text the app returns. No LLM work here."""
+    text = _last_ai_text(state["messages"]) or FALLBACK_REPLY
     property_ids = _collect_property_ids(state["messages"])
-    log(f"💬 NODE respond: final reply ready ({len(text)} chars, {len(property_ids)} card(s))")
+    log(f"💬 NODE respond: final reply ({len(text)} chars, {len(property_ids)} card(s)): «{_fmt(text, 600)}»")
+    if property_ids:
+        log(f"💬 NODE respond: property card ids → {property_ids}")
     return {"reply": text, "property_ids": property_ids}
 
 
-# ============================= 5. THE ROUTERS ============================
-# Conditional-edge functions return the NAME of the next node.
-
-def route_intent(state: AgentState) -> Literal["agent", "respond"]:
-    if state["intent"] in ("buy", "sell"):
-        log(f"↪️  ROUTER: intent={state['intent']} → go to 'agent'")
-        return "agent"
-    log("🏁 ROUTER: intent=unknown → go to 'respond'")
-    return "respond"
-
+# ============================= 6. THE ROUTER =============================
+# Conditional-edge function: returns the NAME of the next node.
 
 def should_continue(state: AgentState) -> Literal["tools", "respond"]:
     last = state["messages"][-1]
     if getattr(last, "tool_calls", None):   # model asked to call a tool
-        log("↪️  ROUTER: tool requested → go to 'tools', then LOOP back to agent")
+        rounds = _tool_rounds_this_turn(state["messages"])
+        if rounds > MAX_TOOL_ROUNDS:
+            log(f"🛑 ROUTER: tool-round cap reached ({rounds} > {MAX_TOOL_ROUNDS}) → force 'respond'")
+            return "respond"
+        log(f"↪️  ROUTER: tool requested (round {rounds}/{MAX_TOOL_ROUNDS}) → go to 'tools', then LOOP back to agent")
         return "tools"
     log("🏁 ROUTER: no tool requested → go to 'respond' (exit the loop)")
     return "respond"                         # model gave a plain answer -> finish
 
 
-# ============================ 6. BUILD & COMPILE ==========================
+# ============================ 7. BUILD & COMPILE ==========================
 builder = StateGraph(AgentState)
 
-builder.add_node("classify", classify)
 builder.add_node("agent", agent)
 builder.add_node("tools", ToolNode(tools, handle_tool_errors=True))  # runs tool_calls
 builder.add_node("respond", respond)
 
-builder.add_edge(START, "classify")                         # entry point
+builder.add_edge(START, "agent")                            # entry point
 # 3rd arg = the nodes this router is allowed to reach (lets LangGraph validate)
-builder.add_conditional_edges("classify", route_intent, ["agent", "respond"])
 builder.add_conditional_edges("agent", should_continue, ["tools", "respond"])
 builder.add_edge("tools", "agent")                          # LOOP back to the LLM
 builder.add_edge("respond", END)                            # exit point
@@ -265,11 +294,11 @@ builder.add_edge("respond", END)                            # exit point
 graph = builder.compile()                                   # MUST compile before use
 
 
-# ================================ 7. RUN ================================
+# ================================ 8. RUN ================================
 if __name__ == "__main__":
     question = sys.argv[1] if len(sys.argv) > 1 else "بدي شقة للإيجار في عمّان بحدود 300 دينار"
     log("=" * 60)
     log(f"NEW RUN — question: «{question}»")
     result = graph.invoke({"messages": [HumanMessage(question)]})
-    print("intent:", result["intent"])
     print("reply :", result["reply"])
+    print("cards :", result["property_ids"])
