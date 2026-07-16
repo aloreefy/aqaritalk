@@ -1,193 +1,254 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { useLocation } from "wouter";
 import {
-  useGetAdminStats,
-  useAdminListUsers,
-  useAdminListProperties,
-  useAdminUpdateUser,
-  useAdminUpdatePropertyStatus,
-} from "@workspace/api-client-react";
+  Search,
+  SlidersHorizontal,
+  Mic,
+  List,
+  Map,
+  Bot,
+  ArrowLeft,
+  MapPin,
+  ChevronDown,
+  Bell,
+} from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { useListProperties } from "@workspace/api-client-react";
 import { useAuth } from "@/contexts/auth";
-import { Button } from "@/components/ui/button";
-import { useQueryClient } from "@tanstack/react-query";
-import { getAdminListPropertiesQueryKey, getAdminListUsersQueryKey } from "@workspace/api-client-react";
+import PropertyCard from "./PropertyCard";
+import MapView from "@/components/map/MapView";
 
-type Tab = "stats" | "users" | "properties";
+type FilterChip = { label: string; key: string };
 
-export default function AdminPage() {
+const FILTER_CHIPS: FilterChip[] = [
+  { label: "الكل", key: "" },
+  { label: "شقق", key: "apartment" },
+  { label: "فلل", key: "villa" },
+  { label: "للبيع", key: "sale" },
+  { label: "للإيجار", key: "rent" },
+  { label: "أراضي", key: "land" },
+];
+
+export default function HomePage() {
   const { t } = useTranslation();
-  const { user, isAuthenticated } = useAuth();
   const [, navigate] = useLocation();
-  const [tab, setTab] = useState<Tab>("stats");
+  const { user } = useAuth();
+  const [viewMode, setViewMode] = useState<"list" | "map">("list");
+  const [query, setQuery] = useState("");
+  const [activeFilter, setActiveFilter] = useState<string>("");
+  const [mapCenter, setMapCenter] = useState({ lat: 31.9539, lng: 35.9106 });
 
-  if (!isAuthenticated || user?.role !== "admin") {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-8 text-center gap-4">
-        <p className="text-gray-500 text-sm">{t("common.loginRequired")}</p>
-        <Button onClick={() => navigate("/auth")}>{t("auth.sendCode")}</Button>
-      </div>
-    );
-  }
+  const { data, isLoading, refetch } = useListProperties({
+    limit: 50,
+    status: "active",
+    ...(activeFilter === "sale" || activeFilter === "rent"
+      ? { transactionMode: activeFilter }
+      : activeFilter
+        ? { propertyType: activeFilter as any }
+        : {}),
+    lat: mapCenter.lat,
+    lng: mapCenter.lng,
+    radiusKm: 30,
+  });
 
-  return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="sticky top-0 z-10 bg-white border-b border-gray-100 px-4 py-4">
-        <h1 className="text-lg font-bold text-gray-900">{t("admin.title")}</h1>
-        <div className="flex gap-1 mt-3">
-          {(["stats", "users", "properties"] as Tab[]).map((t2) => (
-            <button
-              key={t2}
-              type="button"
-              onClick={() => setTab(t2)}
-              className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-                tab === t2
-                  ? "bg-primary text-white"
-                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-              }`}
-            >
-              {t(`admin.${t2}`)}
-            </button>
-          ))}
-        </div>
-      </div>
+  const properties = data?.items ?? [];
 
-      <div className="p-4">
-        {tab === "stats" && <StatsTab />}
-        {tab === "users" && <UsersTab />}
-        {tab === "properties" && <PropertiesTab />}
-      </div>
-    </div>
+  const handleBoundsChange = useCallback(
+    (center: { lat: number; lng: number }, _zoom: number) => {
+      setMapCenter(center);
+      refetch();
+    },
+    [refetch],
   );
-}
 
-function StatsTab() {
-  const { t } = useTranslation();
-  const { data, isLoading } = useGetAdminStats();
-
-  if (isLoading)
-    return <p className="text-center text-sm text-gray-400 py-8">{t("common.loading")}</p>;
+  const goToAi = () => navigate("/chat/new?type=buyer_search");
+  const firstName = user?.name?.split(" ")[0];
 
   return (
-    <div className="grid grid-cols-2 gap-3">
-      <StatCard label={t("admin.totalUsers")} value={data?.totalUsers ?? 0} color="text-blue-600" />
-      <StatCard label={t("admin.activeListings")} value={data?.activeListings ?? 0} color="text-green-600" />
-      <StatCard label={t("admin.contactsThisMonth")} value={data?.contactReleasesThisMonth ?? 0} color="text-purple-600" />
-      <StatCard label={t("admin.pendingReview")} value={data?.pendingReview ?? 0} color="text-amber-600" />
-    </div>
-  );
-}
-
-function StatCard({ label, value, color }: { label: string; value: number; color: string }) {
-  return (
-    <div className="bg-white rounded-xl border border-gray-100 p-4">
-      <p className={`text-3xl font-bold ${color}`}>{value.toLocaleString()}</p>
-      <p className="text-xs text-gray-500 mt-1">{label}</p>
-    </div>
-  );
-}
-
-function UsersTab() {
-  const { t } = useTranslation();
-  const { data, isLoading } = useAdminListUsers();
-  const updateUser = useAdminUpdateUser();
-  const queryClient = useQueryClient();
-
-  async function handleSuspend(id: string, currentStatus: string) {
-    const newStatus = currentStatus === "active" ? "suspended" : "active";
-    await updateUser.mutateAsync({ id, data: { status: newStatus as "active" | "suspended" } });
-    queryClient.invalidateQueries({ queryKey: getAdminListUsersQueryKey() });
-  }
-
-  if (isLoading)
-    return <p className="text-center text-sm text-gray-400 py-8">{t("common.loading")}</p>;
-
-  return (
-    <div className="space-y-2">
-      {data?.map((u) => (
-        <div key={u.id} className="bg-white rounded-xl border border-gray-100 p-4">
-          <div className="flex items-start justify-between gap-2">
-            <div>
-              <p className="font-medium text-sm text-gray-900">{u.name ?? "—"}</p>
-              <p className="text-xs text-gray-500 dir-ltr">{u.phone}</p>
-              <p className="text-xs text-gray-400">{u.role}</p>
+    <div className="flex flex-col h-screen overflow-hidden bg-background">
+      {/* Greeting header — Stitch style */}
+      <header className="shrink-0 bg-card border-b border-border px-4 h-16 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-primary/30 bg-secondary flex items-center justify-center text-primary shrink-0">
+            {user?.name ? (
+              <span className="font-bold text-sm">{user.name.charAt(0)}</span>
+            ) : (
+              <span className="text-lg">👤</span>
+            )}
+          </div>
+          <div className="flex flex-col">
+            <span className="text-muted-foreground text-xs">
+              {firstName ? `مرحباً، ${firstName}` : "مرحباً بك"}
+            </span>
+            <div className="flex items-center gap-1 text-foreground">
+              <MapPin size={14} className="text-primary" fill="currentColor" />
+              <span className="font-semibold text-sm">عمّان، الأردن</span>
+              <ChevronDown size={14} className="text-muted-foreground" />
             </div>
-            <div className="flex flex-col gap-1 items-end">
-              <span
-                className={`text-[10px] px-2 py-0.5 rounded-full ${
-                  u.status === "active" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-600"
-                }`}
-              >
-                {u.status}
-              </span>
+          </div>
+        </div>
+        <button
+          type="button"
+          className="w-10 h-10 rounded-full flex items-center justify-center text-muted-foreground hover:bg-muted transition-colors relative"
+          aria-label={t("nav.notifications", { defaultValue: "الإشعارات" })}
+        >
+          <Bell size={20} />
+          <span className="absolute top-2 end-2 w-2 h-2 bg-destructive rounded-full" />
+        </button>
+      </header>
+
+      {/* Scroll area */}
+      <div className="flex-1 overflow-y-auto">
+        {/* Search */}
+        <div className="px-4 pt-4">
+          <div className="relative">
+            <Search
+              size={18}
+              className="absolute top-1/2 -translate-y-1/2 start-4 text-muted-foreground pointer-events-none"
+            />
+            <Input
+              className="ps-11 pe-24 h-12 text-sm bg-card border-border rounded-2xl shadow-sm"
+              placeholder={t("home.searchPlaceholder")}
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              dir="auto"
+            />
+            <div className="absolute inset-y-0 end-2 flex items-center gap-1">
               <button
                 type="button"
-                onClick={() => handleSuspend(u.id, u.status)}
-                className="text-[11px] text-primary underline"
+                onClick={goToAi}
+                aria-label="بحث صوتي"
+                className="p-2 rounded-xl text-primary bg-primary/10 hover:bg-primary/20 transition-colors"
               >
-                {u.status === "active" ? t("admin.suspend") : t("admin.activate")}
+                <Mic size={18} />
+              </button>
+              <button
+                type="button"
+                aria-label="فلترة"
+                className="p-2 rounded-xl text-muted-foreground hover:bg-muted transition-colors"
+              >
+                <SlidersHorizontal size={18} />
               </button>
             </div>
           </div>
         </div>
-      ))}
-    </div>
-  );
-}
 
-function PropertiesTab() {
-  const { t } = useTranslation();
-  const { data, isLoading } = useAdminListProperties({ status: "pending_review" });
-  const updateStatus = useAdminUpdatePropertyStatus();
-  const queryClient = useQueryClient();
-
-  async function handle(id: string, status: "active" | "rejected") {
-    await updateStatus.mutateAsync({ id, data: { status } });
-    queryClient.invalidateQueries({ queryKey: getAdminListPropertiesQueryKey() });
-  }
-
-  if (isLoading)
-    return <p className="text-center text-sm text-gray-400 py-8">{t("common.loading")}</p>;
-
-  return (
-    <div className="space-y-2">
-      {!data?.items?.length && (
-        <p className="text-center text-sm text-gray-400 py-8">{t("common.noData")}</p>
-      )}
-      {data?.items?.map((p) => (
-        <div key={p.id} className="bg-white rounded-xl border border-gray-100 p-4 space-y-2">
-          <div className="flex items-center justify-between">
-            <p className="font-medium text-sm text-gray-900">
-              {t(`property.types.${p.propertyType}`, { defaultValue: p.propertyType })}
-            </p>
-            <span className="text-xs text-amber-600 bg-amber-100 px-2 py-0.5 rounded-full">
-              {t("property.status.pending_review")}
-            </span>
-          </div>
-          {(p.city || p.district) && (
-            <p className="text-xs text-gray-500">
-              {[p.district, p.city].filter(Boolean).join("، ")}
-            </p>
-          )}
-          <div className="flex gap-2 pt-1">
-            <Button
-              size="sm"
-              className="flex-1 h-8 text-xs"
-              onClick={() => handle(p.id, "active")}
-            >
-              {t("admin.approve")}
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              className="flex-1 h-8 text-xs text-red-600 border-red-200"
-              onClick={() => handle(p.id, "rejected")}
-            >
-              {t("admin.reject")}
-            </Button>
+        {/* Category chips */}
+        <div className="mt-4 overflow-x-auto scrollbar-none px-4">
+          <div className="flex items-center gap-2 min-w-max pb-1">
+            {FILTER_CHIPS.map((chip) => {
+              const active = activeFilter === chip.key;
+              return (
+                <button
+                  key={chip.key || "all"}
+                  onClick={() => setActiveFilter(chip.key)}
+                  type="button"
+                  className={`shrink-0 px-5 py-2 rounded-full text-sm font-semibold transition-all ${
+                    active
+                      ? "bg-primary text-primary-foreground shadow-md"
+                      : "bg-card text-foreground border border-border hover:bg-muted"
+                  }`}
+                >
+                  {chip.label}
+                </button>
+              );
+            })}
           </div>
         </div>
-      ))}
+
+        {/* Hero AI CTA */}
+        <div className="px-4 mt-5">
+          <button
+            type="button"
+            onClick={goToAi}
+            className="w-full text-start relative overflow-hidden rounded-3xl bg-primary shadow-lg group active:scale-[0.99] transition-transform"
+          >
+            <div
+              className="absolute inset-0 opacity-10"
+              style={{
+                backgroundImage:
+                  "radial-gradient(circle at 100% 100%, #ffffff 0, #ffffff 3px, transparent 3px)",
+                backgroundSize: "20px 20px",
+              }}
+            />
+            <div className="relative z-10 p-6 flex items-center justify-between gap-4">
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-2 text-primary-foreground/80">
+                  <Bot size={18} />
+                  <span className="font-bold text-xs tracking-widest">
+                    الذكاء الاصطناعي
+                  </span>
+                </div>
+                <h2 className="text-primary-foreground font-extrabold text-xl mb-1">
+                  تحدث مع وكيلك العقاري الذكي
+                </h2>
+                <p className="text-primary-foreground/80 text-sm">
+                  صِف ما تبحث عنه بالصوت أو النص، وسأجد لك الأنسب فوراً.
+                </p>
+              </div>
+              <div className="w-12 h-12 rounded-full bg-primary-foreground text-primary flex items-center justify-center shrink-0 shadow-md group-hover:scale-110 transition-transform">
+                <ArrowLeft size={22} className="rtl:rotate-180" />
+              </div>
+            </div>
+          </button>
+        </div>
+
+        {/* Section header + view toggle */}
+        <div className="px-4 mt-6 flex items-center justify-between">
+          <h3 className="font-bold text-lg text-foreground">عقارات مميزة</h3>
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => setViewMode("list")}
+              type="button"
+              aria-label="قائمة"
+              className={`p-2 rounded-lg transition-colors ${
+                viewMode === "list" ? "bg-primary/10 text-primary" : "text-muted-foreground"
+              }`}
+            >
+              <List size={18} />
+            </button>
+            <button
+              onClick={() => setViewMode("map")}
+              type="button"
+              aria-label="خريطة"
+              className={`p-2 rounded-lg transition-colors ${
+                viewMode === "map" ? "bg-primary/10 text-primary" : "text-muted-foreground"
+              }`}
+            >
+              <Map size={18} />
+            </button>
+          </div>
+        </div>
+
+        {/* Content */}
+        {viewMode === "map" ? (
+          <div className="mx-4 mt-3 mb-6 relative h-[60vh] rounded-3xl overflow-hidden border border-border">
+            <MapView properties={properties} onBoundsChange={handleBoundsChange} />
+            <div className="absolute top-3 left-1/2 -translate-x-1/2 bg-card/90 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-md text-xs font-medium text-foreground">
+              {isLoading
+                ? "جاري البحث..."
+                : `${properties.length} عقار${properties.length !== 1 ? "ات" : ""}`}
+            </div>
+          </div>
+        ) : (
+          <div className="px-4 mt-3 pb-6 space-y-4">
+            {isLoading && (
+              <p className="text-center text-sm text-muted-foreground py-8">
+                {t("common.loading")}
+              </p>
+            )}
+            {!isLoading && !properties.length && (
+              <p className="text-center text-sm text-muted-foreground py-8">
+                {t("home.noResults")}
+              </p>
+            )}
+            {properties.map((p) => (
+              <PropertyCard key={p.id} property={p} />
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

@@ -13,8 +13,8 @@ export default function AppLayout({ children }: Props) {
   const showNav = !NO_NAV_PATHS.some((p) => location.startsWith(p));
 
   return (
-    <div className="min-h-screen bg-gray-50 max-w-[480px] mx-auto relative">
-      <main className={showNav ? "pb-14" : ""}>{children}</main>
+    <div className="min-h-screen bg-background max-w-[480px] mx-auto relative">
+      <main className={showNav ? "pb-20" : ""}>{children}</main>
       {showNav && <BottomNav />}
     </div>
   );

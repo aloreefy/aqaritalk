@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+
+<html class="light" dir="rtl" lang="ar"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AqariTalk - الرئيسية</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "tertiary-fixed": "#b9f2fe",
+                      "secondary-fixed": "#cee9dc",
+                      "on-secondary-fixed-variant": "#496057",
+                      "on-primary-fixed": "#004937",
+                      "secondary-container": "#cee9dc",
+                      "surface-container-lowest": "#ffffff",
+                      "surface-tint": "#296a55",
+                      "inverse-primary": "#bcffe4",
+                      "surface-dim": "#d2ddd6",
+                      "primary": "#296a55",
+                      "error": "#a83836",
+                      "on-error": "#fff7f6",
+                      "on-tertiary-fixed": "#064a54",
+                      "on-primary-fixed-variant": "#246652",
+                      "surface-container-highest": "#dae5de",
+                      "tertiary-fixed-dim": "#abe3ef",
+                      "outline-variant": "#aab4ae",
+                      "outline": "#737d78",
+                      "secondary-fixed-dim": "#c0dace",
+                      "on-secondary": "#e5fff2",
+                      "secondary": "#4c645a",
+                      "on-secondary-fixed": "#2d443b",
+                      "surface": "#f6faf6",
+                      "surface-bright": "#f6faf6",
+                      "primary-fixed": "#aef0d6",
+                      "on-tertiary-fixed-variant": "#2e6771",
+                      "surface-container": "#e8f0ea",
+                      "on-error-container": "#6e0a12",
+                      "surface-container-low": "#eff5f0",
+                      "surface-variant": "#dae5de",
+                      "inverse-on-surface": "#999e9a",
+                      "surface-container-high": "#e1eae4",
+                      "on-tertiary-container": "#225d67",
+                      "on-surface-variant": "#57615c",
+                      "on-background": "#2b3530",
+                      "secondary-dim": "#40584e",
+                      "tertiary": "#2e6771",
+                      "primary-container": "#aef0d6",
+                      "background": "#f6faf6",
+                      "on-primary-container": "#185c49",
+                      "error-container": "#fa746f",
+                      "on-tertiary": "#edfcff",
+                      "error-dim": "#67040d",
+                      "primary-dim": "#1a5e4a",
+                      "tertiary-dim": "#205b65",
+                      "on-primary": "#e5fff2",
+                      "inverse-surface": "#0b0f0d",
+                      "tertiary-container": "#b9f2fe",
+                      "primary-fixed-dim": "#a0e2c8",
+                      "on-surface": "#2b3530",
+                      "on-secondary-container": "#3f574d"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "2xl": "1rem",
+                      "3xl": "1.5rem",
+                      "full": "9999px"
+              },
+              "spacing": {},
+              "fontFamily": {
+                      "headline": [
+                              "Plus Jakarta Sans", "sans-serif"
+                      ],
+                      "display": [
+                              "Plus Jakarta Sans", "sans-serif"
+                      ],
+                      "body": [
+                              "Inter", "sans-serif"
+                      ],
+                      "label": [
+                              "Inter", "sans-serif"
+                      ]
+              },
+              "fontSize": {}
+      },
+          },
+        }
+      </script>
+<style>
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+      </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body antialiased pb-24 md:pb-8 pt-16">
+<!-- TopAppBar -->
+<header class="fixed top-0 left-0 w-full z-50 flex items-center justify-between px-4 h-16 dir-rtl bg-surface dark:bg-surface-dim shadow-sm">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full overflow-hidden border-2 border-primary-container">
+<img alt="User Profile" class="w-full h-full object-cover" data-alt="A professional headshot of a Middle Eastern man in modern business casual attire. Soft, warm natural lighting emphasizing a friendly expression. Clean, high-resolution portrait style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBjXvOARpIFMScnXsbaodAtbg_V4w88HWxAAePODCFVOd3P5r88JS_uxAQBuVXoGM6HHeAbehpxykU7HSnsj07X7zzXnXuYwOoGDNhKqCsyAhGeVTeyJQuNSSeJs30zeD_mqnxl7-Fjs76KPAJiIbJywyLLCntyb2G2hr7YYUqFjBLfGRwqhuc7MwxWtyyIaUIe0Hr39haYOye7nAu4ZNPZZ6__nA6AzSkOM12MS4dw2wwAaBsG2JGTmB_VUVp4_L5BK81rKZgn34wu"/>
+</div>
+<div class="flex flex-col">
+<span class="text-on-surface-variant font-label text-xs">مرحباً، محمد</span>
+<div class="flex items-center gap-1 text-on-surface">
+<span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1;">location_on</span>
+<span class="font-headline font-semibold text-sm">عمّان، الأردن</span>
+<span class="material-symbols-outlined text-on-surface-variant text-sm">expand_more</span>
+</div>
+</div>
+</div>
+<!-- Web Nav (Hidden on Mobile) -->
+<nav class="hidden md:flex items-center gap-6">
+<a class="text-primary dark:text-primary-fixed font-semibold font-headline active:scale-95 transition-transform hover:bg-surface-container-high px-3 py-2 rounded-lg" href="#">الرئيسية</a>
+<a class="text-on-surface-variant dark:text-on-surface-variant font-medium font-headline active:scale-95 transition-transform hover:bg-surface-container-high px-3 py-2 rounded-lg" href="#">المفضلة</a>
+<a class="text-on-surface-variant dark:text-on-surface-variant font-medium font-headline active:scale-95 transition-transform hover:bg-surface-container-high px-3 py-2 rounded-lg" href="#">رسائلي</a>
+</nav>
+<div class="flex items-center gap-4">
+<h1 class="hidden md:block text-primary dark:text-primary-fixed font-headline font-black text-xl tracking-tight">عقاري توك</h1>
+<button class="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-colors active:scale-95 relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full"></span>
+</button>
+</div>
+</header>
+<main class="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 mt-6">
+<!-- Search Section -->
+<section class="mb-8">
+<div class="relative w-full max-w-2xl mx-auto md:mx-0 group">
+<div class="absolute inset-y-0 right-0 pl-3 pr-4 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-on-surface-variant">search</span>
+</div>
+<input class="w-full bg-surface-container-lowest border border-outline-variant text-on-surface rounded-2xl py-4 pr-12 pl-24 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent font-body placeholder-on-surface-variant/70 shadow-sm transition-shadow group-hover:shadow-md" placeholder="ابحث عن عقار..." type="text"/>
+<div class="absolute inset-y-0 left-0 flex items-center pl-2 space-x-1 space-x-reverse">
+<button class="p-2 rounded-xl text-primary bg-primary-container/20 hover:bg-primary-container/40 transition-colors">
+<span class="material-symbols-outlined">mic</span>
+</button>
+<button class="p-2 rounded-xl text-on-surface-variant hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined">tune</span>
+</button>
+</div>
+</div>
+</section>
+<!-- Categories / Chips -->
+<section class="mb-10 overflow-x-auto hide-scrollbar -mx-4 px-4 md:mx-0 md:px-0">
+<div class="flex items-center gap-3 min-w-max pb-2">
+<button class="px-5 py-2.5 rounded-full font-headline font-semibold text-sm transition-all bg-primary text-on-primary shadow-md">الكل</button>
+<button class="px-5 py-2.5 rounded-full font-headline font-medium text-sm transition-all bg-surface-container-lowest text-on-surface border border-outline-variant hover:bg-surface-container-low hover:border-outline">شقق</button>
+<button class="px-5 py-2.5 rounded-full font-headline font-medium text-sm transition-all bg-surface-container-lowest text-on-surface border border-outline-variant hover:bg-surface-container-low hover:border-outline">فلل</button>
+<button class="px-5 py-2.5 rounded-full font-headline font-medium text-sm transition-all bg-surface-container-lowest text-on-surface border border-outline-variant hover:bg-surface-container-low hover:border-outline">أراضي</button>
+<button class="px-5 py-2.5 rounded-full font-headline font-medium text-sm transition-all bg-surface-container-lowest text-on-surface border border-outline-variant hover:bg-surface-container-low hover:border-outline">محلات</button>
+<button class="px-5 py-2.5 rounded-full font-headline font-medium text-sm transition-all bg-surface-container-lowest text-on-surface border border-outline-variant hover:bg-surface-container-low hover:border-outline">مكاتب</button>
+</div>
+</section>
+<!-- Bento Grid Layout for Main Content -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-12">
+<!-- Main Content Area (Cards) -->
+<div class="lg:col-span-8 flex flex-col gap-6">
+<!-- Hero AI CTA -->
+<div class="relative overflow-hidden rounded-3xl bg-primary shadow-lg group cursor-pointer">
+<!-- Abstract Background Pattern -->
+<div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(circle at 100% 100%, #ffffff 0, #ffffff 3px, transparent 3px); background-size: 20px 20px; background-position: 0 0;"></div>
+<div class="absolute -top-24 -right-24 w-48 h-48 bg-primary-fixed rounded-full blur-3xl opacity-20"></div>
+<div class="relative z-10 p-6 md:p-8 flex flex-col sm:flex-row items-center justify-between gap-6">
+<div class="flex-1 text-center sm:text-right">
+<div class="flex items-center justify-center sm:justify-start gap-2 mb-2 text-primary-fixed">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+<span class="font-headline font-bold text-sm tracking-widest uppercase">الذكاء الاصطناعي</span>
+</div>
+<h2 class="text-on-primary font-headline font-extrabold text-2xl md:text-3xl mb-2">تحدث مع وكيلك العقاري الذكي</h2>
+<p class="text-primary-fixed-dim font-body text-sm md:text-base max-w-md">صِف ما تبحث عنه بالصوت أو النص، وسأقوم بتحليل السوق لإيجاد الأنسب لك فوراً.</p>
+</div>
+<div class="w-14 h-14 rounded-full bg-on-primary text-primary flex items-center justify-center flex-shrink-0 group-hover:scale-110 group-hover:bg-primary-fixed transition-all duration-300 shadow-md">
+<span class="material-symbols-outlined rtl:rotate-180">arrow_forward</span>
+</div>
+</div>
+</div>
+<!-- Featured Properties Section Header -->
+<div class="flex items-center justify-between mt-4 mb-2">
+<h3 class="font-headline font-bold text-xl text-on-background">عقارات مميزة</h3>
+<a class="font-body font-medium text-sm text-primary hover:text-primary-dim transition-colors flex items-center gap-1" href="#">
+                        عرض الكل
+                        <span class="material-symbols-outlined text-sm rtl:rotate-180">arrow_forward_ios</span>
+</a>
+</div>
+<!-- Vertical List of Property Cards -->
+<div class="flex flex-col gap-5">
+<!-- Property Card 1 -->
+<article class="bg-surface-container-lowest rounded-2xl p-4 flex flex-col sm:flex-row gap-5 shadow-sm border border-outline-variant/30 hover:shadow-md transition-shadow cursor-pointer relative overflow-hidden group">
+<!-- Image Container -->
+<div class="relative w-full sm:w-48 md:w-56 h-48 sm:h-full rounded-xl overflow-hidden flex-shrink-0">
+<img alt="Villa exterior" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A stunning modern villa exterior in Amman, Jordan. Golden hour lighting casting warm glows on sleek architectural lines, stone facade, and large glass windows. A lush green lawn and clear blue sky. High-end real estate photography." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBVYMoVf2hYdpoiSJXSZJX9_Jf7MLOQiRITOZtw1xmCs_78h9qkui8cQlVT8lo39hWOjEAo04RquPY2vF9uq4qPpoScR_Wzw2M-Q1t5ohP6BCgMA0Y19zVkuG9aJHCp1nAQIu-N_VxJxB8zxDQSzQvNRUxvnyuvgGPzyRre3wPBuJoUwv1G1wzryxFdHewUewcXfNxUckJRE6TcjBPfVvPZc0qR8MwcGcC6eMma4vL3o_mPLtQARsCC2-9nJgqPLorLOOSqPa2K8tmu"/>
+<!-- Badges overlay -->
+<div class="absolute top-3 right-3 flex flex-col gap-2">
+<span class="bg-surface-container-lowest/90 backdrop-blur-sm text-primary font-headline font-bold text-xs px-2.5 py-1 rounded-md shadow-sm">للبيع</span>
+</div>
+<!-- Favorite FAB -->
+<button class="absolute top-3 left-3 w-8 h-8 rounded-full bg-surface-container-lowest/80 backdrop-blur-sm flex items-center justify-center text-on-surface-variant hover:text-error transition-colors">
+<span class="material-symbols-outlined text-[18px]">favorite</span>
+</button>
+</div>
+<!-- Content Container -->
+<div class="flex flex-col flex-1 py-1 justify-between">
+<div>
+<div class="flex justify-between items-start mb-1">
+<h4 class="font-headline font-bold text-2xl text-on-surface">١٦٢٬٥٠٠ <span class="text-lg font-medium text-on-surface-variant">د.أ</span></h4>
+</div>
+<div class="flex items-center gap-2 mb-3">
+<span class="bg-surface-container text-on-surface-variant font-label text-xs px-2 py-0.5 rounded-md">فيلا</span>
+<span class="w-1 h-1 rounded-full bg-outline-variant"></span>
+<div class="flex items-center text-on-surface-variant text-sm">
+<span class="material-symbols-outlined text-[16px] mr-0.5" style="font-variation-settings: 'FILL' 1;">location_on</span>
+<span class="font-body">مرج الحمام، عمّان</span>
+</div>
+</div>
+<p class="text-on-surface-variant text-sm font-body line-clamp-2 mb-4">فيلا عصرية بتشطيبات ديلوكس، إطلالة بانورامية، حديقة منسقة وكراج يتسع لسيارتين. قريبة من الخدمات الرئيسية.</p>
+</div>
+<!-- Stats Row -->
+<div class="flex items-center gap-4 pt-4 border-t border-outline-variant/30 text-on-surface-variant">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[18px]">bed</span>
+<span class="font-headline font-medium text-sm">٤ <span class="text-xs font-normal">غرف</span></span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[18px]">bathtub</span>
+<span class="font-headline font-medium text-sm">٣ <span class="text-xs font-normal">حمامات</span></span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[18px]">square_foot</span>
+<span class="font-headline font-medium text-sm">٣٥٠ <span class="text-xs font-normal">م²</span></span>
+</div>
+</div>
+</div>
+</article>
+<!-- Property Card 2 -->
+<article class="bg-surface-container-lowest rounded-2xl p-4 flex flex-col sm:flex-row gap-5 shadow-sm border border-outline-variant/30 hover:shadow-md transition-shadow cursor-pointer relative overflow-hidden group">
+<!-- Image Container -->
+<div class="relative w-full sm:w-48 md:w-56 h-48 sm:h-full rounded-xl overflow-hidden flex-shrink-0">
+<img alt="Apartment interior" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A bright, airy living room in a luxury apartment in Saudi Arabia. Floor-to-ceiling windows, modern minimalist furniture, neutral tones with subtle green accents. Natural sunlight creating a warm, inviting atmosphere. Interior real estate photography." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDB2H1wX_kNdt2SpjF4R0lr3CDRg5KGR_V-fYLkrsYCZi8nNfIek8CvkmLkP_N-5x7U5C5U4znk1ljI8Zn300MYGxrxHkg7B-mNjFqldWv4qVbJS4gS2a0XEeAxNc79zKitExo7qk4XElXZ5mhP2tTZPw2Rb48SiNmoGJbMfaxDR4fnmJTRjZi6Ozw5ybR5byJgy_wYEX-VLEAAqmvcEfVgJD0-Z44XRvBn4z7apVzAYELqUrPdcGmoFYe3Po0IwooihW6NBTB09qQr"/>
+<!-- Badges overlay -->
+<div class="absolute top-3 right-3 flex flex-col gap-2">
+<span class="bg-tertiary-fixed text-on-tertiary-fixed font-headline font-bold text-xs px-2.5 py-1 rounded-md shadow-sm">للإيجار</span>
+</div>
+<!-- Favorite FAB -->
+<button class="absolute top-3 left-3 w-8 h-8 rounded-full bg-surface-container-lowest/80 backdrop-blur-sm flex items-center justify-center text-on-surface-variant hover:text-error transition-colors">
+<span class="material-symbols-outlined text-[18px]">favorite</span>
+</button>
+</div>
+<!-- Content Container -->
+<div class="flex flex-col flex-1 py-1 justify-between">
+<div>
+<div class="flex justify-between items-start mb-1">
+<h4 class="font-headline font-bold text-2xl text-on-surface">٤٥٠ <span class="text-lg font-medium text-on-surface-variant">د.أ / شهري</span></h4>
+</div>
+<div class="flex items-center gap-2 mb-3">
+<span class="bg-surface-container text-on-surface-variant font-label text-xs px-2 py-0.5 rounded-md">شقة</span>
+<span class="w-1 h-1 rounded-full bg-outline-variant"></span>
+<div class="flex items-center text-on-surface-variant text-sm">
+<span class="material-symbols-outlined text-[16px] mr-0.5" style="font-variation-settings: 'FILL' 1;">location_on</span>
+<span class="font-body">عبدون، عمّان</span>
+</div>
+</div>
+<p class="text-on-surface-variant text-sm font-body line-clamp-2 mb-4">شقة مفروشة بالكامل في موقع استراتيجي هادئ، طابق ثالث مع مصعد، صالة واسعة ومطبخ راكب.</p>
+</div>
+<!-- Stats Row -->
+<div class="flex items-center gap-4 pt-4 border-t border-outline-variant/30 text-on-surface-variant">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[18px]">bed</span>
+<span class="font-headline font-medium text-sm">٢ <span class="text-xs font-normal">غرف</span></span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[18px]">bathtub</span>
+<span class="font-headline font-medium text-sm">٢ <span class="text-xs font-normal">حمامات</span></span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[18px]">square_foot</span>
+<span class="font-headline font-medium text-sm">١٢٠ <span class="text-xs font-normal">م²</span></span>
+</div>
+</div>
+</div>
+</article>
+</div>
+</div>
+<!-- Sidebar / Secondary Content (Map) -->
+<aside class="lg:col-span-4 flex flex-col gap-6">
+<!-- Map Preview Card -->
+<div class="bg-surface-container-lowest rounded-3xl p-5 shadow-sm border border-outline-variant/30 flex flex-col h-full min-h-[300px]">
+<div class="flex justify-between items-center mb-4">
+<h3 class="font-headline font-bold text-lg text-on-surface">استكشف على الخريطة</h3>
+<button class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-[18px]">fullscreen</span>
+</button>
+</div>
+<div class="relative w-full flex-1 rounded-2xl overflow-hidden bg-surface-variant group cursor-pointer border border-outline-variant/20">
+<img alt="Map view" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-300" data-alt="A clean, modern top-down map view of Amman, Jordan. The map style is minimalist, using light mode colors: soft warm neutrals, subtle greens for parks, and clean gray lines for roads. UI pins indicate property locations." data-location="Amman, Jordan" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB7qLCaj1Zbj2kH8qzSbCqn-Lb-QjGgGndSUKMWkB2NFeo6JTNHeSOZKCfeQC4QTp_emhjUsqcck1HB3KLBKG4XUWAP6drmeo_ow3LVYLNXyIAdFo1td9F6nvDC1hRZJkhmbN43PSi3FxYkUXDbpCaMVpOa0nb3t9js-_aBFtQu6Td-aCcf6F-ZXmen82kYweu_tzxOk4bUANopGBLs5TYJqmUB5gJGCGVpJhb1gUcGK_dMIiM3LGZleEZ2ms7kV9rhdIVorkXLTXp7"/>
+<!-- Map Overlay Gradient -->
+<div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent pointer-events-none"></div>
+<!-- Mock Map Pins -->
+<div class="absolute top-1/4 right-1/3 flex flex-col items-center">
+<div class="bg-primary text-on-primary font-headline font-bold text-xs px-2 py-1 rounded-md shadow-md mb-1 relative">
+                                ١٦٢ ألف
+                                <div class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-primary rotate-45"></div>
+</div>
+</div>
+<div class="absolute bottom-1/3 right-2/3 flex flex-col items-center">
+<div class="bg-surface-container-lowest text-on-surface font-headline font-bold text-xs px-2 py-1 rounded-md shadow-md mb-1 relative border border-outline-variant/50">
+                                ٤٥٠/ش
+                                <div class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-surface-container-lowest border-b border-l border-outline-variant/50 rotate-[-45deg]"></div>
+</div>
+</div>
+<!-- CTA Overlay -->
+<div class="absolute bottom-4 left-0 right-0 flex justify-center">
+<button class="bg-surface-container-lowest/90 backdrop-blur-md text-on-surface font-headline font-semibold text-sm px-6 py-2.5 rounded-full shadow-lg border border-outline-variant/20 hover:bg-primary hover:text-on-primary transition-all duration-300 flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">map</span>
+                                فتح الخريطة
+                            </button>
+</div>
+</div>
+</div>
+</aside>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-2 py-3 dir-rtl bg-surface-container dark:bg-surface-container-lowest border-t border-outline-variant shadow-[0_-2px_10px_rgba(0,0,0,0.05)] rounded-t-xl md:hidden pb-safe">
+<!-- Tab 1: الرئيسية (Active) -->
+<a class="flex flex-col items-center justify-center text-primary dark:text-primary-fixed font-bold bg-primary-container/30 rounded-xl px-3 py-1 active:scale-90 transition-all duration-200 w-16" href="#">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="font-label text-xs font-medium">الرئيسية</span>
+</a>
+<!-- Tab 2: المفضلة (Inactive, Mapped from JSON to match user request 'الخريطة' conceptually or keeping JSON strictness. User prompt said 'الخريطة' but JSON says 'المفضلة'. Following JSON content strictness.) -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-container-high active:scale-90 transition-all duration-200 rounded-xl px-2 py-1 w-16" href="#">
+<span class="material-symbols-outlined mb-1">favorite</span>
+<span class="font-label text-xs font-medium">المفضلة</span>
+</a>
+<!-- Tab 3: إضافة (FAB Style center) -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-container-high active:scale-90 transition-all duration-200 rounded-xl px-2 py-1 w-16 relative -top-3" href="#">
+<div class="bg-primary text-on-primary w-12 h-12 rounded-full flex items-center justify-center shadow-lg border-4 border-surface-container">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">add_circle</span>
+</div>
+<span class="font-label text-xs font-medium mt-1">إضافة</span>
+</a>
+<!-- Tab 4: رسائلي -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-container-high active:scale-90 transition-all duration-200 rounded-xl px-2 py-1 w-16 relative" href="#">
+<span class="material-symbols-outlined mb-1">chat</span>
+<span class="absolute top-1 right-3 w-2 h-2 bg-error rounded-full"></span>
+<span class="font-label text-xs font-medium">رسائلي</span>
+</a>
+<!-- Tab 5: حسابي -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-container-high active:scale-90 transition-all duration-200 rounded-xl px-2 py-1 w-16" href="#">
+<span class="material-symbols-outlined mb-1">person</span>
+<span class="font-label text-xs font-medium">حسابي</span>
+</a>
+</nav>
+<!-- Support for safe area on modern mobile devices -->
+<style>
+        .pb-safe { padding-bottom: env(safe-area-inset-bottom, 0.75rem); }
+    </style>
+</body></html>

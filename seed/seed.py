@@ -5,6 +5,7 @@ Seed the AqariTalk `properties` table with realistic Jordan-focused listings.
   DB enums / constraints.
 - The Arabic `description` is written by a local Gemma GGUF via llama-cpp-python
   (offline, no API).
+  
 
 Usage (from the project root, with the Postgres container running):
     python seed/seed.py                 # 200 listings (default)

@@ -1,4 +1,4 @@
-modules = ["nodejs-24"]
+modules = ["nodejs-24", "python-3.11", "postgresql-16"]
 
 [deployment]
 router = "application"
@@ -10,6 +10,26 @@ env = { "CI" = "true" }
 
 [workflows]
 runButton = "Project"
+
+[[workflows.workflow]]
+name = "Project"
+mode = "parallel"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "langgraph-broker: LangGraph Broker"
+
+[[workflows.workflow]]
+name = "langgraph-broker: LangGraph Broker"
+author = "agent"
+
+[workflows.workflow.metadata]
+outputType = "console"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd /home/runner/workspace/langgraph-broker && python server.py"
 
 [agent]
 stack = "PNPM_WORKSPACE"
@@ -38,5 +58,5 @@ channel = "stable-25_05"
 [userenv]
 
 [userenv.shared]
-AGENT_URL = "https://resupply-illusion-snowiness.ngrok-free.dev"
+AGENT_URL = "http://localhost:8000"
 INTERNAL_API_KEY = "aqari-094d112de8069d24728a28c201a555a03c843b36"

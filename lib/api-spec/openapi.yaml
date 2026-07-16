@@ -1111,6 +1111,14 @@ components:
         timestamp:
           type: string
           format: date-time
+        properties:
+          type: array
+          description: >-
+            Property listings the agent found for this message, rendered as
+            cards in the chat. Present only on assistant messages that returned
+            search results.
+          items:
+            $ref: "#/components/schemas/Property"
 
     ConversationInput:
       type: object

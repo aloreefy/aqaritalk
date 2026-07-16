@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { Link } from "wouter";
-import { MapPin, Bed, Bath, Maximize2 } from "lucide-react";
+import { MapPin, Bed, Bath, Maximize2, Heart } from "lucide-react";
 import type { Property } from "@workspace/api-client-react";
 
 interface Props {
@@ -26,9 +26,9 @@ export default function PropertyCard({ property }: Props) {
 
   return (
     <Link href={`/property/${property.id}`}>
-      <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden cursor-pointer hover:shadow-md transition-shadow">
-        {/* Image placeholder */}
-        <div className="h-44 bg-gray-100 relative flex items-center justify-center">
+      <div className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden cursor-pointer hover:shadow-md active:scale-[0.99] transition-all">
+        {/* Image */}
+        <div className="h-44 bg-muted relative flex items-center justify-center">
           {property.images && property.images.length > 0 ? (
             <img
               src={property.images[0].path}
@@ -36,54 +36,75 @@ export default function PropertyCard({ property }: Props) {
               className="w-full h-full object-cover"
             />
           ) : (
-            <div className="text-gray-300 text-4xl">🏠</div>
+            <div className="text-muted-foreground/40 text-4xl">🏠</div>
           )}
-          <span className="absolute top-2 start-2 bg-primary text-white text-xs font-semibold px-2 py-0.5 rounded">
+          {/* Transaction badge — top-start (right in RTL) */}
+          <span className="absolute top-2 start-2 bg-primary/90 backdrop-blur-sm text-primary-foreground text-xs font-semibold px-2.5 py-1 rounded-lg">
             {txLabel}
           </span>
           {property.verified && (
-            <span className="absolute top-2 end-2 bg-green-500 text-white text-xs px-2 py-0.5 rounded">
-              ✓
+            <span className="absolute top-2 end-2 bg-emerald-500 text-white text-[11px] font-semibold px-2 py-0.5 rounded-lg shadow-sm">
+              ✓ موثّق
             </span>
           )}
         </div>
 
         {/* Info */}
-        <div className="p-3 space-y-1.5">
-          {priceDisplay && (
-            <p className="font-bold text-lg text-gray-900">{priceDisplay}</p>
-          )}
-          <p className="text-sm font-medium text-gray-700">{typeLabel}</p>
+        <div className="p-3 space-y-2">
+          {/* Price + type on the start side, favorite on the end side */}
+          <div className="flex items-start justify-between gap-2">
+            <div className="min-w-0">
+              <p className="text-xs font-medium text-muted-foreground">{typeLabel}</p>
+              {priceDisplay && (
+                <p className="font-bold text-lg text-foreground leading-tight">
+                  {priceDisplay}
+                </p>
+              )}
+            </div>
+            <button
+              type="button"
+              aria-label="حفظ"
+              onClick={(e) => e.preventDefault()}
+              className="shrink-0 text-muted-foreground/60 hover:text-destructive transition-colors p-1 -m-1"
+            >
+              <Heart size={18} />
+            </button>
+          </div>
 
           {(property.city || property.district) && (
-            <div className="flex items-center gap-1 text-xs text-gray-500">
-              <MapPin size={12} />
-              <span>
+            <div className="flex items-center gap-1 text-xs text-muted-foreground">
+              <MapPin size={13} className="shrink-0" />
+              <span className="truncate">
                 {[property.district, property.city].filter(Boolean).join("، ")}
               </span>
             </div>
           )}
 
-          <div className="flex items-center gap-3 text-xs text-gray-500 pt-0.5">
-            {property.rooms != null && (
-              <span className="flex items-center gap-0.5">
-                <Bed size={12} />
-                {property.rooms}
-              </span>
-            )}
-            {property.bathrooms != null && (
-              <span className="flex items-center gap-0.5">
-                <Bath size={12} />
-                {property.bathrooms}
-              </span>
-            )}
-            {property.areaSqm != null && (
-              <span className="flex items-center gap-0.5">
-                <Maximize2 size={12} />
-                {Number(property.areaSqm).toLocaleString()} م²
-              </span>
-            )}
-          </div>
+          {/* Attributes cluster with a top divider */}
+          {(property.rooms != null ||
+            property.bathrooms != null ||
+            property.areaSqm != null) && (
+            <div className="flex items-center gap-4 text-xs text-muted-foreground pt-2 border-t border-border">
+              {property.rooms != null && (
+                <span className="flex items-center gap-1">
+                  <Bed size={14} />
+                  {property.rooms}
+                </span>
+              )}
+              {property.bathrooms != null && (
+                <span className="flex items-center gap-1">
+                  <Bath size={14} />
+                  {property.bathrooms}
+                </span>
+              )}
+              {property.areaSqm != null && (
+                <span className="flex items-center gap-1">
+                  <Maximize2 size={14} />
+                  {Number(property.areaSqm).toLocaleString()} م²
+                </span>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </Link>
