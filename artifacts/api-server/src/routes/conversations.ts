@@ -22,11 +22,25 @@ const AGENT_URL = process.env.AGENT_URL ?? "http://host.docker.internal:8000";
 const AGENT_HISTORY_TURNS = 8;
 
 type ApiProperty = ReturnType<typeof toApiProperty>;
+
+// Discriminated-union cards (docs/adr/0001). The broker sends property ids;
+// we hydrate them into full records before storing.
+type ContactInfo = { phone?: string; email?: string; whatsapp?: string; hours?: string };
+type MessageCard =
+  | { type: "properties"; properties: ApiProperty[] }
+  | { type: "contact"; contact: ContactInfo };
+type BrokerCard =
+  | { type: "properties"; propertyIds?: string[] }
+  | { type: "contact"; contact?: ContactInfo };
+
 type Message = {
   role: "user" | "assistant";
   content: string;
   timestamp: string;
+  // Legacy field: conversations stored before the cards contract. Kept for
+  // rendering old messages; new messages write `cards` only.
   properties?: ApiProperty[];
+  cards?: MessageCard[];
 };
 
 // Given the ids the agent found, load the full Property records (+images) and
@@ -214,7 +228,7 @@ router.post(
     // 180s timeout: local Gemma on CPU can take 30s-2min per multi-step reply.
     // Still bounds the worst case so a stalled sidecar can't hang forever.
     let aiText = "";
-    let propertyIds: string[] = [];
+    let brokerCards: BrokerCard[] = [];
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 180_000);
     try {
@@ -227,10 +241,10 @@ router.post(
       if (!resp.ok) throw new Error(`agent sidecar HTTP ${resp.status}`);
       // Cast is safe: a body without `reply` falls through to the "" fallback;
       // a non-object body throws here and is handled by the catch below.
-      const data = (await resp.json()) as { reply?: string; propertyIds?: string[] };
+      const data = (await resp.json()) as { reply?: string; cards?: BrokerCard[] };
       aiText = (data.reply ?? "").trim();
       if (!aiText) aiText = "أعد المحاولة من فضلك.";
-      propertyIds = Array.isArray(data.propertyIds) ? data.propertyIds.map(String) : [];
+      brokerCards = Array.isArray(data.cards) ? data.cards : [];
     } catch (err) {
       req.log.error({ err }, "Agent sidecar call failed");
       aiText = "عذراً، حدث خطأ تقني. يرجى المحاولة مرة أخرى.";
@@ -238,20 +252,28 @@ router.post(
       clearTimeout(timer);
     }
 
-    // Turn the ids the agent found into full property records so the web can
-    // render them as cards. A hydration failure must not break the reply.
-    let properties: ApiProperty[] = [];
-    try {
-      properties = await hydrateProperties(propertyIds);
-    } catch (err) {
-      req.log.error({ err }, "Property hydration failed");
+    // Hydrate the broker's cards: property ids become full records so the web
+    // can render them. A hydration failure must not break the reply.
+    const cards: MessageCard[] = [];
+    for (const card of brokerCards) {
+      try {
+        if (card.type === "properties" && Array.isArray(card.propertyIds)) {
+          const properties = await hydrateProperties(card.propertyIds.map(String));
+          if (properties.length > 0) cards.push({ type: "properties", properties });
+        } else if (card.type === "contact" && card.contact) {
+          cards.push({ type: "contact", contact: card.contact });
+        }
+        // Unknown card types are dropped here; clients also ignore unknowns.
+      } catch (err) {
+        req.log.error({ err }, "Card hydration failed");
+      }
     }
 
     const aiMsg: Message = {
       role: "assistant",
       content: aiText,
       timestamp: new Date().toISOString(),
-      ...(properties.length > 0 ? { properties } : {}),
+      ...(cards.length > 0 ? { cards } : {}),
     };
 
     const updatedMessages = [...existingMessages, userMsg, aiMsg];

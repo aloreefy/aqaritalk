@@ -1,14 +1,18 @@
 import { useTranslation } from "react-i18next";
-import { Link } from "wouter";
-import { MapPin, Bed, Bath, Maximize2, Heart } from "lucide-react";
+import { Link, useLocation } from "wouter";
+import { MapPin, Bed, Bath, Maximize2, Heart, PhoneCall } from "lucide-react";
 import type { Property } from "@workspace/api-client-react";
 
 interface Props {
   property: Property;
+  // Chat cards show the gated owner-contact CTA (docs/adr/0002); the home
+  // grid keeps the compact card and reaches the same flow via the details page.
+  showContactCta?: boolean;
 }
 
-export default function PropertyCard({ property }: Props) {
+export default function PropertyCard({ property, showContactCta }: Props) {
   const { t } = useTranslation();
+  const [, navigate] = useLocation();
 
   const typeLabel =
     t(`property.types.${property.propertyType}`, { defaultValue: property.propertyType });
@@ -78,6 +82,23 @@ export default function PropertyCard({ property }: Props) {
                 {[property.district, property.city].filter(Boolean).join("، ")}
               </span>
             </div>
+          )}
+
+          {/* Gated owner-contact CTA — routes into the contact-release flow;
+              the broker itself never reveals owner contact (docs/adr/0002) */}
+          {showContactCta && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                navigate(`/contact-release/${property.id}`);
+              }}
+              className="w-full flex items-center justify-center gap-1.5 text-xs font-semibold text-primary border border-primary/40 rounded-xl py-2 hover:bg-primary/5 transition-colors"
+            >
+              <PhoneCall size={13} />
+              طلب التواصل مع المالك
+            </button>
           )}
 
           {/* Attributes cluster with a top divider */}

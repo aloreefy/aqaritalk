@@ -13,8 +13,10 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/auth";
 import { useToast } from "@/hooks/use-toast";
 import { useSpeechInput } from "@/hooks/useSpeechInput";
-import type { ConversationMessage } from "@workspace/api-client-react";
+import type { ConversationMessage, Property } from "@workspace/api-client-react";
 import PropertyCard from "@/pages/home/PropertyCard";
+import ChatContactCard from "./ChatContactCard";
+import PreSelectionGrid from "./PreSelectionGrid";
 
 // ── Criteria chip helpers ─────────────────────────────────────────────────────
 
@@ -255,6 +257,12 @@ export default function ChatDetailPage() {
         <div ref={bottomRef} />
       </div>
 
+      {/* Pre-selection grid — empty buyer chat only; chips compose the
+          message into the input, the user presses send (CONTEXT.md) */}
+      {!isSeller && messages.length <= 1 && !isLoading && (
+        <PreSelectionGrid onCompose={setInput} />
+      )}
+
       {/* Action buttons */}
       {(showViewOnMap || showAddImages || showSubmit) && (
         <div className="bg-white border-t border-gray-50 px-3 py-2 flex flex-wrap gap-2">
@@ -361,9 +369,25 @@ export default function ChatDetailPage() {
   );
 }
 
+function PropertyCarousel({ properties }: { properties: Property[] }) {
+  return (
+    <div className="w-full overflow-x-auto pb-1 -mx-1 px-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <div className="flex gap-3 min-w-min snap-x snap-mandatory">
+        {properties.map((property) => (
+          <div key={property.id} className="w-[240px] shrink-0 snap-start">
+            <PropertyCard property={property} showContactCta />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function MessageBubble({ message }: { message: ConversationMessage }) {
   const isUser = message.role === "user";
-  const cards = message.properties ?? [];
+  // Legacy field: conversations stored before the cards contract (docs/adr/0001).
+  const legacyProperties = message.properties ?? [];
+  const cards = message.cards ?? [];
   return (
     <div className={`flex flex-col ${isUser ? "items-end" : "items-start"} gap-2`}>
       <div
@@ -377,18 +401,18 @@ function MessageBubble({ message }: { message: ConversationMessage }) {
         {message.content}
       </div>
 
-      {/* Clickable result cards — horizontal carousel, each links to /property/:id */}
-      {cards.length > 0 && (
-        <div className="w-full overflow-x-auto pb-1 -mx-1 px-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          <div className="flex gap-3 min-w-min snap-x snap-mandatory">
-            {cards.map((property) => (
-              <div key={property.id} className="w-[240px] shrink-0 snap-start">
-                <PropertyCard property={property} />
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+      {legacyProperties.length > 0 && <PropertyCarousel properties={legacyProperties} />}
+
+      {/* Discriminated card union — unknown types are ignored on purpose */}
+      {cards.map((card, i) => {
+        if (card.type === "properties") {
+          return <PropertyCarousel key={i} properties={card.properties} />;
+        }
+        if (card.type === "contact") {
+          return <ChatContactCard key={i} contact={card.contact} />;
+        }
+        return null;
+      })}
     </div>
   );
 }

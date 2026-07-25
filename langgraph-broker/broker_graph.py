@@ -156,7 +156,33 @@ def create_listing(
     return result
 
 
-tools = [search_properties, create_listing]
+@tool
+def get_property_details(property_id: str) -> dict:
+    """اعرض التفاصيل الكاملة لعقار واحد بمعرّفه (من نتائج بحث سابقة)."""
+    log(f"🔧 TOOL get_property_details INPUT  ← {_fmt({'property_id': property_id})}")
+    result = db.get_property_details(property_id)
+    log(f"🔧 TOOL get_property_details OUTPUT → {_fmt(result)}")
+    return result
+
+
+# Company customer-service contact. Placeholders — swap real values in .env.
+SUPPORT_CONTACT = {
+    "phone": os.environ.get("SUPPORT_PHONE", "+962-6-XXX-XXXX"),
+    "email": os.environ.get("SUPPORT_EMAIL", "support@aqaritalk.com"),
+    "whatsapp": os.environ.get("SUPPORT_WHATSAPP", "+962-7X-XXX-XXXX"),
+    "hours": os.environ.get("SUPPORT_HOURS", "السبت–الخميس 9:00–18:00"),
+}
+
+
+@tool
+def get_contact_info() -> dict:
+    """معلومات التواصل مع خدمة عملاء عقاري توك (وليس مالكي العقارات)."""
+    log("🔧 TOOL get_contact_info INPUT  ← {}")
+    log(f"🔧 TOOL get_contact_info OUTPUT → {_fmt(SUPPORT_CONTACT)}")
+    return SUPPORT_CONTACT
+
+
+tools = [search_properties, create_listing, get_property_details, get_contact_info]
 llm_with_tools = llm.bind_tools(tools)   # gives the model the tool schemas
 
 
@@ -165,7 +191,7 @@ llm_with_tools = llm.bind_tools(tools)   # gives the model the tool schemas
 class AgentState(TypedDict):
     messages: Annotated[list[BaseMessage], add_messages]  # append, don't overwrite
     reply: Optional[str]
-    property_ids: Optional[list[str]]   # ids of the listings the search actually found
+    cards: Optional[list[dict]]   # discriminated-union cards (see docs/adr/0001)
 
 
 # ============================ 4. THE SYSTEM PROMPT ========================
@@ -186,7 +212,12 @@ AGENT_PROMPT = (
     "3. رد على التحية والدردشة القصيرة بشكل طبيعي وودود، وقدّم نفسك كوكيل "
     "عقاري، ثم وجّه الحديث نحو احتياج العميل العقاري.\n"
     "4. مجالك العقارات فقط: إذا سأل العميل عن أي موضوع آخر، اعتذر بلطف "
-    "وأعد توجيه الحديث إلى العقارات."
+    "وأعد توجيه الحديث إلى العقارات.\n"
+    "5. إذا سأل العميل عن تفاصيل عقار ظهر في نتائج سابقة، استدعِ "
+    "get_property_details بمعرّف ذلك العقار وأجب من بياناته.\n"
+    "6. إذا طلب العميل التواصل مع خدمة العملاء أو الدعم، استدعِ get_contact_info.\n"
+    "7. لا تعطِ أبداً رقم هاتف أو بريد مالك العقار ولا تعد بذلك — التواصل مع "
+    "المالك يتم حصراً عبر زر «طلب التواصل مع المالك» في بطاقة العقار داخل التطبيق."
 )
 
 # Circuit breaker: max agent->tools laps per user turn before we force an exit.
@@ -225,23 +256,42 @@ def _tool_rounds_this_turn(messages: list[BaseMessage]) -> int:
     return rounds
 
 
-def _collect_property_ids(messages: list[BaseMessage]) -> list[str]:
-    """Pull the ids from the LAST search_properties tool result in the transcript.
+def _collect_cards(messages: list[BaseMessage]) -> list[dict]:
+    """Build the reply's cards from this run's tool results (see docs/adr/0001).
 
-    The search tool returns {"count", "results":[{"id",...}]} which the ToolNode
-    stores as a ToolMessage. We surface those ids so the app can render cards.
+    ToolMessages only exist for the current request (history arrives as plain
+    text turns), so scanning the whole transcript is scanning this turn.
+    - search_properties → {"type": "properties", "propertyIds": [...]} (last search wins)
+    - get_property_details → same card type with that single id
+    - get_contact_info → {"type": "contact", "contact": {...}}
     """
-    ids: list[str] = []
+    property_ids: list[str] = []
+    contact: Optional[dict] = None
     for m in messages:
-        if isinstance(m, ToolMessage) and getattr(m, "name", "") == "search_properties":
-            try:
-                data = json.loads(m.content) if isinstance(m.content, str) else m.content
-                found = [str(r["id"]) for r in data.get("results", []) if r.get("id")]
-                if found:
-                    ids = found   # keep the most recent search's results
-            except Exception:
-                pass
-    return ids
+        if not isinstance(m, ToolMessage):
+            continue
+        try:
+            data = json.loads(m.content) if isinstance(m.content, str) else m.content
+        except Exception:
+            continue
+        if not isinstance(data, dict):
+            continue
+        name = getattr(m, "name", "")
+        if name == "search_properties":
+            found = [str(r["id"]) for r in data.get("results", []) if r.get("id")]
+            if found:
+                property_ids = found   # keep the most recent search's results
+        elif name == "get_property_details" and data.get("id"):
+            property_ids = [str(data["id"])]
+        elif name == "get_contact_info":
+            contact = data
+
+    cards: list[dict] = []
+    if property_ids:
+        cards.append({"type": "properties", "propertyIds": property_ids})
+    if contact:
+        cards.append({"type": "contact", "contact": contact})
+    return cards
 
 
 def _last_ai_text(messages: list[BaseMessage]) -> str:
@@ -253,13 +303,13 @@ def _last_ai_text(messages: list[BaseMessage]) -> str:
 
 
 def respond(state: AgentState) -> dict:
-    """Produce the final Arabic text the app returns. No LLM work here."""
+    """Produce the final Arabic text + cards the app returns. No LLM work here."""
     text = _last_ai_text(state["messages"]) or FALLBACK_REPLY
-    property_ids = _collect_property_ids(state["messages"])
-    log(f"💬 NODE respond: final reply ({len(text)} chars, {len(property_ids)} card(s)): «{_fmt(text, 600)}»")
-    if property_ids:
-        log(f"💬 NODE respond: property card ids → {property_ids}")
-    return {"reply": text, "property_ids": property_ids}
+    cards = _collect_cards(state["messages"])
+    log(f"💬 NODE respond: final reply ({len(text)} chars, {len(cards)} card(s)): «{_fmt(text, 600)}»")
+    if cards:
+        log(f"💬 NODE respond: cards → {_fmt(cards, 600)}")
+    return {"reply": text, "cards": cards}
 
 
 # ============================= 6. THE ROUTER =============================
@@ -301,4 +351,4 @@ if __name__ == "__main__":
     log(f"NEW RUN — question: «{question}»")
     result = graph.invoke({"messages": [HumanMessage(question)]})
     print("reply :", result["reply"])
-    print("cards :", result["property_ids"])
+    print("cards :", result["cards"])

@@ -6,12 +6,15 @@
  * OpenAPI spec version: 0.1.0
  */
 import type { ConversationMessageRole } from './conversationMessageRole';
+import type { MessageCard } from './messageCard';
 import type { Property } from './property';
 
 export interface ConversationMessage {
   role: ConversationMessageRole;
   content: string;
   timestamp: Date;
-  /** Property listings the agent found for this message, rendered as cards in the chat. Present only on assistant messages that returned search results. */
+  /** Legacy card field kept for conversations stored before the cards contract (docs/adr/0001). New messages carry `cards` instead; clients keep rendering this when present. */
   properties?: Property[];
+  /** Rich cards attached to an assistant message, discriminated by `type` (docs/adr/0001). Clients must ignore unknown card types. */
+  cards?: MessageCard[];
 }

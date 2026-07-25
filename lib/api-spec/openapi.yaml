@@ -1114,11 +1114,59 @@ components:
         properties:
           type: array
           description: >-
-            Property listings the agent found for this message, rendered as
-            cards in the chat. Present only on assistant messages that returned
-            search results.
+            Legacy card field kept for conversations stored before the cards
+            contract (docs/adr/0001). New messages carry `cards` instead;
+            clients keep rendering this when present.
           items:
             $ref: "#/components/schemas/Property"
+        cards:
+          type: array
+          description: >-
+            Rich cards attached to an assistant message, discriminated by
+            `type` (docs/adr/0001). Clients must ignore unknown card types.
+          items:
+            $ref: "#/components/schemas/MessageCard"
+
+    MessageCard:
+      oneOf:
+        - $ref: "#/components/schemas/PropertiesCard"
+        - $ref: "#/components/schemas/ContactCard"
+      discriminator:
+        propertyName: type
+        mapping:
+          properties: "#/components/schemas/PropertiesCard"
+          contact: "#/components/schemas/ContactCard"
+
+    PropertiesCard:
+      type: object
+      required: [type, properties]
+      properties:
+        type:
+          type: string
+          enum: [properties]
+        properties:
+          type: array
+          items:
+            $ref: "#/components/schemas/Property"
+
+    ContactCard:
+      type: object
+      required: [type, contact]
+      properties:
+        type:
+          type: string
+          enum: [contact]
+        contact:
+          type: object
+          properties:
+            phone:
+              type: string
+            email:
+              type: string
+            whatsapp:
+              type: string
+            hours:
+              type: string
 
     ConversationInput:
       type: object
