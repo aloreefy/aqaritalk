@@ -194,6 +194,69 @@ export default function HomePage() {
           </button>
         </div>
 
+        {/* ── Option A: Living Orb ── */}
+        <div className="px-4 mt-5">
+          <button
+            type="button"
+            onClick={goToAi}
+            className="w-full rounded-3xl overflow-hidden active:scale-[0.98] transition-transform"
+            style={{ background: "linear-gradient(160deg, #0d1a12 0%, #0a1a0e 100%)" }}
+          >
+            <div className="flex flex-col items-center py-10 px-6">
+              {/* Orb + rings */}
+              <div className="relative flex items-center justify-center w-32 h-32">
+                <div className="voice-ring" />
+                <div className="voice-ring voice-ring-2" />
+                <div className="voice-ring voice-ring-3" />
+                <div
+                  className="voice-orb relative z-10 w-32 h-32 rounded-full flex items-center justify-center"
+                  style={{
+                    background: "radial-gradient(circle at 35% 35%, hsl(var(--primary)), hsl(var(--primary) / 0.55))",
+                    boxShadow: "0 0 48px 12px hsl(var(--primary) / 0.35)",
+                  }}
+                >
+                  <Mic size={38} className="text-white" strokeWidth={1.75} />
+                </div>
+              </div>
+              {/* Labels */}
+              <p className="mt-6 text-white font-extrabold text-2xl tracking-tight">كلّمني</p>
+              <p className="mt-1.5 text-white/50 text-sm">ابحث عن عقارك بصوتك</p>
+            </div>
+          </button>
+        </div>
+
+        {/* ── Option B: Waveform Banner ── */}
+        <div className="px-4 mt-5">
+          <button
+            type="button"
+            onClick={goToAi}
+            className="w-full rounded-3xl bg-card border border-border overflow-hidden active:scale-[0.98] transition-transform"
+          >
+            <div className="px-6 pt-6 pb-5">
+              <p className="text-center font-extrabold text-foreground text-xl mb-1">
+                اسألني عن أي عقار
+              </p>
+              <p className="text-center text-muted-foreground text-sm mb-5">
+                اضغط وتحدث — أنا هنا أستمع
+              </p>
+              {/* Waveform bars */}
+              <div className="flex items-end justify-center gap-[3.5px] h-12 px-2">
+                {Array.from({ length: 36 }).map((_, i) => (
+                  <div
+                    key={i}
+                    className="waveform-bar"
+                    style={{
+                      animationDelay: `${((i * 1.1) / 36).toFixed(3)}s`,
+                      animationDuration: `${0.9 + (i % 5) * 0.08}s`,
+                      opacity: 0.4 + 0.6 * Math.abs(Math.sin((i / 36) * Math.PI)),
+                    }}
+                  />
+                ))}
+              </div>
+            </div>
+          </button>
+        </div>
+
         {/* Section header + view toggle */}
         <div className="px-4 mt-6 flex items-center justify-between">
           <h3 className="font-bold text-lg text-foreground">عقارات مميزة</h3>
