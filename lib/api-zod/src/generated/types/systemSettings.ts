@@ -8,6 +8,7 @@
 import type { SystemSettingsAiGuardrailLevel } from './systemSettingsAiGuardrailLevel';
 import type { SystemSettingsDefaultCurrency } from './systemSettingsDefaultCurrency';
 import type { SystemSettingsDefaultLanguage } from './systemSettingsDefaultLanguage';
+import type { SystemSettingsVoiceCtaStyle } from './systemSettingsVoiceCtaStyle';
 
 export interface SystemSettings {
   id: string;
@@ -29,5 +30,6 @@ export interface SystemSettings {
   featureMapView: boolean;
   featureContactRelease: boolean;
   featureSellerWizard: boolean;
+  voiceCtaStyle: SystemSettingsVoiceCtaStyle;
   updatedAt: Date;
 }

@@ -570,6 +570,20 @@ export interface AdminStats {
   usersByRole?: AdminStatsUsersByRole;
 }
 
+export type AppSettingsVoiceCtaStyle = typeof AppSettingsVoiceCtaStyle[keyof typeof AppSettingsVoiceCtaStyle];
+
+
+export const AppSettingsVoiceCtaStyle = {
+  green_card: 'green_card',
+  orb: 'orb',
+  waveform: 'waveform',
+  sonar: 'sonar',
+} as const;
+
+export interface AppSettings {
+  voiceCtaStyle: AppSettingsVoiceCtaStyle;
+}
+
 export type SystemSettingsAiGuardrailLevel = typeof SystemSettingsAiGuardrailLevel[keyof typeof SystemSettingsAiGuardrailLevel];
 
 
@@ -604,6 +618,16 @@ export const SystemSettingsDefaultCurrency = {
   IQD: 'IQD',
 } as const;
 
+export type SystemSettingsVoiceCtaStyle = typeof SystemSettingsVoiceCtaStyle[keyof typeof SystemSettingsVoiceCtaStyle];
+
+
+export const SystemSettingsVoiceCtaStyle = {
+  green_card: 'green_card',
+  orb: 'orb',
+  waveform: 'waveform',
+  sonar: 'sonar',
+} as const;
+
 export interface SystemSettings {
   id: string;
   otpExpiryMinutes: number;
@@ -624,8 +648,19 @@ export interface SystemSettings {
   featureMapView: boolean;
   featureContactRelease: boolean;
   featureSellerWizard: boolean;
+  voiceCtaStyle: SystemSettingsVoiceCtaStyle;
   updatedAt: string;
 }
+
+export type SystemSettingsUpdateVoiceCtaStyle = typeof SystemSettingsUpdateVoiceCtaStyle[keyof typeof SystemSettingsUpdateVoiceCtaStyle];
+
+
+export const SystemSettingsUpdateVoiceCtaStyle = {
+  green_card: 'green_card',
+  orb: 'orb',
+  waveform: 'waveform',
+  sonar: 'sonar',
+} as const;
 
 export type SystemSettingsUpdateAiGuardrailLevel = typeof SystemSettingsUpdateAiGuardrailLevel[keyof typeof SystemSettingsUpdateAiGuardrailLevel];
 
@@ -662,6 +697,7 @@ export const SystemSettingsUpdateDefaultCurrency = {
 } as const;
 
 export interface SystemSettingsUpdate {
+  voiceCtaStyle?: SystemSettingsUpdateVoiceCtaStyle;
   /**
      * @minimum 1
      * @maximum 60

@@ -187,6 +187,7 @@
     "noUsers": "No users found",
     "noProperties": "No properties found",
     "settingsSections": {
+      "appearance": "Appearance",
       "otpAuth": "OTP & Auth",
       "aiBroker": "AI Broker",
       "marketLoc": "Market & Localization",
@@ -194,6 +195,17 @@
       "systemFlags": "System & Feature Flags"
     },
     "settingsFields": {
+      "voiceCtaStyle": "Voice CTA Style",
+      "voiceCtaStyles": {
+        "greenCard": "Original Card",
+        "greenCardDesc": "Classic green card",
+        "orb": "Glowing Orb",
+        "orbDesc": "Animated glow effect",
+        "waveform": "Sound Wave",
+        "waveformDesc": "Animated bars",
+        "sonar": "Radar Pulse",
+        "sonarDesc": "Rings expanding outward"
+      },
       "otpExpiry": "OTP Expiry (minutes)",
       "maxFailedAttempts": "Max Failed Attempts",
       "maxOtpRequests": "Max OTP Requests",

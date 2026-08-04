@@ -27,6 +27,13 @@ function toResponse(row: typeof systemSettingsTable.$inferSelect) {
   };
 }
 
+// ── Public (no auth) ──────────────────────────────────────────────────────
+router.get("/settings", async (_req, res): Promise<void> => {
+  const settings = await getOrCreateSettings();
+  res.json({ voiceCtaStyle: settings.voiceCtaStyle ?? "green_card" });
+});
+
+// ── Admin ─────────────────────────────────────────────────────────────────
 router.get("/admin/settings", ...adminGuard, async (_req, res): Promise<void> => {
   const settings = await getOrCreateSettings();
   res.json(toResponse(settings));

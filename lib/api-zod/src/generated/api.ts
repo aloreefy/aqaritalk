@@ -1129,6 +1129,14 @@ export const GetAdminStatsResponse = zod.object({
 
 
 /**
+ * @summary Get public app settings (no auth required)
+ */
+export const GetAppSettingsResponse = zod.object({
+  "voiceCtaStyle": zod.enum(['green_card', 'orb', 'waveform', 'sonar'])
+})
+
+
+/**
  * @summary Get system settings
  */
 export const GetAdminSettingsResponse = zod.object({
@@ -1151,6 +1159,7 @@ export const GetAdminSettingsResponse = zod.object({
   "featureMapView": zod.boolean(),
   "featureContactRelease": zod.boolean(),
   "featureSellerWizard": zod.boolean(),
+  "voiceCtaStyle": zod.enum(['green_card', 'orb', 'waveform', 'sonar']),
   "updatedAt": zod.coerce.date()
 })
 
@@ -1178,6 +1187,7 @@ export const updateAdminSettingsBodyListingExpiryDaysMax = 365;
 
 
 export const UpdateAdminSettingsBody = zod.object({
+  "voiceCtaStyle": zod.enum(['green_card', 'orb', 'waveform', 'sonar']).optional(),
   "otpExpiryMinutes": zod.number().min(1).max(updateAdminSettingsBodyOtpExpiryMinutesMax).optional(),
   "otpMaxAttempts": zod.number().min(1).max(updateAdminSettingsBodyOtpMaxAttemptsMax).optional(),
   "otpRateLimitCount": zod.number().min(1).max(updateAdminSettingsBodyOtpRateLimitCountMax).optional(),
@@ -1218,6 +1228,7 @@ export const UpdateAdminSettingsResponse = zod.object({
   "featureMapView": zod.boolean(),
   "featureContactRelease": zod.boolean(),
   "featureSellerWizard": zod.boolean(),
+  "voiceCtaStyle": zod.enum(['green_card', 'orb', 'waveform', 'sonar']),
   "updatedAt": zod.coerce.date()
 })
 

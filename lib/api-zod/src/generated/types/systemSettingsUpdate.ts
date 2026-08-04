@@ -8,8 +8,10 @@
 import type { SystemSettingsUpdateAiGuardrailLevel } from './systemSettingsUpdateAiGuardrailLevel';
 import type { SystemSettingsUpdateDefaultCurrency } from './systemSettingsUpdateDefaultCurrency';
 import type { SystemSettingsUpdateDefaultLanguage } from './systemSettingsUpdateDefaultLanguage';
+import type { SystemSettingsUpdateVoiceCtaStyle } from './systemSettingsUpdateVoiceCtaStyle';
 
 export interface SystemSettingsUpdate {
+  voiceCtaStyle?: SystemSettingsUpdateVoiceCtaStyle;
   /**
      * @minimum 1
      * @maximum 60

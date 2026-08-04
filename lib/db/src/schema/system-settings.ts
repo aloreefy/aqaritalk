@@ -24,6 +24,9 @@ export const systemSettingsTable = pgTable("system_settings", {
   autoApproveListings: boolean("auto_approve_listings").notNull().default(false),
   listingExpiryDays: integer("listing_expiry_days").notNull().default(90),
 
+  // ── Appearance ────────────────────────────────────────
+  voiceCtaStyle: text("voice_cta_style").notNull().default("green_card"),
+
   // ── System & Feature Flags ────────────────────────────
   maintenanceMode: boolean("maintenance_mode").notNull().default(false),
   featureVoiceInput: boolean("feature_voice_input").notNull().default(true),

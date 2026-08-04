@@ -709,6 +709,19 @@ paths:
               schema:
                 $ref: "#/components/schemas/AdminStats"
 
+  /settings:
+    get:
+      operationId: getAppSettings
+      tags: [settings]
+      summary: Get public app settings (no auth required)
+      responses:
+        "200":
+          description: Public settings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AppSettings"
+
   /admin/settings:
     get:
       operationId: getAdminSettings
@@ -1353,9 +1366,17 @@ components:
             broker:
               type: integer
 
+    AppSettings:
+      type: object
+      required: [voiceCtaStyle]
+      properties:
+        voiceCtaStyle:
+          type: string
+          enum: [green_card, orb, waveform, sonar]
+
     SystemSettings:
       type: object
-      required: [id, otpExpiryMinutes, otpMaxAttempts, otpRateLimitCount, otpRateLimitWindowMinutes, aiModel, aiTemperature, aiMaxTurns, aiGuardrailLevel, defaultLanguage, defaultCurrency, maxImagesPerProperty, autoApproveListings, listingExpiryDays, maintenanceMode, featureVoiceInput, featureMapView, featureContactRelease, featureSellerWizard, updatedAt]
+      required: [id, otpExpiryMinutes, otpMaxAttempts, otpRateLimitCount, otpRateLimitWindowMinutes, aiModel, aiTemperature, aiMaxTurns, aiGuardrailLevel, defaultLanguage, defaultCurrency, maxImagesPerProperty, autoApproveListings, listingExpiryDays, maintenanceMode, featureVoiceInput, featureMapView, featureContactRelease, featureSellerWizard, voiceCtaStyle, updatedAt]
       properties:
         id:
           type: string
@@ -1398,6 +1419,9 @@ components:
           type: boolean
         featureSellerWizard:
           type: boolean
+        voiceCtaStyle:
+          type: string
+          enum: [green_card, orb, waveform, sonar]
         updatedAt:
           type: string
           format: date-time
@@ -1405,6 +1429,9 @@ components:
     SystemSettingsUpdate:
       type: object
       properties:
+        voiceCtaStyle:
+          type: string
+          enum: [green_card, orb, waveform, sonar]
         otpExpiryMinutes:
           type: integer
           minimum: 1

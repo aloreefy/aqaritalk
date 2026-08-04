@@ -15,6 +15,7 @@ import {
   type Property,
   type User,
   type SystemSettingsUpdate,
+  type SystemSettingsUpdateVoiceCtaStyle,
 } from "@workspace/api-client-react";
 import { useAuth } from "@/contexts/auth";
 import { Button } from "@/components/ui/button";
@@ -43,6 +44,7 @@ import {
   CheckCircle2,
   XCircle,
   Settings as SettingsIcon,
+  Bot,
 } from "lucide-react";
 
 type Tab = "stats" | "users" | "properties" | "settings";
@@ -556,8 +558,22 @@ function SettingsTab() {
 
   return (
     <div className="p-4 space-y-4 animate-in fade-in duration-300">
-      <Accordion type="multiple" defaultValue={["otp", "ai", "market", "property", "system"]} className="space-y-3">
-        
+      <Accordion type="multiple" defaultValue={["appearance", "otp", "ai", "market", "property", "system"]} className="space-y-3">
+
+        {/* Section 0 — Appearance */}
+        <AccordionItem value="appearance" className="bg-card rounded-xl border border-border shadow-sm px-4">
+          <AccordionTrigger className="hover:no-underline py-3">
+            <span className="font-bold text-sm">{t("admin.settingsSections.appearance")}</span>
+          </AccordionTrigger>
+          <AccordionContent className="pt-1 pb-3">
+            <VoiceCtaStylePicker
+              label={t("admin.settingsFields.voiceCtaStyle")}
+              value={(settings as unknown as { voiceCtaStyle?: string }).voiceCtaStyle ?? "green_card"}
+              onChange={(v) => save({ voiceCtaStyle: v as SystemSettingsUpdateVoiceCtaStyle })}
+            />
+          </AccordionContent>
+        </AccordionItem>
+
         {/* Section 1 — OTP & Auth */}
         <AccordionItem value="otp" className="bg-card rounded-xl border border-border shadow-sm px-4">
           <AccordionTrigger className="hover:no-underline py-3">
@@ -658,6 +674,117 @@ function SettingsTab() {
 // ---------------------------------------------
 // Form Subcomponents
 // ---------------------------------------------
+
+const VOICE_CTA_STYLES: { value: string; labelKey: string; descKey: string }[] = [
+  { value: "green_card", labelKey: "greenCard", descKey: "greenCardDesc" },
+  { value: "orb", labelKey: "orb", descKey: "orbDesc" },
+  { value: "waveform", labelKey: "waveform", descKey: "waveformDesc" },
+  { value: "sonar", labelKey: "sonar", descKey: "sonarDesc" },
+];
+
+function VoiceCtaIconPreview({ styleValue, active }: { styleValue: string; active: boolean }) {
+  const tint = active ? "text-primary" : "text-muted-foreground";
+  if (styleValue === "green_card") {
+    return (
+      <div className="w-9 h-9 rounded-lg bg-muted/60 flex items-center justify-center">
+        <Bot size={18} className={tint} />
+      </div>
+    );
+  }
+  if (styleValue === "orb") {
+    return (
+      <div className="w-9 h-9 rounded-lg bg-muted/60 flex items-center justify-center">
+        <span className={`block w-3.5 h-3.5 rounded-full ${active ? "bg-primary" : "bg-muted-foreground/60"}`} />
+      </div>
+    );
+  }
+  if (styleValue === "waveform") {
+    return (
+      <div className="w-9 h-9 rounded-lg bg-muted/60 flex items-center justify-center gap-[3px]">
+        <span className={`block w-[3px] h-2.5 rounded-full ${active ? "bg-primary" : "bg-muted-foreground/60"}`} />
+        <span className={`block w-[3px] h-4 rounded-full ${active ? "bg-primary" : "bg-muted-foreground/60"}`} />
+        <span className={`block w-[3px] h-1.5 rounded-full ${active ? "bg-primary" : "bg-muted-foreground/60"}`} />
+      </div>
+    );
+  }
+  // sonar
+  return (
+    <div className="w-9 h-9 rounded-lg bg-muted/60 flex items-center justify-center relative">
+      <span className={`absolute w-7 h-7 rounded-full border ${active ? "border-primary/30" : "border-muted-foreground/25"}`} />
+      <span className={`absolute w-5 h-5 rounded-full border ${active ? "border-primary/50" : "border-muted-foreground/35"}`} />
+      <span className={`block w-2 h-2 rounded-full ${active ? "bg-primary" : "bg-muted-foreground/60"}`} />
+    </div>
+  );
+}
+
+function VoiceCtaStylePicker({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => Promise<void> }) {
+  const { t } = useTranslation();
+  const [isSaving, setIsSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [pending, setPending] = useState<string | null>(null);
+
+  const handleSelect = async (v: string) => {
+    if (v === value || isSaving) return;
+    setPending(v);
+    setIsSaving(true);
+    setSaved(false);
+    try {
+      await onChange(v);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2000);
+    } finally {
+      setIsSaving(false);
+      setPending(null);
+    }
+  };
+
+  return (
+    <div className="flex flex-col gap-3 py-3 border-b border-border/50 last:border-0 max-w-[400px]">
+      <label className="text-sm font-semibold text-foreground flex items-center gap-2">
+        {label}
+        {saved && <CheckCircle2 size={14} className="text-emerald-500 animate-in zoom-in" />}
+        {isSaving && <span className="text-[10px] font-bold text-muted-foreground animate-pulse">...</span>}
+      </label>
+      <div className="grid grid-cols-2 gap-2.5">
+        {VOICE_CTA_STYLES.map((opt) => {
+          const active = value === opt.value;
+          const isThisPending = pending === opt.value;
+          return (
+            <button
+              key={opt.value}
+              type="button"
+              onClick={() => handleSelect(opt.value)}
+              disabled={isSaving}
+              className={`relative flex flex-col items-start gap-2 rounded-xl border p-3 text-start transition-all disabled:opacity-70 ${
+                active
+                  ? "border-primary bg-primary/5 ring-1 ring-primary/20"
+                  : "border-border hover:border-primary/40 hover:bg-muted/30"
+              }`}
+            >
+              {active && (
+                <span className="absolute top-2 end-2 w-4 h-4 rounded-full bg-primary flex items-center justify-center">
+                  <CheckCircle2 size={12} className="text-primary-foreground" strokeWidth={3} />
+                </span>
+              )}
+              <VoiceCtaIconPreview styleValue={opt.value} active={active} />
+              <div className="min-w-0">
+                <p className="text-xs font-bold text-foreground leading-tight">
+                  {t(`admin.settingsFields.voiceCtaStyles.${opt.labelKey}`)}
+                </p>
+                <p className="text-[10px] text-muted-foreground mt-0.5 leading-snug">
+                  {t(`admin.settingsFields.voiceCtaStyles.${opt.descKey}`)}
+                </p>
+              </div>
+              {isThisPending && (
+                <span className="absolute bottom-2 end-2 text-[9px] font-bold text-muted-foreground animate-pulse">...</span>
+              )}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
 
 function SettingRow({ label, description, warning, children, isSaving, saved }: { label: string, description?: string, warning?: string, children: React.ReactNode, isSaving: boolean, saved: boolean }) {
   return (

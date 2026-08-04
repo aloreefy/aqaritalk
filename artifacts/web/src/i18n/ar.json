@@ -187,6 +187,7 @@
     "noUsers": "لا يوجد مستخدمين",
     "noProperties": "لا توجد عقارات",
     "settingsSections": {
+      "appearance": "المظهر",
       "otpAuth": "المصادقة ورمز التحقق",
       "aiBroker": "الوسيط الذكي",
       "marketLoc": "السوق واللغة",
@@ -194,6 +195,17 @@
       "systemFlags": "النظام والميزات"
     },
     "settingsFields": {
+      "voiceCtaStyle": "شكل زر التسجيل الصوتي",
+      "voiceCtaStyles": {
+        "greenCard": "الكارت الأصلي",
+        "greenCardDesc": "بطاقة خضراء كلاسيكية",
+        "orb": "الكرة المتوهجة",
+        "orbDesc": "تأثير توهج متحرك",
+        "waveform": "الموجة الصوتية",
+        "waveformDesc": "أشرطة متحركة",
+        "sonar": "نبضات الرادار",
+        "sonarDesc": "حلقات تتمدد للخارج"
+      },
       "otpExpiry": "صلاحية رمز التحقق (دقائق)",
       "maxFailedAttempts": "الحد الأقصى للمحاولات الفاشلة",
       "maxOtpRequests": "الحد الأقصى لطلبات الرمز",
