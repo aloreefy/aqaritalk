@@ -257,6 +257,37 @@ export default function HomePage() {
           </button>
         </div>
 
+        {/* ── Option D: Sonar / Radar ── */}
+        <div className="px-4 mt-5">
+          <button
+            type="button"
+            onClick={goToAi}
+            className="w-full rounded-3xl bg-card border border-border overflow-hidden active:scale-[0.98] transition-transform"
+          >
+            <div className="flex items-center gap-6 px-6 py-7">
+              {/* Radar icon */}
+              <div className="relative flex items-center justify-center w-16 h-16 shrink-0">
+                <div className="radar-ring" />
+                <div className="radar-ring radar-ring-2" />
+                <div className="radar-ring radar-ring-3" />
+                <div className="radar-ring radar-ring-4" />
+                <div className="relative z-10 w-16 h-16 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center">
+                  <Mic size={26} className="text-primary" strokeWidth={1.75} />
+                </div>
+              </div>
+              {/* Text */}
+              <div className="flex-1 text-start">
+                <p className="font-extrabold text-foreground text-lg leading-snug">
+                  تحدّث، أنا أسمعك
+                </p>
+                <p className="text-muted-foreground text-sm mt-1">
+                  صِف عقارك بكلماتك، وسأجد الأنسب
+                </p>
+              </div>
+            </div>
+          </button>
+        </div>
+
         {/* Section header + view toggle */}
         <div className="px-4 mt-6 flex items-center justify-between">
           <h3 className="font-bold text-lg text-foreground">عقارات مميزة</h3>
