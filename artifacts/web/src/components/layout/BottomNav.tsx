@@ -1,9 +1,10 @@
 import { useLocation, Link } from "wouter";
 import { useTranslation } from "react-i18next";
-import { Home, Heart, MessageSquare, Plus, User } from "lucide-react";
+import { Home, Heart, MessageSquare, Plus, User, ShieldCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/contexts/auth";
 
-const navItems = [
+const baseNavItems = [
   { key: "home", href: "/", icon: Home, labelKey: "nav.home" },
   { key: "search", href: "/?search=1", icon: Heart, labelKey: "nav.search" },
   { key: "list", href: "/list", icon: Plus, labelKey: "nav.list", center: true },
@@ -11,9 +12,16 @@ const navItems = [
   { key: "profile", href: "/profile", icon: User, labelKey: "nav.profile" },
 ];
 
+const adminNavItem = { key: "admin", href: "/admin", icon: ShieldCheck, labelKey: "nav.admin" };
+
 export default function BottomNav() {
   const [location] = useLocation();
   const { t } = useTranslation();
+  const { user } = useAuth();
+
+  const navItems = user?.role === "admin"
+    ? [...baseNavItems, adminNavItem]
+    : baseNavItems;
 
   function isActive(href: string) {
     if (href === "/") return location === "/";

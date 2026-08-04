@@ -8,7 +8,8 @@
     "search": "Search",
     "chat": "Chat",
     "list": "List",
-    "profile": "Profile"
+    "profile": "Profile",
+    "admin": "Admin"
   },
   "auth": {
     "title": "Welcome",
