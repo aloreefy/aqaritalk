@@ -2,3 +2,5 @@
 - [OTP verify response shape](otp-verify-response.md) — VerifyOtpResponse requires isNewUser + user.createdAt/updatedAt; omitting any causes a 500 Zod parse error.
 - [Gemini SDK and model config](gemini-config.md) — AQ. prefix keys require @google/genai v1.x; gemini-2.0-flash has quota=0 on this key; gemini-2.5-flash works.
 - [Guardrail false positive: دين in دينار](guardrail-dinar-bug.md) — Arabic substring "دين" (religion keyword) matched inside "دينار" (JOD currency), silently triggering off-topic guard on every price mention. Fixed with explicit full-form keywords.
+- [api-server zod import rule](api-server-zod-import.md) — Use generated schemas from @workspace/api-zod, never import zod/v4 directly; esbuild cannot resolve the zod/v4 subpath export.
+- [System settings table](system-settings-table.md) — system_settings is a single-row table (get-or-create pattern); covers OTP, AI broker, market, listings, and feature flags.

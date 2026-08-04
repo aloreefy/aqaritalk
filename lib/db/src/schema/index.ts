@@ -8,4 +8,5 @@ export * from "./commission-settings";
 export * from "./otp-sessions";
 export * from "./audit-logs";
 export * from "./notifications";
+export * from "./system-settings";
 

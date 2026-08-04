@@ -1128,3 +1128,97 @@ export const GetAdminStatsResponse = zod.object({
 })
 
 
+/**
+ * @summary Get system settings
+ */
+export const GetAdminSettingsResponse = zod.object({
+  "id": zod.string(),
+  "otpExpiryMinutes": zod.number(),
+  "otpMaxAttempts": zod.number(),
+  "otpRateLimitCount": zod.number(),
+  "otpRateLimitWindowMinutes": zod.number(),
+  "aiModel": zod.string(),
+  "aiTemperature": zod.number(),
+  "aiMaxTurns": zod.number(),
+  "aiGuardrailLevel": zod.enum(['strict', 'balanced', 'relaxed']),
+  "defaultLanguage": zod.enum(['ar', 'en']),
+  "defaultCurrency": zod.enum(['JOD', 'SAR', 'AED', 'EGP', 'KWD', 'QAR', 'BHD', 'OMR', 'MAD', 'LBP', 'IQD']),
+  "maxImagesPerProperty": zod.number(),
+  "autoApproveListings": zod.boolean(),
+  "listingExpiryDays": zod.number(),
+  "maintenanceMode": zod.boolean(),
+  "featureVoiceInput": zod.boolean(),
+  "featureMapView": zod.boolean(),
+  "featureContactRelease": zod.boolean(),
+  "featureSellerWizard": zod.boolean(),
+  "updatedAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary Update system settings (admin only)
+ */
+export const updateAdminSettingsBodyOtpExpiryMinutesMax = 60;
+
+export const updateAdminSettingsBodyOtpMaxAttemptsMax = 10;
+
+export const updateAdminSettingsBodyOtpRateLimitCountMax = 10;
+
+export const updateAdminSettingsBodyOtpRateLimitWindowMinutesMax = 60;
+
+export const updateAdminSettingsBodyAiTemperatureMin = 0;
+export const updateAdminSettingsBodyAiTemperatureMax = 1;
+
+export const updateAdminSettingsBodyAiMaxTurnsMax = 20;
+
+export const updateAdminSettingsBodyMaxImagesPerPropertyMax = 50;
+
+export const updateAdminSettingsBodyListingExpiryDaysMax = 365;
+
+
+
+export const UpdateAdminSettingsBody = zod.object({
+  "otpExpiryMinutes": zod.number().min(1).max(updateAdminSettingsBodyOtpExpiryMinutesMax).optional(),
+  "otpMaxAttempts": zod.number().min(1).max(updateAdminSettingsBodyOtpMaxAttemptsMax).optional(),
+  "otpRateLimitCount": zod.number().min(1).max(updateAdminSettingsBodyOtpRateLimitCountMax).optional(),
+  "otpRateLimitWindowMinutes": zod.number().min(1).max(updateAdminSettingsBodyOtpRateLimitWindowMinutesMax).optional(),
+  "aiModel": zod.string().optional(),
+  "aiTemperature": zod.number().min(updateAdminSettingsBodyAiTemperatureMin).max(updateAdminSettingsBodyAiTemperatureMax).optional(),
+  "aiMaxTurns": zod.number().min(1).max(updateAdminSettingsBodyAiMaxTurnsMax).optional(),
+  "aiGuardrailLevel": zod.enum(['strict', 'balanced', 'relaxed']).optional(),
+  "defaultLanguage": zod.enum(['ar', 'en']).optional(),
+  "defaultCurrency": zod.enum(['JOD', 'SAR', 'AED', 'EGP', 'KWD', 'QAR', 'BHD', 'OMR', 'MAD', 'LBP', 'IQD']).optional(),
+  "maxImagesPerProperty": zod.number().min(1).max(updateAdminSettingsBodyMaxImagesPerPropertyMax).optional(),
+  "autoApproveListings": zod.boolean().optional(),
+  "listingExpiryDays": zod.number().min(1).max(updateAdminSettingsBodyListingExpiryDaysMax).optional(),
+  "maintenanceMode": zod.boolean().optional(),
+  "featureVoiceInput": zod.boolean().optional(),
+  "featureMapView": zod.boolean().optional(),
+  "featureContactRelease": zod.boolean().optional(),
+  "featureSellerWizard": zod.boolean().optional()
+})
+
+export const UpdateAdminSettingsResponse = zod.object({
+  "id": zod.string(),
+  "otpExpiryMinutes": zod.number(),
+  "otpMaxAttempts": zod.number(),
+  "otpRateLimitCount": zod.number(),
+  "otpRateLimitWindowMinutes": zod.number(),
+  "aiModel": zod.string(),
+  "aiTemperature": zod.number(),
+  "aiMaxTurns": zod.number(),
+  "aiGuardrailLevel": zod.enum(['strict', 'balanced', 'relaxed']),
+  "defaultLanguage": zod.enum(['ar', 'en']),
+  "defaultCurrency": zod.enum(['JOD', 'SAR', 'AED', 'EGP', 'KWD', 'QAR', 'BHD', 'OMR', 'MAD', 'LBP', 'IQD']),
+  "maxImagesPerProperty": zod.number(),
+  "autoApproveListings": zod.boolean(),
+  "listingExpiryDays": zod.number(),
+  "maintenanceMode": zod.boolean(),
+  "featureVoiceInput": zod.boolean(),
+  "featureMapView": zod.boolean(),
+  "featureContactRelease": zod.boolean(),
+  "featureSellerWizard": zod.boolean(),
+  "updatedAt": zod.coerce.date()
+})
+
+

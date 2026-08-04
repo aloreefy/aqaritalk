@@ -709,6 +709,40 @@ paths:
               schema:
                 $ref: "#/components/schemas/AdminStats"
 
+  /admin/settings:
+    get:
+      operationId: getAdminSettings
+      tags: [admin]
+      summary: Get system settings
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: System settings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SystemSettings"
+    put:
+      operationId: updateAdminSettings
+      tags: [admin]
+      summary: Update system settings (admin only)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SystemSettingsUpdate"
+      responses:
+        "200":
+          description: Updated settings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SystemSettings"
+
 components:
   securitySchemes:
     bearerAuth:
@@ -1318,3 +1352,111 @@ components:
               type: integer
             broker:
               type: integer
+
+    SystemSettings:
+      type: object
+      required: [id, otpExpiryMinutes, otpMaxAttempts, otpRateLimitCount, otpRateLimitWindowMinutes, aiModel, aiTemperature, aiMaxTurns, aiGuardrailLevel, defaultLanguage, defaultCurrency, maxImagesPerProperty, autoApproveListings, listingExpiryDays, maintenanceMode, featureVoiceInput, featureMapView, featureContactRelease, featureSellerWizard, updatedAt]
+      properties:
+        id:
+          type: string
+        otpExpiryMinutes:
+          type: integer
+        otpMaxAttempts:
+          type: integer
+        otpRateLimitCount:
+          type: integer
+        otpRateLimitWindowMinutes:
+          type: integer
+        aiModel:
+          type: string
+        aiTemperature:
+          type: number
+        aiMaxTurns:
+          type: integer
+        aiGuardrailLevel:
+          type: string
+          enum: [strict, balanced, relaxed]
+        defaultLanguage:
+          type: string
+          enum: [ar, en]
+        defaultCurrency:
+          type: string
+          enum: [JOD, SAR, AED, EGP, KWD, QAR, BHD, OMR, MAD, LBP, IQD]
+        maxImagesPerProperty:
+          type: integer
+        autoApproveListings:
+          type: boolean
+        listingExpiryDays:
+          type: integer
+        maintenanceMode:
+          type: boolean
+        featureVoiceInput:
+          type: boolean
+        featureMapView:
+          type: boolean
+        featureContactRelease:
+          type: boolean
+        featureSellerWizard:
+          type: boolean
+        updatedAt:
+          type: string
+          format: date-time
+
+    SystemSettingsUpdate:
+      type: object
+      properties:
+        otpExpiryMinutes:
+          type: integer
+          minimum: 1
+          maximum: 60
+        otpMaxAttempts:
+          type: integer
+          minimum: 1
+          maximum: 10
+        otpRateLimitCount:
+          type: integer
+          minimum: 1
+          maximum: 10
+        otpRateLimitWindowMinutes:
+          type: integer
+          minimum: 1
+          maximum: 60
+        aiModel:
+          type: string
+        aiTemperature:
+          type: number
+          minimum: 0
+          maximum: 1
+        aiMaxTurns:
+          type: integer
+          minimum: 1
+          maximum: 20
+        aiGuardrailLevel:
+          type: string
+          enum: [strict, balanced, relaxed]
+        defaultLanguage:
+          type: string
+          enum: [ar, en]
+        defaultCurrency:
+          type: string
+          enum: [JOD, SAR, AED, EGP, KWD, QAR, BHD, OMR, MAD, LBP, IQD]
+        maxImagesPerProperty:
+          type: integer
+          minimum: 1
+          maximum: 50
+        autoApproveListings:
+          type: boolean
+        listingExpiryDays:
+          type: integer
+          minimum: 1
+          maximum: 365
+        maintenanceMode:
+          type: boolean
+        featureVoiceInput:
+          type: boolean
+        featureMapView:
+          type: boolean
+        featureContactRelease:
+          type: boolean
+        featureSellerWizard:
+          type: boolean

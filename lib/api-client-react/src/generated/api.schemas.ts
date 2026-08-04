@@ -570,6 +570,150 @@ export interface AdminStats {
   usersByRole?: AdminStatsUsersByRole;
 }
 
+export type SystemSettingsAiGuardrailLevel = typeof SystemSettingsAiGuardrailLevel[keyof typeof SystemSettingsAiGuardrailLevel];
+
+
+export const SystemSettingsAiGuardrailLevel = {
+  strict: 'strict',
+  balanced: 'balanced',
+  relaxed: 'relaxed',
+} as const;
+
+export type SystemSettingsDefaultLanguage = typeof SystemSettingsDefaultLanguage[keyof typeof SystemSettingsDefaultLanguage];
+
+
+export const SystemSettingsDefaultLanguage = {
+  ar: 'ar',
+  en: 'en',
+} as const;
+
+export type SystemSettingsDefaultCurrency = typeof SystemSettingsDefaultCurrency[keyof typeof SystemSettingsDefaultCurrency];
+
+
+export const SystemSettingsDefaultCurrency = {
+  JOD: 'JOD',
+  SAR: 'SAR',
+  AED: 'AED',
+  EGP: 'EGP',
+  KWD: 'KWD',
+  QAR: 'QAR',
+  BHD: 'BHD',
+  OMR: 'OMR',
+  MAD: 'MAD',
+  LBP: 'LBP',
+  IQD: 'IQD',
+} as const;
+
+export interface SystemSettings {
+  id: string;
+  otpExpiryMinutes: number;
+  otpMaxAttempts: number;
+  otpRateLimitCount: number;
+  otpRateLimitWindowMinutes: number;
+  aiModel: string;
+  aiTemperature: number;
+  aiMaxTurns: number;
+  aiGuardrailLevel: SystemSettingsAiGuardrailLevel;
+  defaultLanguage: SystemSettingsDefaultLanguage;
+  defaultCurrency: SystemSettingsDefaultCurrency;
+  maxImagesPerProperty: number;
+  autoApproveListings: boolean;
+  listingExpiryDays: number;
+  maintenanceMode: boolean;
+  featureVoiceInput: boolean;
+  featureMapView: boolean;
+  featureContactRelease: boolean;
+  featureSellerWizard: boolean;
+  updatedAt: string;
+}
+
+export type SystemSettingsUpdateAiGuardrailLevel = typeof SystemSettingsUpdateAiGuardrailLevel[keyof typeof SystemSettingsUpdateAiGuardrailLevel];
+
+
+export const SystemSettingsUpdateAiGuardrailLevel = {
+  strict: 'strict',
+  balanced: 'balanced',
+  relaxed: 'relaxed',
+} as const;
+
+export type SystemSettingsUpdateDefaultLanguage = typeof SystemSettingsUpdateDefaultLanguage[keyof typeof SystemSettingsUpdateDefaultLanguage];
+
+
+export const SystemSettingsUpdateDefaultLanguage = {
+  ar: 'ar',
+  en: 'en',
+} as const;
+
+export type SystemSettingsUpdateDefaultCurrency = typeof SystemSettingsUpdateDefaultCurrency[keyof typeof SystemSettingsUpdateDefaultCurrency];
+
+
+export const SystemSettingsUpdateDefaultCurrency = {
+  JOD: 'JOD',
+  SAR: 'SAR',
+  AED: 'AED',
+  EGP: 'EGP',
+  KWD: 'KWD',
+  QAR: 'QAR',
+  BHD: 'BHD',
+  OMR: 'OMR',
+  MAD: 'MAD',
+  LBP: 'LBP',
+  IQD: 'IQD',
+} as const;
+
+export interface SystemSettingsUpdate {
+  /**
+     * @minimum 1
+     * @maximum 60
+     */
+  otpExpiryMinutes?: number;
+  /**
+     * @minimum 1
+     * @maximum 10
+     */
+  otpMaxAttempts?: number;
+  /**
+     * @minimum 1
+     * @maximum 10
+     */
+  otpRateLimitCount?: number;
+  /**
+     * @minimum 1
+     * @maximum 60
+     */
+  otpRateLimitWindowMinutes?: number;
+  aiModel?: string;
+  /**
+     * @minimum 0
+     * @maximum 1
+     */
+  aiTemperature?: number;
+  /**
+     * @minimum 1
+     * @maximum 20
+     */
+  aiMaxTurns?: number;
+  aiGuardrailLevel?: SystemSettingsUpdateAiGuardrailLevel;
+  defaultLanguage?: SystemSettingsUpdateDefaultLanguage;
+  defaultCurrency?: SystemSettingsUpdateDefaultCurrency;
+  /**
+     * @minimum 1
+     * @maximum 50
+     */
+  maxImagesPerProperty?: number;
+  autoApproveListings?: boolean;
+  /**
+     * @minimum 1
+     * @maximum 365
+     */
+  listingExpiryDays?: number;
+  maintenanceMode?: boolean;
+  featureVoiceInput?: boolean;
+  featureMapView?: boolean;
+  featureContactRelease?: boolean;
+  featureSellerWizard?: boolean;
+}
+
 export type ListPropertiesParams = {
 /**
  * @nullable
