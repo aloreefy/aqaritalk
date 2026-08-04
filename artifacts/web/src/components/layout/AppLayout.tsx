@@ -28,13 +28,13 @@ export default function AppLayout({ children }: Props) {
             aria-label="Admin panel"
             style={{
               position: "fixed",
-              top: "14px",
-              right: "max(14px, calc(50vw - 226px))",
+              bottom: "88px",
+              right: "max(16px, calc(50vw - 224px))",
               zIndex: 60,
             }}
-            className="w-9 h-9 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-lg shadow-primary/30 active:scale-90 transition-transform border-2 border-primary-foreground/20"
+            className="w-14 h-14 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-xl shadow-primary/40 active:scale-90 transition-transform border-2 border-primary-foreground/20"
           >
-            <ShieldCheck size={17} strokeWidth={2.25} />
+            <ShieldCheck size={24} strokeWidth={2} />
           </button>
         </Link>
       )}
