@@ -3,8 +3,10 @@ import { useLocation } from "wouter";
 import { useAdminPortalLogin } from "@workspace/api-client-react";
 import { useToast } from "@/hooks/use-toast";
 import { Building, Lock, ShieldAlert } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export default function Login() {
+  const { t } = useTranslation();
   const [password, setPassword] = useState("");
   const [, setLocation] = useLocation();
   const { toast } = useToast();
@@ -21,8 +23,8 @@ export default function Login() {
       },
       onError: (err) => {
         toast({
-          title: "Access Denied",
-          description: (err.data as Record<string, string> | null)?.error ?? err.message ?? "Invalid operator credentials.",
+          title: t('login.toast.errorTitle'),
+          description: (err.data as Record<string, string> | null)?.error ?? err.message ?? t('login.toast.errorFallback'),
           variant: "destructive",
         });
       }
@@ -45,14 +47,14 @@ export default function Login() {
                 <Building className="w-6 h-6" />
               </div>
             </div>
-            <h1 className="text-xl font-semibold text-center tracking-tight">AqariTalk Central</h1>
-            <p className="text-xs text-muted-foreground text-center mt-1 font-mono uppercase tracking-wider">Restricted Operator Access</p>
+            <h1 className="text-xl font-semibold text-center tracking-tight">{t('login.title')}</h1>
+            <p className="text-xs text-muted-foreground text-center mt-1 font-mono uppercase tracking-wider">{t('login.subtitle')}</p>
           </div>
 
           <form onSubmit={handleSubmit} className="p-6 space-y-6">
             <div className="space-y-2">
               <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
-                <Lock className="w-3 h-3" /> Passkey Required
+                <Lock className="w-3 h-3" /> {t('login.passkeyLabel')}
               </label>
               <div className="relative">
                 <input
@@ -63,6 +65,7 @@ export default function Login() {
                   placeholder="••••••••••••"
                   autoFocus
                   autoComplete="current-password"
+                  dir="ltr"
                 />
               </div>
             </div>
@@ -75,16 +78,14 @@ export default function Login() {
               {loginMutation.isPending ? (
                 <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin"></div>
               ) : (
-                "Authenticate & Initialize"
+                t('login.submitButton')
               )}
             </button>
           </form>
           
           <div className="px-6 py-4 bg-muted/50 border-t flex items-start gap-3 text-xs text-muted-foreground">
             <ShieldAlert className="w-4 h-4 shrink-0 text-amber-500 mt-0.5" />
-            <p className="leading-relaxed">
-              This system is restricted to authorized administrative personnel. All actions are logged and audited.
-            </p>
+            <p className="leading-relaxed">{t('login.securityNotice')}</p>
           </div>
         </div>
       </div>

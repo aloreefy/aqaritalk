@@ -8,8 +8,10 @@ import {
   ArrowUpRight
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
 
 export default function Dashboard() {
+  const { t } = useTranslation();
   const { data: stats, isLoading, isError } = useGetAdminStats({
     query: {
       queryKey: getGetAdminStatsQueryKey()
@@ -33,46 +35,46 @@ export default function Dashboard() {
     return (
       <div className="h-[60vh] flex flex-col items-center justify-center text-muted-foreground">
         <Activity className="w-12 h-12 mb-4 opacity-20" />
-        <p>Failed to retrieve system telemetry.</p>
+        <p>{t('dashboard.error')}</p>
       </div>
     );
   }
 
   const statCards = [
     {
-      title: "Total Registered Users",
+      title: t('dashboard.cards.totalUsers'),
       value: stats.totalUsers,
       icon: Users,
       trend: "+12.5%",
-      description: "Across all markets",
+      description: t('dashboard.cards.totalUsersDesc'),
       color: "text-blue-500",
       bgColor: "bg-blue-500/10"
     },
     {
-      title: "Active Properties",
+      title: t('dashboard.cards.activeProperties'),
       value: stats.activeListings,
       icon: Building2,
       trend: "+4.1%",
-      description: "Live on platform",
+      description: t('dashboard.cards.activePropertiesDesc'),
       color: "text-emerald-500",
       bgColor: "bg-emerald-500/10"
     },
     {
-      title: "Pending Reviews",
+      title: t('dashboard.cards.pendingReviews'),
       value: stats.pendingReview,
       icon: Clock,
       trend: "-2.3%",
-      description: "Requires action",
+      description: t('dashboard.cards.pendingReviewsDesc'),
       color: "text-amber-500",
       bgColor: "bg-amber-500/10",
       alert: stats.pendingReview > 10
     },
     {
-      title: "Contact Releases",
+      title: t('dashboard.cards.contactReleases'),
       value: stats.contactReleasesThisMonth,
       icon: Key,
       trend: "+18.2%",
-      description: "This month",
+      description: t('dashboard.cards.contactReleasesDesc'),
       color: "text-purple-500",
       bgColor: "bg-purple-500/10"
     }
@@ -81,8 +83,8 @@ export default function Dashboard() {
   return (
     <div className="space-y-8">
       <div>
-        <h2 className="text-2xl font-bold tracking-tight">System Telemetry</h2>
-        <p className="text-sm text-muted-foreground mt-1">Real-time overview of platform activity and health.</p>
+        <h2 className="text-2xl font-bold tracking-tight">{t('dashboard.title')}</h2>
+        <p className="text-sm text-muted-foreground mt-1">{t('dashboard.subtitle')}</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -92,7 +94,7 @@ export default function Dashboard() {
             card.alert && "border-amber-500/50 shadow-[0_0_15px_-3px_rgba(245,158,11,0.1)]"
           )}>
             {card.alert && (
-              <div className="absolute top-0 right-0 w-12 h-12 bg-amber-500/10 rounded-bl-full flex items-start justify-end p-2">
+              <div className="absolute top-0 end-0 w-12 h-12 bg-amber-500/10 rounded-es-full flex items-start justify-end p-2">
                 <div className="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></div>
               </div>
             )}
@@ -125,15 +127,15 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="col-span-1 bg-card border rounded-lg overflow-hidden">
           <div className="p-5 border-b bg-muted/20">
-            <h3 className="font-semibold">User Distribution</h3>
-            <p className="text-xs text-muted-foreground mt-1">Breakdown by assigned role</p>
+            <h3 className="font-semibold">{t('dashboard.distribution.title')}</h3>
+            <p className="text-xs text-muted-foreground mt-1">{t('dashboard.distribution.subtitle')}</p>
           </div>
           <div className="p-5">
             <div className="space-y-4">
               {[
-                { label: "Buyers", value: stats.usersByRole?.buyer || 0, color: "bg-blue-500" },
-                { label: "Sellers", value: stats.usersByRole?.seller || 0, color: "bg-emerald-500" },
-                { label: "Brokers", value: stats.usersByRole?.broker || 0, color: "bg-purple-500" }
+                { label: t('dashboard.distribution.buyers'),  value: stats.usersByRole?.buyer  || 0, color: "bg-blue-500" },
+                { label: t('dashboard.distribution.sellers'), value: stats.usersByRole?.seller || 0, color: "bg-emerald-500" },
+                { label: t('dashboard.distribution.brokers'), value: stats.usersByRole?.broker || 0, color: "bg-purple-500" }
               ].map((role) => (
                 <div key={role.label} className="space-y-2">
                   <div className="flex justify-between text-sm">
@@ -154,10 +156,9 @@ export default function Dashboard() {
 
         <div className="col-span-1 lg:col-span-2 bg-card border rounded-lg overflow-hidden flex flex-col items-center justify-center p-8 text-center">
           <Activity className="w-8 h-8 text-muted-foreground/30 mb-3" />
-          <h3 className="text-sm font-semibold text-muted-foreground">Detailed Analytics</h3>
+          <h3 className="text-sm font-semibold text-muted-foreground">{t('dashboard.analytics.title')}</h3>
           <p className="text-xs text-muted-foreground/70 mt-1 max-w-sm">
-            Full metric exploration and historical charting is currently offline for maintenance. 
-            Core vitals are reported nominally.
+            {t('dashboard.analytics.offline')}
           </p>
         </div>
       </div>

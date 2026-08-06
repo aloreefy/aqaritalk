@@ -4,6 +4,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Search, UserCog, ShieldAlert, CheckCircle2, XCircle, MoreHorizontal } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
 
 import {
   DropdownMenu,
@@ -15,6 +16,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 export default function Users() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [search, setSearch] = useState("");
@@ -45,7 +47,7 @@ export default function Users() {
   const handleUpdateStatus = (id: string, newStatus: 'active' | 'suspended') => {
     updateUserMutation.mutate({ id, data: { status: newStatus } }, {
       onSuccess: () => {
-        toast({ title: "Operator logged", description: `User status updated to ${newStatus}.` });
+        toast({ title: t('users.toast.statusTitle'), description: t('users.toast.statusDesc', { status: newStatus }) });
         queryClient.invalidateQueries({ queryKey: getAdminListUsersQueryKey() });
       }
     });
@@ -54,7 +56,7 @@ export default function Users() {
   const handleUpdateRole = (id: string, newRole: 'admin' | 'broker' | 'buyer' | 'seller') => {
     updateUserMutation.mutate({ id, data: { role: newRole as any } }, {
       onSuccess: () => {
-        toast({ title: "Clearance updated", description: `User role modified to ${newRole}.` });
+        toast({ title: t('users.toast.roleTitle'), description: t('users.toast.roleDesc', { role: newRole }) });
         queryClient.invalidateQueries({ queryKey: getAdminListUsersQueryKey() });
       }
     });
@@ -71,19 +73,19 @@ export default function Users() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight">Operator Directory</h2>
-          <p className="text-sm text-muted-foreground mt-1">Manage personnel clearance and access vectors.</p>
+          <h2 className="text-2xl font-bold tracking-tight">{t('users.title')}</h2>
+          <p className="text-sm text-muted-foreground mt-1">{t('users.subtitle')}</p>
         </div>
         
         <div className="flex items-center gap-2">
           <div className="relative w-64">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+            <Search className="w-4 h-4 absolute start-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
             <input 
               type="text"
-              placeholder="Query identifier or comm-link..."
+              placeholder={t('users.searchPlaceholder')}
               value={search}
               onChange={e => setSearch(e.target.value)}
-              className="w-full h-9 pl-9 pr-3 bg-card border border-input rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-primary transition-all font-mono placeholder:font-sans"
+              className="w-full h-9 ps-9 pe-3 bg-card border border-input rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-primary transition-all font-mono placeholder:font-sans"
             />
           </div>
           
@@ -92,11 +94,11 @@ export default function Users() {
             onChange={e => setRoleFilter(e.target.value)}
             className="h-9 bg-card border border-input rounded-md text-sm px-3 focus:outline-none focus:ring-1 focus:ring-primary"
           >
-            <option value="all">All Clearances</option>
-            <option value="buyer">Buyer</option>
-            <option value="seller">Seller</option>
-            <option value="broker">Broker</option>
-            <option value="admin">Administrator</option>
+            <option value="all">{t('users.filters.allClearances')}</option>
+            <option value="buyer">{t('users.filters.buyer')}</option>
+            <option value="seller">{t('users.filters.seller')}</option>
+            <option value="broker">{t('users.filters.broker')}</option>
+            <option value="admin">{t('users.filters.administrator')}</option>
           </select>
           
           <select 
@@ -104,24 +106,24 @@ export default function Users() {
             onChange={e => setStatusFilter(e.target.value)}
             className="h-9 bg-card border border-input rounded-md text-sm px-3 focus:outline-none focus:ring-1 focus:ring-primary"
           >
-            <option value="all">All States</option>
-            <option value="active">Active</option>
-            <option value="suspended">Suspended</option>
+            <option value="all">{t('users.filters.allStates')}</option>
+            <option value="active">{t('users.filters.active')}</option>
+            <option value="suspended">{t('users.filters.suspended')}</option>
           </select>
         </div>
       </div>
 
       <div className="bg-card border rounded-lg overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
-          <table className="w-full text-sm text-left whitespace-nowrap">
+          <table className="w-full text-sm text-start whitespace-nowrap">
             <thead className="bg-muted/50 text-muted-foreground text-xs uppercase tracking-wider font-semibold border-b">
               <tr>
-                <th className="px-6 py-4">Identity</th>
-                <th className="px-6 py-4">Comm-Link</th>
-                <th className="px-6 py-4">Clearance</th>
-                <th className="px-6 py-4">State</th>
-                <th className="px-6 py-4">Sector</th>
-                <th className="px-6 py-4 text-right">Actions</th>
+                <th className="px-6 py-4 text-start">{t('users.table.identity')}</th>
+                <th className="px-6 py-4 text-start">{t('users.table.commLink')}</th>
+                <th className="px-6 py-4 text-start">{t('users.table.clearance')}</th>
+                <th className="px-6 py-4 text-start">{t('users.table.state')}</th>
+                <th className="px-6 py-4 text-start">{t('users.table.sector')}</th>
+                <th className="px-6 py-4 text-end">{t('users.table.actions')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
@@ -129,7 +131,7 @@ export default function Users() {
                 <tr>
                   <td colSpan={6} className="px-6 py-12 text-center text-muted-foreground">
                     <UserCog className="w-10 h-10 mx-auto mb-3 opacity-20" />
-                    <p>No matching personnel found in directory.</p>
+                    <p>{t('users.empty')}</p>
                   </td>
                 </tr>
               ) : (
@@ -141,7 +143,7 @@ export default function Users() {
                           {user.name ? user.name.substring(0, 2) : 'UK'}
                         </div>
                         <div>
-                          <div className="font-medium text-foreground">{user.name || "Unknown Identity"}</div>
+                          <div className="font-medium text-foreground">{user.name || t('users.unknownIdentity')}</div>
                           <div className="text-[10px] font-mono text-muted-foreground">{user.id.substring(0, 8)}...</div>
                         </div>
                       </div>
@@ -154,7 +156,7 @@ export default function Users() {
                         user.role === 'broker' ? "bg-purple-500/10 text-purple-600" :
                         "bg-blue-500/10 text-blue-600"
                       )}>
-                        {user.role}
+                        {t(`users.roles.${user.role}`, { defaultValue: user.role })}
                       </span>
                     </td>
                     <td className="px-6 py-3">
@@ -162,18 +164,18 @@ export default function Users() {
                         {user.status === 'active' ? (
                           <>
                             <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
-                            <span className="text-xs font-medium text-emerald-600 dark:text-emerald-500">Active</span>
+                            <span className="text-xs font-medium text-emerald-600 dark:text-emerald-500">{t('users.filters.active')}</span>
                           </>
                         ) : (
                           <>
                             <ShieldAlert className="w-3.5 h-3.5 text-amber-500" />
-                            <span className="text-xs font-medium text-amber-600 dark:text-amber-500">Suspended</span>
+                            <span className="text-xs font-medium text-amber-600 dark:text-amber-500">{t('users.filters.suspended')}</span>
                           </>
                         )}
                       </div>
                     </td>
                     <td className="px-6 py-3 font-mono text-xs text-muted-foreground">{user.market}</td>
-                    <td className="px-6 py-3 text-right">
+                    <td className="px-6 py-3 text-end">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <button className="h-8 w-8 inline-flex items-center justify-center rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors">
@@ -181,26 +183,27 @@ export default function Users() {
                           </button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-48">
-                          <DropdownMenuLabel>Operator Controls</DropdownMenuLabel>
+                          <DropdownMenuLabel>{t('users.dropdown.label')}</DropdownMenuLabel>
                           <DropdownMenuSeparator />
                           
-                          <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground uppercase tracking-wider">State Override</div>
+                          <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t('users.dropdown.stateOverride')}</div>
                           {user.status === 'suspended' ? (
                             <DropdownMenuItem onClick={() => handleUpdateStatus(user.id, 'active')} className="text-emerald-600 cursor-pointer">
-                              <CheckCircle2 className="w-4 h-4 mr-2" /> Reinstate Operator
+                              <CheckCircle2 className="w-4 h-4 me-2" /> {t('users.dropdown.reinstate')}
                             </DropdownMenuItem>
                           ) : (
                             <DropdownMenuItem onClick={() => handleUpdateStatus(user.id, 'suspended')} className="text-amber-600 cursor-pointer">
-                              <XCircle className="w-4 h-4 mr-2" /> Suspend Operator
+                              <XCircle className="w-4 h-4 me-2" /> {t('users.dropdown.suspend')}
                             </DropdownMenuItem>
                           )}
                           
                           <DropdownMenuSeparator />
-                          <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Clearance Override</div>
+                          <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t('users.dropdown.clearanceOverride')}</div>
                           
                           {['buyer', 'seller', 'broker', 'admin'].filter(r => r !== user.role).map(role => (
                             <DropdownMenuItem key={role} onClick={() => handleUpdateRole(user.id, role as any)} className="cursor-pointer">
-                              <UserCog className="w-4 h-4 mr-2" /> Set as {role.charAt(0).toUpperCase() + role.slice(1)}
+                              <UserCog className="w-4 h-4 me-2" />
+                              {t('users.dropdown.setAs', { role: t(`users.roles.${role}`, { defaultValue: role }) })}
                             </DropdownMenuItem>
                           ))}
                         </DropdownMenuContent>

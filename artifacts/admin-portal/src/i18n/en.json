@@ -1,0 +1,253 @@
+{
+  "sidebar": {
+    "brand": "AqariTalk Control",
+    "platform": "Platform",
+    "nav": {
+      "overview": "Overview",
+      "users": "Users",
+      "listings": "Listings",
+      "commissions": "Commissions",
+      "systemConfig": "System Config"
+    },
+    "logout": "Terminate Session"
+  },
+  "header": {
+    "routes": {
+      "/": "Overview",
+      "/users": "User Directory",
+      "/properties": "Property Registry",
+      "/commission": "Commission Tables",
+      "/settings": "System Config"
+    },
+    "fallback": "Dashboard"
+  },
+  "login": {
+    "title": "AqariTalk Central",
+    "subtitle": "Restricted Operator Access",
+    "passkeyLabel": "Passkey Required",
+    "submitButton": "Authenticate & Initialize",
+    "securityNotice": "This system is restricted to authorized administrative personnel. All actions are logged and audited.",
+    "toast": {
+      "errorTitle": "Access Denied",
+      "errorFallback": "Invalid operator credentials."
+    }
+  },
+  "dashboard": {
+    "title": "System Telemetry",
+    "subtitle": "Real-time overview of platform activity and health.",
+    "error": "Failed to retrieve system telemetry.",
+    "cards": {
+      "totalUsers": "Total Registered Users",
+      "totalUsersDesc": "Across all markets",
+      "activeProperties": "Active Properties",
+      "activePropertiesDesc": "Live on platform",
+      "pendingReviews": "Pending Reviews",
+      "pendingReviewsDesc": "Requires action",
+      "contactReleases": "Contact Releases",
+      "contactReleasesDesc": "This month"
+    },
+    "distribution": {
+      "title": "User Distribution",
+      "subtitle": "Breakdown by assigned role",
+      "buyers": "Buyers",
+      "sellers": "Sellers",
+      "brokers": "Brokers"
+    },
+    "analytics": {
+      "title": "Detailed Analytics",
+      "offline": "Full metric exploration and historical charting is currently offline for maintenance. Core vitals are reported nominally."
+    }
+  },
+  "users": {
+    "title": "Operator Directory",
+    "subtitle": "Manage personnel clearance and access vectors.",
+    "searchPlaceholder": "Query identifier or comm-link...",
+    "filters": {
+      "allClearances": "All Clearances",
+      "buyer": "Buyer",
+      "seller": "Seller",
+      "broker": "Broker",
+      "administrator": "Administrator",
+      "allStates": "All States",
+      "active": "Active",
+      "suspended": "Suspended"
+    },
+    "table": {
+      "identity": "Identity",
+      "commLink": "Comm-Link",
+      "clearance": "Clearance",
+      "state": "State",
+      "sector": "Sector",
+      "actions": "Actions"
+    },
+    "empty": "No matching personnel found in directory.",
+    "unknownIdentity": "Unknown Identity",
+    "dropdown": {
+      "label": "Operator Controls",
+      "stateOverride": "State Override",
+      "reinstate": "Reinstate Operator",
+      "suspend": "Suspend Operator",
+      "clearanceOverride": "Clearance Override",
+      "setAs": "Set as {{role}}"
+    },
+    "roles": {
+      "buyer": "Buyer",
+      "seller": "Seller",
+      "broker": "Broker",
+      "admin": "Admin"
+    },
+    "toast": {
+      "statusTitle": "Operator logged",
+      "statusDesc": "User status updated to {{status}}.",
+      "roleTitle": "Clearance updated",
+      "roleDesc": "User role modified to {{role}}."
+    }
+  },
+  "properties": {
+    "title": "Asset Registry",
+    "subtitle": "Monitor and moderate platform real estate listings.",
+    "filters": {
+      "allStates": "All States",
+      "pendingReview": "Pending Review",
+      "active": "Active",
+      "draft": "Draft",
+      "sold": "Sold",
+      "rented": "Rented",
+      "rejected": "Rejected",
+      "deleted": "Deleted"
+    },
+    "table": {
+      "assetId": "Asset ID",
+      "classification": "Classification",
+      "valuation": "Valuation",
+      "location": "Location",
+      "state": "State",
+      "actions": "Actions"
+    },
+    "empty": "No assets found matching current parameters.",
+    "by": "By:",
+    "tbd": "TBD",
+    "unspecified": "Unspecified",
+    "dropdown": {
+      "label": "Asset Directives",
+      "authorize": "Authorize & Publish",
+      "reject": "Reject Asset",
+      "markDeleted": "Mark Deleted"
+    },
+    "toast": {
+      "title": "Asset record updated",
+      "desc": "Asset status changed to {{status}}."
+    },
+    "pagination": {
+      "showing": "Showing {{count}} of {{total}} assets",
+      "previous": "Previous",
+      "next": "Next"
+    }
+  },
+  "commission": {
+    "title": "Commission Architecture",
+    "subtitle": "Configure global fee structures for platform transactions.",
+    "warning": {
+      "title": "Global Revenue Impact",
+      "body": "Modifications to these parameters immediately affect all new contact releases and smart contracts. Existing agreements are locked at their historical rates."
+    },
+    "feeParams": "Fee Parameters",
+    "fields": {
+      "buyerPct": "Buyer Commission (%)",
+      "buyerPctDesc": "Standard fee applied to the buyer side.",
+      "sellerPct": "Seller Commission (%)",
+      "sellerPctDesc": "Standard fee applied to the seller side.",
+      "negotiable": "Agent Negotiation Authority",
+      "negotiableDesc": "Allow the AI broker to dynamically adjust commission rates during negotiation to secure agreements."
+    },
+    "submit": "Commit Configuration",
+    "toast": {
+      "title": "Configuration Updated",
+      "desc": "Commission rates have been synchronized."
+    }
+  },
+  "settings": {
+    "title": "System Configuration",
+    "subtitle": "Core platform parameters, AI model tuning, and feature flags.",
+    "submit": "Commit Changes",
+    "tabs": {
+      "engine": "AI Engine",
+      "security": "Security & Auth",
+      "features": "Feature Flags",
+      "platform": "Regional & Rules",
+      "system": "System State"
+    },
+    "engine": {
+      "model": "Inference Model",
+      "modelDesc": "Provider identifier (e.g. gpt-4o, claude-3-opus).",
+      "temperature": "Temperature",
+      "temperatureDesc": "Creativity vs precision (0.0 to 1.0). Lower is more deterministic.",
+      "maxTurns": "Max Conversation Turns",
+      "maxTurnsDesc": "Hard limit to prevent infinite loops.",
+      "guardrail": "Guardrail Strictness",
+      "guardrailDesc": "Controls off-topic detection aggressiveness.",
+      "guardrailOptions": {
+        "strict": "Strict (Blocks all edge cases)",
+        "balanced": "Balanced (Recommended)",
+        "relaxed": "Relaxed (Fluid conversation)"
+      }
+    },
+    "security": {
+      "otpExpiry": "OTP Expiry (Min)",
+      "maxAttempts": "Max OTP Attempts",
+      "rateLimitCap": "Rate Limit Cap",
+      "rateLimitWindow": "Rate Limit Window (Min)"
+    },
+    "features": {
+      "voiceInput": "Voice Input",
+      "voiceInputDesc": "Allow voice recording for AI interaction.",
+      "mapView": "Interactive Map",
+      "mapViewDesc": "Show map visualization for search results.",
+      "contactRelease": "Contact Release Contract",
+      "contactReleaseDesc": "Enable digital commission agreements.",
+      "sellerWizard": "AI Seller Wizard",
+      "sellerWizardDesc": "Allow property addition via conversational AI.",
+      "voiceAesthetic": "Voice Interface Aesthetic",
+      "voiceAestheticDesc": "Visual style of the main AI interaction component.",
+      "voiceStyles": {
+        "greenCard": "Green Card (Classic)",
+        "orb": "Floating Orb (Modern)",
+        "waveform": "Waveform (Technical)",
+        "sonar": "Sonar Pulse (Dynamic)"
+      }
+    },
+    "platform": {
+      "defaultLocale": "Default Locale",
+      "localeEn": "English (US)",
+      "localeAr": "Arabic (Standard)",
+      "baseCurrency": "Base Currency",
+      "maxImages": "Max Assets per Listing",
+      "listingTtl": "Listing TTL (Days)",
+      "listingTtlDesc": "Days until automatic archival.",
+      "autoApprove": "Auto-Approve Listings",
+      "autoApproveDesc": "Bypass manual administrator review for new properties."
+    },
+    "system": {
+      "maintenanceTitle": "Platform Maintenance Mode",
+      "maintenanceDesc": "Engaging maintenance mode will immediately suspend all active user sessions and disable API access for non-administrators.",
+      "engageLockdown": "Engage Lockdown"
+    },
+    "toast": {
+      "successTitle": "Configuration Updated",
+      "successDesc": "System parameters successfully applied.",
+      "errorTitle": "Configuration Error",
+      "errorDesc": "Failed to apply parameters"
+    },
+    "voiceMeta": {
+      "green_card": { "label": "Green Card", "description": "Full-width emerald CTA card" },
+      "orb":        { "label": "Floating Orb", "description": "Dark canvas with glowing orb" },
+      "waveform":   { "label": "Waveform", "description": "Animated frequency bars" },
+      "sonar":      { "label": "Sonar Pulse", "description": "Radar rings around mic icon" }
+    }
+  },
+  "notFound": {
+    "title": "Sector Not Found",
+    "subtitle": "The requested administrative module is offline or does not exist.",
+    "returnButton": "Return to Dashboard"
+  }
+}

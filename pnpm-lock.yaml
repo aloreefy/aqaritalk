@@ -181,6 +181,13 @@ importers:
         version: 5.9.3
 
   artifacts/admin-portal:
+    dependencies:
+      i18next:
+        specifier: ^26.3.0
+        version: 26.3.0(typescript@5.9.3)
+      react-i18next:
+        specifier: ^17.0.8
+        version: 17.0.8(i18next@26.3.0(typescript@5.9.3))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(typescript@5.9.3)
     devDependencies:
       '@hookform/resolvers':
         specifier: ^3.10.0
@@ -3946,6 +3953,7 @@ packages:
   tsconfck@3.1.6:
     resolution: {integrity: sha512-ks6Vjr/jEw0P1gmOVwutM3B7fWxoWBL2KRDb1JfqGVawBmO5UsvmWOQFGHBPl5yxYz4eERr19E6L7NMv+Fej4w==}
     engines: {node: ^18 || >=20}
+    deprecated: unmaintained
     hasBin: true
     peerDependencies:
       typescript: ^5.0.0

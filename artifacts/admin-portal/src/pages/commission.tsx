@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
+import { useTranslation } from "react-i18next";
 
 const commissionSchema = z.object({
   defaultBuyerPct: z.coerce.number().min(0).max(10),
@@ -20,6 +21,7 @@ const commissionSchema = z.object({
 type CommissionFormValues = z.infer<typeof commissionSchema>;
 
 export default function Commission() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
@@ -58,7 +60,7 @@ export default function Commission() {
       { data: values },
       {
         onSuccess: (updated) => {
-          toast({ title: "Configuration Updated", description: "Commission rates have been synchronized." });
+          toast({ title: t('commission.toast.title'), description: t('commission.toast.desc') });
           queryClient.setQueryData(getGetCommissionSettingsQueryKey(), updated);
         }
       }
@@ -77,25 +79,22 @@ export default function Commission() {
   return (
     <div className="max-w-2xl space-y-6">
       <div>
-        <h2 className="text-2xl font-bold tracking-tight">Commission Architecture</h2>
-        <p className="text-sm text-muted-foreground mt-1">Configure global fee structures for platform transactions.</p>
+        <h2 className="text-2xl font-bold tracking-tight">{t('commission.title')}</h2>
+        <p className="text-sm text-muted-foreground mt-1">{t('commission.subtitle')}</p>
       </div>
 
       <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-4 flex gap-3">
         <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0" />
         <div>
-          <h4 className="text-sm font-semibold text-amber-600">Global Revenue Impact</h4>
-          <p className="text-xs text-amber-600/80 mt-1">
-            Modifications to these parameters immediately affect all new contact releases and smart contracts. 
-            Existing agreements are locked at their historical rates.
-          </p>
+          <h4 className="text-sm font-semibold text-amber-600">{t('commission.warning.title')}</h4>
+          <p className="text-xs text-amber-600/80 mt-1">{t('commission.warning.body')}</p>
         </div>
       </div>
 
       <div className="bg-card border rounded-lg overflow-hidden shadow-sm">
         <div className="p-5 border-b bg-muted/20 flex items-center gap-2">
           <BadgePercent className="w-4 h-4 text-primary" />
-          <h3 className="font-semibold text-sm">Fee Parameters</h3>
+          <h3 className="font-semibold text-sm">{t('commission.feeParams')}</h3>
         </div>
         
         <Form {...form}>
@@ -107,19 +106,21 @@ export default function Commission() {
                 name="defaultBuyerPct"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Buyer Commission (%)</FormLabel>
+                    <FormLabel className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">
+                      {t('commission.fields.buyerPct')}
+                    </FormLabel>
                     <FormControl>
                       <div className="relative">
                         <Input 
                           type="number" 
                           step="0.1" 
-                          className="font-mono pl-3 pr-8"
+                          className="font-mono ps-3 pe-8"
                           {...field} 
                         />
-                        <div className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground font-mono">%</div>
+                        <div className="absolute end-3 top-1/2 -translate-y-1/2 text-muted-foreground font-mono">%</div>
                       </div>
                     </FormControl>
-                    <p className="text-[10px] text-muted-foreground">Standard fee applied to the buyer side.</p>
+                    <p className="text-[10px] text-muted-foreground">{t('commission.fields.buyerPctDesc')}</p>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -130,19 +131,21 @@ export default function Commission() {
                 name="defaultSellerPct"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Seller Commission (%)</FormLabel>
+                    <FormLabel className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">
+                      {t('commission.fields.sellerPct')}
+                    </FormLabel>
                     <FormControl>
                       <div className="relative">
                         <Input 
                           type="number" 
                           step="0.1" 
-                          className="font-mono pl-3 pr-8"
+                          className="font-mono ps-3 pe-8"
                           {...field} 
                         />
-                        <div className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground font-mono">%</div>
+                        <div className="absolute end-3 top-1/2 -translate-y-1/2 text-muted-foreground font-mono">%</div>
                       </div>
                     </FormControl>
-                    <p className="text-[10px] text-muted-foreground">Standard fee applied to the seller side.</p>
+                    <p className="text-[10px] text-muted-foreground">{t('commission.fields.sellerPctDesc')}</p>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -157,10 +160,8 @@ export default function Commission() {
               render={({ field }) => (
                 <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 bg-muted/30">
                   <div className="space-y-0.5">
-                    <FormLabel className="text-sm font-semibold">Agent Negotiation Authority</FormLabel>
-                    <p className="text-xs text-muted-foreground max-w-[80%]">
-                      Allow the AI broker to dynamically adjust commission rates during negotiation to secure agreements.
-                    </p>
+                    <FormLabel className="text-sm font-semibold">{t('commission.fields.negotiable')}</FormLabel>
+                    <p className="text-xs text-muted-foreground max-w-[80%]">{t('commission.fields.negotiableDesc')}</p>
                   </div>
                   <FormControl>
                     <Switch
@@ -188,7 +189,7 @@ export default function Commission() {
                 ) : (
                   <Save className="w-4 h-4" />
                 )}
-                Commit Configuration
+                {t('commission.submit')}
               </button>
             </div>
           </form>

@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useTranslation } from "react-i18next";
 
 // AqariTalk brand emerald — matches the public app's --primary token
 const EM   = "hsl(161,100%,21%)";
@@ -19,13 +20,6 @@ const EM55 = "hsl(161 100% 21% / 0.55)";
 const EM35 = "hsl(161 100% 21% / 0.35)";
 const EM30 = "hsl(161 100% 21% / 0.30)";
 const EM10 = "hsl(161 100% 21% / 0.10)";
-
-const voiceStyleMeta: Record<string, { label: string; description: string }> = {
-  green_card: { label: "Green Card",    description: "Full-width emerald CTA card" },
-  orb:        { label: "Floating Orb",  description: "Dark canvas with glowing orb" },
-  waveform:   { label: "Waveform",      description: "Animated frequency bars" },
-  sonar:      { label: "Sonar Pulse",   description: "Radar rings around mic icon" },
-};
 
 // Animations copied verbatim from the public app's index.css
 const VP_STYLES = `
@@ -61,7 +55,9 @@ const VP_STYLES = `
 `;
 
 function VoiceStylePreview({ style }: { style: string }) {
-  const meta = voiceStyleMeta[style];
+  const { t } = useTranslation();
+  const meta = t(`settings.voiceMeta.${style}`, { returnObjects: true }) as { label: string; description: string };
+
   return (
     <div className="flex flex-col gap-2 shrink-0" style={{ width: 210 }}>
       <style>{VP_STYLES}</style>
@@ -79,7 +75,7 @@ function VoiceStylePreview({ style }: { style: string }) {
                 backgroundSize: "20px 20px",
               }}
             />
-            <div className="relative z-10 flex-1 min-w-0">
+            <div className="relative z-10 flex-1 min-w-0" dir="rtl">
               <div className="flex items-center gap-1 mb-1" style={{ color: "rgba(255,255,255,0.8)" }}>
                 <Bot className="w-3 h-3 shrink-0" />
                 <span className="text-[8px] font-bold tracking-widest">الذكاء الاصطناعي</span>
@@ -157,7 +153,7 @@ function VoiceStylePreview({ style }: { style: string }) {
                 <Mic size={18} style={{ color: EM }} strokeWidth={1.75} />
               </div>
             </div>
-            <div className="flex-1 min-w-0 text-start">
+            <div className="flex-1 min-w-0 text-start" dir="rtl">
               <p className="font-extrabold text-foreground text-xs leading-snug">تحدّث، أنا أسمعك</p>
               <p className="text-muted-foreground text-[10px] mt-0.5 truncate">صِف عقارك بكلماتك</p>
             </div>
@@ -198,6 +194,7 @@ const settingsSchema = z.object({
 type SettingsFormValues = z.infer<typeof settingsSchema>;
 
 export default function Settings() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
@@ -268,13 +265,12 @@ export default function Settings() {
       { data: values },
       {
         onSuccess: (updated) => {
-          toast({ title: "Configuration Updated", description: "System parameters successfully applied." });
+          toast({ title: t('settings.toast.successTitle'), description: t('settings.toast.successDesc') });
           queryClient.setQueryData(getGetAdminSettingsQueryKey(), updated);
-          // Reset dirty state
           form.reset(values);
         },
         onError: (err) => {
-          toast({ title: "Configuration Error", description: err.message || "Failed to apply parameters", variant: "destructive" });
+          toast({ title: t('settings.toast.errorTitle'), description: err.message || t('settings.toast.errorDesc'), variant: "destructive" });
         }
       }
     );
@@ -293,8 +289,8 @@ export default function Settings() {
     <div className="space-y-6 pb-20">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight">System Configuration</h2>
-          <p className="text-sm text-muted-foreground mt-1">Core platform parameters, AI model tuning, and feature flags.</p>
+          <h2 className="text-2xl font-bold tracking-tight">{t('settings.title')}</h2>
+          <p className="text-sm text-muted-foreground mt-1">{t('settings.subtitle')}</p>
         </div>
         <button
           onClick={form.handleSubmit(onSubmit)}
@@ -311,29 +307,29 @@ export default function Settings() {
           ) : (
             <Save className="w-4 h-4" />
           )}
-          Commit Changes
+          {t('settings.submit')}
         </button>
       </div>
 
       <Form {...form}>
         <form className="bg-card border rounded-lg overflow-hidden shadow-sm">
           <Tabs defaultValue="engine" className="w-full">
-            <div className="border-b bg-muted/20 px-4">
-              <TabsList className="bg-transparent h-14 space-x-6">
+            <div className="border-b bg-muted/20 px-4 overflow-x-auto">
+              <TabsList className="bg-transparent h-14 space-x-6 rtl:space-x-reverse">
                 <TabsTrigger value="engine" className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-0 py-4 font-medium text-muted-foreground data-[state=active]:text-foreground">
-                  <BrainCircuit className="w-4 h-4 mr-2" /> AI Engine
+                  <BrainCircuit className="w-4 h-4 me-2" /> {t('settings.tabs.engine')}
                 </TabsTrigger>
                 <TabsTrigger value="security" className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-0 py-4 font-medium text-muted-foreground data-[state=active]:text-foreground">
-                  <Shield className="w-4 h-4 mr-2" /> Security & Auth
+                  <Shield className="w-4 h-4 me-2" /> {t('settings.tabs.security')}
                 </TabsTrigger>
                 <TabsTrigger value="features" className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-0 py-4 font-medium text-muted-foreground data-[state=active]:text-foreground">
-                  <LayoutGrid className="w-4 h-4 mr-2" /> Feature Flags
+                  <LayoutGrid className="w-4 h-4 me-2" /> {t('settings.tabs.features')}
                 </TabsTrigger>
                 <TabsTrigger value="platform" className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-0 py-4 font-medium text-muted-foreground data-[state=active]:text-foreground">
-                  <Globe className="w-4 h-4 mr-2" /> Regional & Rules
+                  <Globe className="w-4 h-4 me-2" /> {t('settings.tabs.platform')}
                 </TabsTrigger>
                 <TabsTrigger value="system" className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-0 py-4 font-medium text-muted-foreground data-[state=active]:text-foreground">
-                  <Server className="w-4 h-4 mr-2" /> System State
+                  <Server className="w-4 h-4 me-2" /> {t('settings.tabs.system')}
                 </TabsTrigger>
               </TabsList>
             </div>
@@ -343,40 +339,40 @@ export default function Settings() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <FormField control={form.control} name="aiModel" render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Inference Model</FormLabel>
+                    <FormLabel className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">{t('settings.engine.model')}</FormLabel>
                     <FormControl>
-                      <Input className="font-mono bg-muted/30" {...field} />
+                      <Input className="font-mono bg-muted/30" dir="ltr" {...field} />
                     </FormControl>
-                    <p className="text-[10px] text-muted-foreground">Provider identifier (e.g. gpt-4o, claude-3-opus).</p>
+                    <p className="text-[10px] text-muted-foreground">{t('settings.engine.modelDesc')}</p>
                     <FormMessage />
                   </FormItem>
                 )} />
 
                 <FormField control={form.control} name="aiTemperature" render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Temperature</FormLabel>
+                    <FormLabel className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">{t('settings.engine.temperature')}</FormLabel>
                     <FormControl>
-                      <Input type="number" step="0.1" min="0" max="1" className="font-mono bg-muted/30" {...field} />
+                      <Input type="number" step="0.1" min="0" max="1" className="font-mono bg-muted/30" dir="ltr" {...field} />
                     </FormControl>
-                    <p className="text-[10px] text-muted-foreground">Creativity vs precision (0.0 to 1.0). Lower is more deterministic.</p>
+                    <p className="text-[10px] text-muted-foreground">{t('settings.engine.temperatureDesc')}</p>
                     <FormMessage />
                   </FormItem>
                 )} />
 
                 <FormField control={form.control} name="aiMaxTurns" render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Max Conversation Turns</FormLabel>
+                    <FormLabel className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">{t('settings.engine.maxTurns')}</FormLabel>
                     <FormControl>
-                      <Input type="number" className="font-mono bg-muted/30" {...field} />
+                      <Input type="number" className="font-mono bg-muted/30" dir="ltr" {...field} />
                     </FormControl>
-                    <p className="text-[10px] text-muted-foreground">Hard limit to prevent infinite loops.</p>
+                    <p className="text-[10px] text-muted-foreground">{t('settings.engine.maxTurnsDesc')}</p>
                     <FormMessage />
                   </FormItem>
                 )} />
 
                 <FormField control={form.control} name="aiGuardrailLevel" render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Guardrail Strictness</FormLabel>
+                    <FormLabel className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">{t('settings.engine.guardrail')}</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger className="bg-muted/30 font-mono text-sm">
@@ -384,12 +380,12 @@ export default function Settings() {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="strict">Strict (Blocks all edge cases)</SelectItem>
-                        <SelectItem value="balanced">Balanced (Recommended)</SelectItem>
-                        <SelectItem value="relaxed">Relaxed (Fluid conversation)</SelectItem>
+                        <SelectItem value="strict">{t('settings.engine.guardrailOptions.strict')}</SelectItem>
+                        <SelectItem value="balanced">{t('settings.engine.guardrailOptions.balanced')}</SelectItem>
+                        <SelectItem value="relaxed">{t('settings.engine.guardrailOptions.relaxed')}</SelectItem>
                       </SelectContent>
                     </Select>
-                    <p className="text-[10px] text-muted-foreground">Controls off-topic detection aggressiveness.</p>
+                    <p className="text-[10px] text-muted-foreground">{t('settings.engine.guardrailDesc')}</p>
                     <FormMessage />
                   </FormItem>
                 )} />
@@ -401,9 +397,9 @@ export default function Settings() {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <FormField control={form.control} name="otpExpiryMinutes" render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">OTP Expiry (Min)</FormLabel>
+                    <FormLabel className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">{t('settings.security.otpExpiry')}</FormLabel>
                     <FormControl>
-                      <Input type="number" className="font-mono bg-muted/30" {...field} />
+                      <Input type="number" className="font-mono bg-muted/30" dir="ltr" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -411,9 +407,9 @@ export default function Settings() {
 
                 <FormField control={form.control} name="otpMaxAttempts" render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Max OTP Attempts</FormLabel>
+                    <FormLabel className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">{t('settings.security.maxAttempts')}</FormLabel>
                     <FormControl>
-                      <Input type="number" className="font-mono bg-muted/30" {...field} />
+                      <Input type="number" className="font-mono bg-muted/30" dir="ltr" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -421,9 +417,9 @@ export default function Settings() {
 
                 <FormField control={form.control} name="otpRateLimitCount" render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Rate Limit Cap</FormLabel>
+                    <FormLabel className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">{t('settings.security.rateLimitCap')}</FormLabel>
                     <FormControl>
-                      <Input type="number" className="font-mono bg-muted/30" {...field} />
+                      <Input type="number" className="font-mono bg-muted/30" dir="ltr" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -431,9 +427,9 @@ export default function Settings() {
 
                 <FormField control={form.control} name="otpRateLimitWindowMinutes" render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Rate Limit Window (Min)</FormLabel>
+                    <FormLabel className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">{t('settings.security.rateLimitWindow')}</FormLabel>
                     <FormControl>
-                      <Input type="number" className="font-mono bg-muted/30" {...field} />
+                      <Input type="number" className="font-mono bg-muted/30" dir="ltr" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -447,8 +443,8 @@ export default function Settings() {
                 <FormField control={form.control} name="featureVoiceInput" render={({ field }) => (
                   <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 bg-muted/10">
                     <div className="space-y-0.5">
-                      <FormLabel className="text-sm font-semibold">Voice Input</FormLabel>
-                      <p className="text-xs text-muted-foreground">Allow voice recording for AI interaction.</p>
+                      <FormLabel className="text-sm font-semibold">{t('settings.features.voiceInput')}</FormLabel>
+                      <p className="text-xs text-muted-foreground">{t('settings.features.voiceInputDesc')}</p>
                     </div>
                     <FormControl>
                       <Switch checked={field.value} onCheckedChange={field.onChange} />
@@ -459,8 +455,8 @@ export default function Settings() {
                 <FormField control={form.control} name="featureMapView" render={({ field }) => (
                   <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 bg-muted/10">
                     <div className="space-y-0.5">
-                      <FormLabel className="text-sm font-semibold">Interactive Map</FormLabel>
-                      <p className="text-xs text-muted-foreground">Show map visualization for search results.</p>
+                      <FormLabel className="text-sm font-semibold">{t('settings.features.mapView')}</FormLabel>
+                      <p className="text-xs text-muted-foreground">{t('settings.features.mapViewDesc')}</p>
                     </div>
                     <FormControl>
                       <Switch checked={field.value} onCheckedChange={field.onChange} />
@@ -471,8 +467,8 @@ export default function Settings() {
                 <FormField control={form.control} name="featureContactRelease" render={({ field }) => (
                   <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 bg-muted/10">
                     <div className="space-y-0.5">
-                      <FormLabel className="text-sm font-semibold">Contact Release Contract</FormLabel>
-                      <p className="text-xs text-muted-foreground">Enable digital commission agreements.</p>
+                      <FormLabel className="text-sm font-semibold">{t('settings.features.contactRelease')}</FormLabel>
+                      <p className="text-xs text-muted-foreground">{t('settings.features.contactReleaseDesc')}</p>
                     </div>
                     <FormControl>
                       <Switch checked={field.value} onCheckedChange={field.onChange} />
@@ -483,8 +479,8 @@ export default function Settings() {
                 <FormField control={form.control} name="featureSellerWizard" render={({ field }) => (
                   <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 bg-muted/10">
                     <div className="space-y-0.5">
-                      <FormLabel className="text-sm font-semibold">AI Seller Wizard</FormLabel>
-                      <p className="text-xs text-muted-foreground">Allow property addition via conversational AI.</p>
+                      <FormLabel className="text-sm font-semibold">{t('settings.features.sellerWizard')}</FormLabel>
+                      <p className="text-xs text-muted-foreground">{t('settings.features.sellerWizardDesc')}</p>
                     </div>
                     <FormControl>
                       <Switch checked={field.value} onCheckedChange={field.onChange} />
@@ -496,7 +492,7 @@ export default function Settings() {
               <div className="border-t pt-6">
                 <FormField control={form.control} name="voiceCtaStyle" render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Voice Interface Aesthetic</FormLabel>
+                    <FormLabel className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">{t('settings.features.voiceAesthetic')}</FormLabel>
                     <div className="flex items-start gap-6 mt-1">
                       <div className="flex-1 max-w-xs space-y-2">
                         <Select onValueChange={field.onChange} value={field.value}>
@@ -506,13 +502,13 @@ export default function Settings() {
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="green_card">Green Card (Classic)</SelectItem>
-                            <SelectItem value="orb">Floating Orb (Modern)</SelectItem>
-                            <SelectItem value="waveform">Waveform (Technical)</SelectItem>
-                            <SelectItem value="sonar">Sonar Pulse (Dynamic)</SelectItem>
+                            <SelectItem value="green_card">{t('settings.features.voiceStyles.greenCard')}</SelectItem>
+                            <SelectItem value="orb">{t('settings.features.voiceStyles.orb')}</SelectItem>
+                            <SelectItem value="waveform">{t('settings.features.voiceStyles.waveform')}</SelectItem>
+                            <SelectItem value="sonar">{t('settings.features.voiceStyles.sonar')}</SelectItem>
                           </SelectContent>
                         </Select>
-                        <p className="text-[10px] text-muted-foreground">Visual style of the main AI interaction component.</p>
+                        <p className="text-[10px] text-muted-foreground">{t('settings.features.voiceAestheticDesc')}</p>
                         <FormMessage />
                       </div>
                       <VoiceStylePreview style={field.value} />
@@ -527,7 +523,7 @@ export default function Settings() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <FormField control={form.control} name="defaultLanguage" render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Default Locale</FormLabel>
+                    <FormLabel className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">{t('settings.platform.defaultLocale')}</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger className="bg-muted/30">
@@ -535,8 +531,8 @@ export default function Settings() {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="en">English (US)</SelectItem>
-                        <SelectItem value="ar">Arabic (Standard)</SelectItem>
+                        <SelectItem value="en">{t('settings.platform.localeEn')}</SelectItem>
+                        <SelectItem value="ar">{t('settings.platform.localeAr')}</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -545,7 +541,7 @@ export default function Settings() {
 
                 <FormField control={form.control} name="defaultCurrency" render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Base Currency</FormLabel>
+                    <FormLabel className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">{t('settings.platform.baseCurrency')}</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger className="bg-muted/30 font-mono">
@@ -564,9 +560,9 @@ export default function Settings() {
 
                 <FormField control={form.control} name="maxImagesPerProperty" render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Max Assets per Listing</FormLabel>
+                    <FormLabel className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">{t('settings.platform.maxImages')}</FormLabel>
                     <FormControl>
-                      <Input type="number" className="font-mono bg-muted/30" {...field} />
+                      <Input type="number" className="font-mono bg-muted/30" dir="ltr" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -574,11 +570,11 @@ export default function Settings() {
 
                 <FormField control={form.control} name="listingExpiryDays" render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Listing TTL (Days)</FormLabel>
+                    <FormLabel className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">{t('settings.platform.listingTtl')}</FormLabel>
                     <FormControl>
-                      <Input type="number" className="font-mono bg-muted/30" {...field} />
+                      <Input type="number" className="font-mono bg-muted/30" dir="ltr" {...field} />
                     </FormControl>
-                    <p className="text-[10px] text-muted-foreground">Days until automatic archival.</p>
+                    <p className="text-[10px] text-muted-foreground">{t('settings.platform.listingTtlDesc')}</p>
                     <FormMessage />
                   </FormItem>
                 )} />
@@ -586,8 +582,8 @@ export default function Settings() {
                 <FormField control={form.control} name="autoApproveListings" render={({ field }) => (
                   <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 bg-muted/10 col-span-1 md:col-span-2">
                     <div className="space-y-0.5">
-                      <FormLabel className="text-sm font-semibold">Auto-Approve Listings</FormLabel>
-                      <p className="text-xs text-muted-foreground">Bypass manual administrator review for new properties.</p>
+                      <FormLabel className="text-sm font-semibold">{t('settings.platform.autoApprove')}</FormLabel>
+                      <p className="text-xs text-muted-foreground">{t('settings.platform.autoApproveDesc')}</p>
                     </div>
                     <FormControl>
                       <Switch checked={field.value} onCheckedChange={field.onChange} />
@@ -603,16 +599,14 @@ export default function Settings() {
                 <Server className="w-8 h-8 text-destructive shrink-0" />
                 <div className="space-y-4 w-full">
                   <div>
-                    <h3 className="text-lg font-bold text-destructive">Platform Maintenance Mode</h3>
-                    <p className="text-sm text-destructive/80 mt-1">
-                      Engaging maintenance mode will immediately suspend all active user sessions and disable API access for non-administrators.
-                    </p>
+                    <h3 className="text-lg font-bold text-destructive">{t('settings.system.maintenanceTitle')}</h3>
+                    <p className="text-sm text-destructive/80 mt-1">{t('settings.system.maintenanceDesc')}</p>
                   </div>
                   
                   <FormField control={form.control} name="maintenanceMode" render={({ field }) => (
                     <FormItem className="flex flex-row items-center justify-between rounded-md border border-destructive/30 p-4 bg-destructive/5">
                       <div className="space-y-0.5">
-                        <FormLabel className="text-sm font-semibold text-destructive">Engage Lockdown</FormLabel>
+                        <FormLabel className="text-sm font-semibold text-destructive">{t('settings.system.engageLockdown')}</FormLabel>
                       </div>
                       <FormControl>
                         <Switch 
