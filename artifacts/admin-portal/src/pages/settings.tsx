@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { useGetAdminSettings, useUpdateAdminSettings, getGetAdminSettingsQueryKey } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
-import { Save, Server, Shield, BrainCircuit, Globe, LayoutGrid } from "lucide-react";
+import { Save, Server, Shield, BrainCircuit, Globe, LayoutGrid, Mic } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
@@ -12,6 +12,79 @@ import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
+const voiceStyleMeta: Record<string, { label: string; description: string }> = {
+  green_card: { label: "Green Card", description: "Classic hold-to-speak button" },
+  orb:        { label: "Floating Orb", description: "Ambient pulsing sphere" },
+  waveform:   { label: "Waveform",     description: "Animated frequency bars" },
+  sonar:      { label: "Sonar Pulse",  description: "Expanding ripple rings" },
+};
+
+function VoiceStylePreview({ style }: { style: string }) {
+  const meta = voiceStyleMeta[style];
+  return (
+    <div className="flex flex-col gap-3 min-w-[180px] max-w-[220px]">
+      <style>{`
+        @keyframes vp-bar { 0%,100%{transform:scaleY(0.3)} 50%{transform:scaleY(1)} }
+        @keyframes vp-ring { 0%{transform:scale(0.6);opacity:0.8} 100%{transform:scale(1.8);opacity:0} }
+        @keyframes vp-orb  { 0%,100%{box-shadow:0 0 0 0 rgba(99,102,241,.5)} 50%{box-shadow:0 0 0 14px rgba(99,102,241,.0)} }
+        .vp-bar { animation: vp-bar 0.9s ease-in-out infinite; transform-origin:bottom }
+        .vp-bar:nth-child(2){animation-delay:.15s}
+        .vp-bar:nth-child(3){animation-delay:.3s}
+        .vp-bar:nth-child(4){animation-delay:.45s}
+        .vp-bar:nth-child(5){animation-delay:.6s}
+        .vp-ring { animation: vp-ring 1.6s ease-out infinite }
+        .vp-ring:nth-child(2){ animation-delay:.5s }
+        .vp-ring:nth-child(3){ animation-delay:1s }
+        .vp-orb  { animation: vp-orb 1.8s ease-in-out infinite }
+      `}</style>
+
+      <div className="rounded-lg border bg-muted/20 h-28 flex items-center justify-center overflow-hidden">
+
+        {style === 'green_card' && (
+          <button className="flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500 text-white text-xs font-semibold shadow-md shadow-emerald-500/30 active:scale-95 cursor-default select-none">
+            <Mic className="w-3.5 h-3.5" />
+            Hold to speak
+          </button>
+        )}
+
+        {style === 'orb' && (
+          <div className="vp-orb w-14 h-14 rounded-full bg-gradient-to-br from-indigo-400 to-violet-600 shadow-lg shadow-indigo-500/40" />
+        )}
+
+        {style === 'waveform' && (
+          <div className="flex items-end gap-[3px] h-10">
+            {[14, 22, 30, 22, 14].map((h, i) => (
+              <div
+                key={i}
+                className={`vp-bar w-[5px] rounded-full bg-primary`}
+                style={{ height: h, animationDelay: `${i * 0.15}s` }}
+              />
+            ))}
+          </div>
+        )}
+
+        {style === 'sonar' && (
+          <div className="relative w-12 h-12 flex items-center justify-center">
+            {[0, 1, 2].map(i => (
+              <div
+                key={i}
+                className="vp-ring absolute inset-0 rounded-full border-2 border-primary"
+                style={{ animationDelay: `${i * 0.5}s` }}
+              />
+            ))}
+            <Mic className="w-4 h-4 text-primary relative z-10" />
+          </div>
+        )}
+      </div>
+
+      <div>
+        <p className="text-xs font-semibold">{meta?.label}</p>
+        <p className="text-[10px] text-muted-foreground">{meta?.description}</p>
+      </div>
+    </div>
+  );
+}
 
 const settingsSchema = z.object({
   otpExpiryMinutes: z.coerce.number().min(1).max(60),
@@ -335,23 +408,28 @@ export default function Settings() {
 
               <div className="border-t pt-6">
                 <FormField control={form.control} name="voiceCtaStyle" render={({ field }) => (
-                  <FormItem className="max-w-md">
+                  <FormItem>
                     <FormLabel className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Voice Interface Aesthetic</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger className="bg-muted/30">
-                          <SelectValue />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="green_card">Green Card (Classic)</SelectItem>
-                        <SelectItem value="orb">Floating Orb (Modern)</SelectItem>
-                        <SelectItem value="waveform">Waveform (Technical)</SelectItem>
-                        <SelectItem value="sonar">Sonar Pulse (Dynamic)</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <p className="text-[10px] text-muted-foreground">Visual style of the main AI interaction component.</p>
-                    <FormMessage />
+                    <div className="flex items-start gap-6 mt-1">
+                      <div className="flex-1 max-w-xs space-y-2">
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl>
+                            <SelectTrigger className="bg-muted/30">
+                              <SelectValue />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="green_card">Green Card (Classic)</SelectItem>
+                            <SelectItem value="orb">Floating Orb (Modern)</SelectItem>
+                            <SelectItem value="waveform">Waveform (Technical)</SelectItem>
+                            <SelectItem value="sonar">Sonar Pulse (Dynamic)</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <p className="text-[10px] text-muted-foreground">Visual style of the main AI interaction component.</p>
+                        <FormMessage />
+                      </div>
+                      <VoiceStylePreview style={field.value} />
+                    </div>
                   </FormItem>
                 )} />
               </div>

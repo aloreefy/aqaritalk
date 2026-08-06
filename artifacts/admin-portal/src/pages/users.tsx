@@ -21,10 +21,10 @@ export default function Users() {
   const [roleFilter, setRoleFilter] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
 
-  const { data: users, isLoading } = useAdminListUsers({
+  const { data: users, isLoading } = useAdminListUsers(undefined, {
     query: {
-      queryKey: getAdminListUsersQueryKey()
-    }
+      queryKey: getAdminListUsersQueryKey(),
+    },
   });
 
   const updateUserMutation = useAdminUpdateUser();

@@ -1,10 +1,10 @@
 import { useLocation } from "wouter";
-import { useGetMe } from "@workspace/api-client-react";
+import { useGetMe, getGetMeQueryKey } from "@workspace/api-client-react";
 import { Activity, Bell, Search, User as UserIcon } from "lucide-react";
 
 export function Header() {
   const [location] = useLocation();
-  const { data: me } = useGetMe({ query: { enabled: !!localStorage.getItem("admin_token") }});
+  const { data: me } = useGetMe({ query: { enabled: !!localStorage.getItem("admin_token"), queryKey: getGetMeQueryKey() } });
 
   // Just a simple breadcrumb map for the header
   const routeMap: Record<string, string> = {

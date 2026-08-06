@@ -22,7 +22,7 @@ export default function Login() {
       onError: (err) => {
         toast({
           title: "Access Denied",
-          description: err.error || "Invalid operator credentials.",
+          description: (err.data as Record<string, string> | null)?.error ?? err.message ?? "Invalid operator credentials.",
           variant: "destructive",
         });
       }
