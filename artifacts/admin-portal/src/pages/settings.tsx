@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { useGetAdminSettings, useUpdateAdminSettings, getGetAdminSettingsQueryKey } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
-import { Save, Server, Shield, BrainCircuit, Globe, LayoutGrid, Mic } from "lucide-react";
+import { Save, Server, Shield, BrainCircuit, Globe, LayoutGrid, Mic, Bot, ArrowLeft } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
@@ -13,67 +13,154 @@ import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
+// AqariTalk brand emerald — matches the public app's --primary token
+const EM   = "hsl(161,100%,21%)";
+const EM55 = "hsl(161 100% 21% / 0.55)";
+const EM35 = "hsl(161 100% 21% / 0.35)";
+const EM30 = "hsl(161 100% 21% / 0.30)";
+const EM10 = "hsl(161 100% 21% / 0.10)";
+
 const voiceStyleMeta: Record<string, { label: string; description: string }> = {
-  green_card: { label: "Green Card", description: "Classic hold-to-speak button" },
-  orb:        { label: "Floating Orb", description: "Ambient pulsing sphere" },
-  waveform:   { label: "Waveform",     description: "Animated frequency bars" },
-  sonar:      { label: "Sonar Pulse",  description: "Expanding ripple rings" },
+  green_card: { label: "Green Card",    description: "Full-width emerald CTA card" },
+  orb:        { label: "Floating Orb",  description: "Dark canvas with glowing orb" },
+  waveform:   { label: "Waveform",      description: "Animated frequency bars" },
+  sonar:      { label: "Sonar Pulse",   description: "Radar rings around mic icon" },
 };
+
+// Animations copied verbatim from the public app's index.css
+const VP_STYLES = `
+  @keyframes vpa-orb-breathe { 0%,100%{transform:scale(1)} 50%{transform:scale(1.09)} }
+  @keyframes vpa-ring-ripple { 0%{transform:scale(1);opacity:0.75} 100%{transform:scale(2.6);opacity:0} }
+  @keyframes vpa-bar-wave    { 0%,100%{transform:scaleY(0.12)} 50%{transform:scaleY(1)} }
+  @keyframes vpa-radar-ping  { 0%{transform:scale(0.4);opacity:0.9} 100%{transform:scale(3.2);opacity:0} }
+
+  .vpa-orb { animation: vpa-orb-breathe 3s ease-in-out infinite; }
+
+  .vpa-ring {
+    position:absolute; inset:0; border-radius:9999px;
+    border:2px solid ${EM};
+    animation: vpa-ring-ripple 3s ease-out infinite;
+  }
+  .vpa-ring-2 { animation-delay:1s; }
+  .vpa-ring-3 { animation-delay:2s; }
+
+  .vpa-bar {
+    width:2px; border-radius:9999px; transform-origin:center bottom;
+    background-color:${EM};
+    animation: vpa-bar-wave 1.1s ease-in-out infinite;
+  }
+
+  .vpa-radar {
+    position:absolute; inset:0; border-radius:9999px;
+    border:1.5px solid ${EM};
+    animation: vpa-radar-ping 2s ease-out infinite;
+  }
+  .vpa-radar-2 { animation-delay:0.5s; }
+  .vpa-radar-3 { animation-delay:1s; }
+  .vpa-radar-4 { animation-delay:1.5s; }
+`;
 
 function VoiceStylePreview({ style }: { style: string }) {
   const meta = voiceStyleMeta[style];
   return (
-    <div className="flex flex-col gap-3 min-w-[180px] max-w-[220px]">
-      <style>{`
-        @keyframes vp-bar { 0%,100%{transform:scaleY(0.3)} 50%{transform:scaleY(1)} }
-        @keyframes vp-ring { 0%{transform:scale(0.6);opacity:0.8} 100%{transform:scale(1.8);opacity:0} }
-        @keyframes vp-orb  { 0%,100%{box-shadow:0 0 0 0 rgba(99,102,241,.5)} 50%{box-shadow:0 0 0 14px rgba(99,102,241,.0)} }
-        .vp-bar { animation: vp-bar 0.9s ease-in-out infinite; transform-origin:bottom }
-        .vp-bar:nth-child(2){animation-delay:.15s}
-        .vp-bar:nth-child(3){animation-delay:.3s}
-        .vp-bar:nth-child(4){animation-delay:.45s}
-        .vp-bar:nth-child(5){animation-delay:.6s}
-        .vp-ring { animation: vp-ring 1.6s ease-out infinite }
-        .vp-ring:nth-child(2){ animation-delay:.5s }
-        .vp-ring:nth-child(3){ animation-delay:1s }
-        .vp-orb  { animation: vp-orb 1.8s ease-in-out infinite }
-      `}</style>
+    <div className="flex flex-col gap-2 shrink-0" style={{ width: 210 }}>
+      <style>{VP_STYLES}</style>
 
-      <div className="rounded-lg border bg-muted/20 h-28 flex items-center justify-center overflow-hidden">
+      {/* ── container matches the actual component's outer shape ── */}
+      <div className="rounded-3xl overflow-hidden" style={{ height: 96 }}>
 
+        {/* GREEN CARD — emerald bg, dot-grid, Bot icon, Arabic text, white arrow */}
         {style === 'green_card' && (
-          <button className="flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500 text-white text-xs font-semibold shadow-md shadow-emerald-500/30 active:scale-95 cursor-default select-none">
-            <Mic className="w-3.5 h-3.5" />
-            Hold to speak
-          </button>
-        )}
-
-        {style === 'orb' && (
-          <div className="vp-orb w-14 h-14 rounded-full bg-gradient-to-br from-indigo-400 to-violet-600 shadow-lg shadow-indigo-500/40" />
-        )}
-
-        {style === 'waveform' && (
-          <div className="flex items-end gap-[3px] h-10">
-            {[14, 22, 30, 22, 14].map((h, i) => (
-              <div
-                key={i}
-                className={`vp-bar w-[5px] rounded-full bg-primary`}
-                style={{ height: h, animationDelay: `${i * 0.15}s` }}
-              />
-            ))}
+          <div className="relative h-full flex items-center gap-3 px-4" style={{ background: EM }}>
+            <div
+              className="absolute inset-0 opacity-10 pointer-events-none"
+              style={{
+                backgroundImage: "radial-gradient(circle at 100% 100%, #fff 0, #fff 3px, transparent 3px)",
+                backgroundSize: "20px 20px",
+              }}
+            />
+            <div className="relative z-10 flex-1 min-w-0">
+              <div className="flex items-center gap-1 mb-1" style={{ color: "rgba(255,255,255,0.8)" }}>
+                <Bot className="w-3 h-3 shrink-0" />
+                <span className="text-[8px] font-bold tracking-widest">الذكاء الاصطناعي</span>
+              </div>
+              <p className="text-white font-extrabold text-[11px] leading-tight mb-0.5">تحدث مع وكيلك الذكي</p>
+              <p className="text-[9px] leading-tight" style={{ color: "rgba(255,255,255,0.7)" }}>صِف ما تبحث عنه بالصوت</p>
+            </div>
+            <div
+              className="relative z-10 w-8 h-8 rounded-full flex items-center justify-center shrink-0 shadow-md"
+              style={{ background: "white", color: EM }}
+            >
+              <ArrowLeft className="w-4 h-4" />
+            </div>
           </div>
         )}
 
-        {style === 'sonar' && (
-          <div className="relative w-12 h-12 flex items-center justify-center">
-            {[0, 1, 2].map(i => (
+        {/* ORB — dark gradient canvas, emerald orb with radial gradient + glow, 3 ripple rings */}
+        {style === 'orb' && (
+          <div
+            className="h-full flex flex-col items-center justify-center gap-2"
+            style={{ background: "linear-gradient(160deg, #0d1a12 0%, #0a1a0e 100%)" }}
+          >
+            <div className="relative flex items-center justify-center" style={{ width: 48, height: 48 }}>
+              <div className="vpa-ring" />
+              <div className="vpa-ring vpa-ring-2" />
+              <div className="vpa-ring vpa-ring-3" />
               <div
-                key={i}
-                className="vp-ring absolute inset-0 rounded-full border-2 border-primary"
-                style={{ animationDelay: `${i * 0.5}s` }}
-              />
-            ))}
-            <Mic className="w-4 h-4 text-primary relative z-10" />
+                className="vpa-orb relative z-10 rounded-full flex items-center justify-center"
+                style={{
+                  width: 48, height: 48,
+                  background: `radial-gradient(circle at 35% 35%, ${EM}, ${EM55})`,
+                  boxShadow: `0 0 20px 6px ${EM35}`,
+                }}
+              >
+                <Mic size={20} className="text-white" strokeWidth={1.75} />
+              </div>
+            </div>
+            <p className="text-white font-extrabold text-sm tracking-tight">كلّمني</p>
+          </div>
+        )}
+
+        {/* WAVEFORM — card bg, 24 emerald bars with bar-wave animation */}
+        {style === 'waveform' && (
+          <div className="h-full bg-card border flex flex-col items-center justify-center gap-2 px-3">
+            <p className="font-extrabold text-foreground text-[11px]">اسألني عن أي عقار</p>
+            <div className="flex items-end justify-center gap-[2.5px]" style={{ height: 28 }}>
+              {Array.from({ length: 24 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="vpa-bar"
+                  style={{
+                    height: 28,
+                    animationDelay:    `${((i * 1.1) / 24).toFixed(3)}s`,
+                    animationDuration: `${0.9 + (i % 5) * 0.08}s`,
+                    opacity: 0.4 + 0.6 * Math.abs(Math.sin((i / 24) * Math.PI)),
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* SONAR — card bg, 4 radar-ping rings, primary/10 circle, mic icon, text */}
+        {style === 'sonar' && (
+          <div className="h-full bg-card border flex items-center gap-4 px-4">
+            <div className="relative flex items-center justify-center shrink-0" style={{ width: 40, height: 40 }}>
+              <div className="vpa-radar" />
+              <div className="vpa-radar vpa-radar-2" />
+              <div className="vpa-radar vpa-radar-3" />
+              <div className="vpa-radar vpa-radar-4" />
+              <div
+                className="relative z-10 rounded-full flex items-center justify-center"
+                style={{ width: 40, height: 40, background: EM10, border: `1px solid ${EM30}` }}
+              >
+                <Mic size={18} style={{ color: EM }} strokeWidth={1.75} />
+              </div>
+            </div>
+            <div className="flex-1 min-w-0 text-start">
+              <p className="font-extrabold text-foreground text-xs leading-snug">تحدّث، أنا أسمعك</p>
+              <p className="text-muted-foreground text-[10px] mt-0.5 truncate">صِف عقارك بكلماتك</p>
+            </div>
           </div>
         )}
       </div>
