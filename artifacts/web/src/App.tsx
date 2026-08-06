@@ -15,7 +15,6 @@ import ListPage from "@/pages/list";
 import ProfilePage from "@/pages/profile";
 import PropertyPage from "@/pages/property";
 import ContactReleasePage from "@/pages/contact-release";
-import AdminPage from "@/pages/admin";
 import WizardStep1Preview from "@/pages/list/wizard/step1-preview";
 import WizardStep2Location from "@/pages/list/wizard/step2-location";
 import WizardStep3Photos from "@/pages/list/wizard/step3-photos";
@@ -53,7 +52,6 @@ function AppRoutes() {
       <Route path="/property/:id" component={PropertyPage} />
       <Route path="/profile" component={ProfilePage} />
       <Route path="/contact-release/:id" component={ContactReleasePage} />
-      <Route path="/admin" component={AdminPage} />
       <Route component={NotFound} />
     </Switch>
   );
