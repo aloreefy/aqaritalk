@@ -542,6 +542,11 @@ export interface AdminUserUpdate {
   verificationStatus?: AdminUserUpdateVerificationStatus;
 }
 
+export interface AdminPortalLoginInput {
+  /** @minLength 1 */
+  password: string;
+}
+
 export type AdminPropertyStatusUpdateStatus = typeof AdminPropertyStatusUpdateStatus[keyof typeof AdminPropertyStatusUpdateStatus];
 
 

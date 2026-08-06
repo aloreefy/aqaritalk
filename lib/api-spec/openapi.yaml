@@ -694,6 +694,31 @@ paths:
               schema:
                 $ref: "#/components/schemas/Property"
 
+  /admin/portal/login:
+    post:
+      operationId: adminPortalLogin
+      tags: [admin]
+      summary: Admin portal password-based login (no OTP)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminPortalLoginInput"
+      responses:
+        "200":
+          description: Authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "401":
+          description: Invalid password
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
   /admin/stats:
     get:
       operationId: getAdminStats
@@ -1333,6 +1358,14 @@ components:
         verificationStatus:
           type: string
           enum: [unverified, verified]
+
+    AdminPortalLoginInput:
+      type: object
+      required: [password]
+      properties:
+        password:
+          type: string
+          minLength: 1
 
     AdminPropertyStatusUpdate:
       type: object

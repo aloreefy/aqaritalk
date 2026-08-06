@@ -1113,6 +1113,35 @@ export const AdminUpdatePropertyStatusResponse = zod.object({
 
 
 /**
+ * @summary Admin portal password-based login (no OTP)
+ */
+
+
+
+export const AdminPortalLoginBody = zod.object({
+  "password": zod.string().min(1)
+})
+
+export const AdminPortalLoginResponse = zod.object({
+  "token": zod.string(),
+  "user": zod.object({
+  "id": zod.string(),
+  "phone": zod.string(),
+  "name": zod.string().nullish(),
+  "role": zod.enum(['buyer', 'seller', 'broker', 'admin']),
+  "market": zod.enum(['JO', 'SA', 'AE', 'EG', 'KW', 'QA', 'BH', 'OM', 'MA', 'LB', 'IQ']),
+  "language": zod.enum(['ar', 'en']),
+  "verificationStatus": zod.enum(['unverified', 'verified']),
+  "status": zod.enum(['active', 'suspended']),
+  "autoSendVoice": zod.boolean(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+}),
+  "isNewUser": zod.boolean()
+})
+
+
+/**
  * @summary Platform statistics
  */
 export const GetAdminStatsResponse = zod.object({

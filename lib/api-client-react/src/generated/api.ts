@@ -23,6 +23,7 @@ import type {
   AckInput,
   AdminListPropertiesParams,
   AdminListUsersParams,
+  AdminPortalLoginInput,
   AdminPropertyStatusUpdate,
   AdminStats,
   AdminUserUpdate,
@@ -2163,6 +2164,77 @@ export const useAdminUpdatePropertyStatus = <TError = ErrorType<unknown>,
         TContext
       > => {
       return useMutation(getAdminUpdatePropertyStatusMutationOptions(options));
+    }
+
+export const getAdminPortalLoginUrl = () => {
+
+
+
+
+  return `/api/admin/portal/login`
+}
+
+/**
+ * @summary Admin portal password-based login (no OTP)
+ */
+export const adminPortalLogin = async (adminPortalLoginInput: AdminPortalLoginInput, options?: RequestInit): Promise<AuthResponse> => {
+
+  return customFetch<AuthResponse>(getAdminPortalLoginUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      adminPortalLoginInput,)
+  }
+);}
+
+
+
+
+export const getAdminPortalLoginMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminPortalLogin>>, TError,{data: BodyType<AdminPortalLoginInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof adminPortalLogin>>, TError,{data: BodyType<AdminPortalLoginInput>}, TContext> => {
+
+const mutationKey = ['adminPortalLogin'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof adminPortalLogin>>, {data: BodyType<AdminPortalLoginInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  adminPortalLogin(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AdminPortalLoginMutationResult = NonNullable<Awaited<ReturnType<typeof adminPortalLogin>>>
+    export type AdminPortalLoginMutationBody = BodyType<AdminPortalLoginInput>
+    export type AdminPortalLoginMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Admin portal password-based login (no OTP)
+ */
+export const useAdminPortalLogin = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminPortalLogin>>, TError,{data: BodyType<AdminPortalLoginInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof adminPortalLogin>>,
+        TError,
+        {data: BodyType<AdminPortalLoginInput>},
+        TContext
+      > => {
+      return useMutation(getAdminPortalLoginMutationOptions(options));
     }
 
 export const getGetAdminStatsUrl = () => {

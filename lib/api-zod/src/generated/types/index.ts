@@ -10,6 +10,7 @@ export * from './ackInput';
 export * from './ackInputRole';
 export * from './adminListPropertiesParams';
 export * from './adminListUsersParams';
+export * from './adminPortalLoginInput';
 export * from './adminPropertyStatusUpdate';
 export * from './adminPropertyStatusUpdateStatus';
 export * from './adminStats';
