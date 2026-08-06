@@ -192,7 +192,8 @@
       "aiBroker": "الوسيط الذكي",
       "marketLoc": "السوق واللغة",
       "propertyListings": "إعلانات العقارات",
-      "systemFlags": "النظام والميزات"
+      "systemFlags": "النظام والميزات",
+      "commission": "العمولة"
     },
     "settingsFields": {
       "voiceCtaStyle": "شكل زر التسجيل الصوتي",
@@ -230,7 +231,10 @@
       "voiceInput": "الإدخال الصوتي",
       "mapView": "عرض الخريطة",
       "contactRelease": "طلب التواصل",
-      "sellerWizard": "مساعد البائع"
+      "sellerWizard": "مساعد البائع",
+      "defaultBuyerPct": "عمولة المشتري الافتراضية (%)",
+      "defaultSellerPct": "عمولة البائع الافتراضية (%)",
+      "negotiable": "قابلة للتفاوض"
     }
   },
   "wizard": {

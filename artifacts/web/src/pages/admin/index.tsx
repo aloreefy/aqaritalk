@@ -9,9 +9,12 @@ import {
   useAdminUpdatePropertyStatus,
   useGetAdminSettings,
   useUpdateAdminSettings,
+  useGetCommissionSettings,
+  useUpdateCommissionSettings,
   getAdminListUsersQueryKey,
   getAdminListPropertiesQueryKey,
   getGetAdminSettingsQueryKey,
+  getGetCommissionSettingsQueryKey,
   type Property,
   type User,
   type SystemSettingsUpdate,
@@ -537,6 +540,44 @@ function AdminPropertyCard({
   );
 }
 
+function CommissionSection() {
+  const { t } = useTranslation();
+  const { data, isLoading } = useGetCommissionSettings();
+  const update = useUpdateCommissionSettings();
+  const queryClient = useQueryClient();
+
+  const save = async (patch: { defaultBuyerPct?: number; defaultSellerPct?: number; negotiable?: boolean }) => {
+    await update.mutateAsync({ data: patch });
+    queryClient.invalidateQueries({ queryKey: getGetCommissionSettingsQueryKey() });
+  };
+
+  if (isLoading || !data) {
+    return <p className="text-xs text-muted-foreground py-2">{t("common.loading")}</p>;
+  }
+
+  return (
+    <>
+      <SettingSlider
+        label={t("admin.settingsFields.defaultBuyerPct")}
+        value={data.defaultBuyerPct}
+        onChange={(v) => save({ defaultBuyerPct: v })}
+        min={0} max={10} step={0.25}
+      />
+      <SettingSlider
+        label={t("admin.settingsFields.defaultSellerPct")}
+        value={data.defaultSellerPct}
+        onChange={(v) => save({ defaultSellerPct: v })}
+        min={0} max={10} step={0.25}
+      />
+      <SettingSwitch
+        label={t("admin.settingsFields.negotiable")}
+        value={data.negotiable}
+        onChange={(v) => save({ negotiable: v })}
+      />
+    </>
+  );
+}
+
 function SettingsTab() {
   const { t } = useTranslation();
   const { data: settings, isLoading } = useGetAdminSettings();
@@ -558,7 +599,7 @@ function SettingsTab() {
 
   return (
     <div className="p-4 space-y-4 animate-in fade-in duration-300">
-      <Accordion type="multiple" defaultValue={["appearance", "otp", "ai", "market", "property", "system"]} className="space-y-3">
+      <Accordion type="multiple" defaultValue={["appearance", "otp", "ai", "market", "property", "system", "commission"]} className="space-y-3">
 
         {/* Section 0 — Appearance */}
         <AccordionItem value="appearance" className="bg-card rounded-xl border border-border shadow-sm px-4">
@@ -663,6 +704,16 @@ function SettingsTab() {
             <SettingSwitch label={t("admin.settingsFields.mapView")} value={settings.featureMapView} onChange={(v) => save({ featureMapView: v })} />
             <SettingSwitch label={t("admin.settingsFields.contactRelease")} value={settings.featureContactRelease} onChange={(v) => save({ featureContactRelease: v })} />
             <SettingSwitch label={t("admin.settingsFields.sellerWizard")} value={settings.featureSellerWizard} onChange={(v) => save({ featureSellerWizard: v })} />
+          </AccordionContent>
+        </AccordionItem>
+
+        {/* Section 6 — Commission */}
+        <AccordionItem value="commission" className="bg-card rounded-xl border border-border shadow-sm px-4">
+          <AccordionTrigger className="hover:no-underline py-3">
+            <span className="font-bold text-sm">{t("admin.settingsSections.commission")}</span>
+          </AccordionTrigger>
+          <AccordionContent className="pt-1 pb-3">
+            <CommissionSection />
           </AccordionContent>
         </AccordionItem>
 

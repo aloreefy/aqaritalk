@@ -192,7 +192,8 @@
       "aiBroker": "AI Broker",
       "marketLoc": "Market & Localization",
       "propertyListings": "Property Listings",
-      "systemFlags": "System & Feature Flags"
+      "systemFlags": "System & Feature Flags",
+      "commission": "Commission"
     },
     "settingsFields": {
       "voiceCtaStyle": "Voice CTA Style",
@@ -230,7 +231,10 @@
       "voiceInput": "Voice Input",
       "mapView": "Map View",
       "contactRelease": "Contact Release",
-      "sellerWizard": "Seller Wizard"
+      "sellerWizard": "Seller Wizard",
+      "defaultBuyerPct": "Default Buyer Commission (%)",
+      "defaultSellerPct": "Default Seller Commission (%)",
+      "negotiable": "Negotiable"
     }
   },
   "wizard": {
