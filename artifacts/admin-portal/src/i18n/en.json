@@ -9,7 +9,7 @@
       "commissions": "Commissions",
       "systemConfig": "System Config"
     },
-    "logout": "Terminate Session"
+    "logout": "Logout"
   },
   "header": {
     "routes": {

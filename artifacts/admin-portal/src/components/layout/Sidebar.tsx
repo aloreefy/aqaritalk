@@ -32,7 +32,7 @@ export function Sidebar() {
   };
 
   return (
-    <aside className="w-64 border-e bg-card flex flex-col hidden md:flex shrink-0">
+    <aside className="w-64 border-e bg-card flex flex-col hidden md:flex shrink-0 h-screen sticky top-0">
       <div className="h-14 border-b flex items-center px-6 gap-2">
         <div className="bg-primary/10 text-primary p-1.5 rounded-md">
           <Building className="w-5 h-5" />
