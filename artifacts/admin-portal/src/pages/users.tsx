@@ -22,6 +22,36 @@ import {
 import { usePagePreferences } from "@/hooks/use-page-preferences";
 import { DataPagination } from "@/components/ui/data-pagination";
 
+/** Shared avatar widget — shows photo if available, falls back to initials. */
+function UserAvatar({
+  name, phone, avatarUrl, size = "sm",
+}: { name?: string | null; phone: string; avatarUrl?: string | null; size?: "sm" | "lg" }) {
+  const dim = size === "lg" ? "w-10 h-10 text-sm" : "w-8 h-8 text-xs";
+  const initial = (name ?? phone).charAt(0).toUpperCase();
+
+  if (avatarUrl) {
+    return (
+      <img
+        src={avatarUrl}
+        alt={name ?? phone}
+        className={`${dim} rounded-full object-cover border shrink-0`}
+        onError={(e) => {
+          // Swap to initials fallback on broken URL
+          const el = e.currentTarget as HTMLImageElement;
+          el.style.display = "none";
+          const fb = el.nextElementSibling as HTMLElement | null;
+          if (fb) fb.style.display = "flex";
+        }}
+      />
+    );
+  }
+  return (
+    <div className={`${dim} rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold shrink-0`}>
+      {initial}
+    </div>
+  );
+}
+
 const STATUS_COLORS: Record<string, string> = {
   active: "bg-emerald-100 text-emerald-700 border-emerald-200",
   restricted: "bg-amber-100 text-amber-700 border-amber-200",
@@ -231,8 +261,13 @@ export default function Users() {
                     className="hover:bg-muted/30 cursor-pointer transition-colors"
                   >
                     <td className="px-4 py-3">
-                      <p className="font-medium">{user.name ?? "—"}</p>
-                      <p className="text-xs text-muted-foreground font-mono">{user.phone}</p>
+                      <div className="flex items-center gap-2.5">
+                        <UserAvatar name={user.name} phone={user.phone} avatarUrl={(user as any).avatarUrl} size="sm" />
+                        <div>
+                          <p className="font-medium">{user.name ?? "—"}</p>
+                          <p className="text-xs text-muted-foreground font-mono">{user.phone}</p>
+                        </div>
+                      </div>
                     </td>
                     <td className="px-4 py-3"><RoleBadge role={user.role} /></td>
                     <td className="px-4 py-3"><StatusBadge status={user.status} /></td>
@@ -256,9 +291,7 @@ export default function Users() {
               className="bg-card border rounded-xl p-4 hover:shadow-md cursor-pointer transition-all hover:border-primary/30 space-y-3"
             >
               <div className="flex items-start justify-between">
-                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm shrink-0">
-                  {(user.name ?? user.phone).charAt(0).toUpperCase()}
-                </div>
+                <UserAvatar name={user.name} phone={user.phone} avatarUrl={(user as any).avatarUrl} size="lg" />
                 <StatusBadge status={user.status} />
               </div>
               <div>

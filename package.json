@@ -21,6 +21,10 @@
     "lightningcss-win32-x64-msvc": "1.32.0"
   },
   "pnpm": {
+    "overrides": {
+      "react": "19.1.0",
+      "react-dom": "19.1.0"
+    },
     "supportedArchitectures": {
       "os": [
         "win32",

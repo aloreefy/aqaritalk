@@ -1,4 +1,5 @@
 import { useParams, useLocation } from "wouter";
+import { AvatarUpload } from "@/components/ui/avatar-upload";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -113,20 +114,23 @@ function EditForm({ user, id }: { user: any; id: string }) {
             </FormItem>
           )} />
 
-          {/* Avatar URL */}
+          {/* Avatar URL + Upload button */}
           <FormField control={form.control} name="avatarUrl" render={({ field }) => (
             <FormItem>
-              <FormLabel>Avatar URL</FormLabel>
-              <div className="flex items-center gap-3">
+              <FormLabel>Avatar</FormLabel>
+              <div className="flex items-start gap-2">
                 {field.value && (
                   <img
                     src={field.value}
                     alt="Avatar preview"
-                    className="w-10 h-10 rounded-full object-cover border shrink-0"
+                    className="w-10 h-10 rounded-full object-cover border shrink-0 mt-0.5"
                     onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
                   />
                 )}
-                <FormControl><Input {...field} placeholder="https://example.com/photo.jpg" dir="ltr" /></FormControl>
+                <FormControl className="flex-1">
+                  <Input {...field} placeholder="https://example.com/photo.jpg" dir="ltr" />
+                </FormControl>
+                <AvatarUpload onUploaded={(url) => form.setValue("avatarUrl", url, { shouldDirty: true })} />
               </div>
               <FormMessage />
             </FormItem>
