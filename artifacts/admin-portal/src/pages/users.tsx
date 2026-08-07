@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useLocation } from "wouter";
 import {
   useAdminListUsers,
@@ -8,20 +7,20 @@ import {
 import { useQueryClient } from "@tanstack/react-query";
 import {
   Search, UserPlus, LayoutList, LayoutGrid,
-  Eye, Pencil, Trash2, ChevronLeft, ChevronRight,
+  Eye, Pencil, Trash2,
   Phone, Calendar, MapPin,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
+import { useState } from "react";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel,
   AlertDialogContent, AlertDialogDescription, AlertDialogFooter,
   AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Badge } from "@/components/ui/badge";
-
-const PAGE_SIZES = [10, 25, 50, 100];
+import { usePagePreferences } from "@/hooks/use-page-preferences";
+import { DataPagination } from "@/components/ui/data-pagination";
 
 const STATUS_COLORS: Record<string, string> = {
   active: "bg-emerald-100 text-emerald-700 border-emerald-200",
@@ -37,20 +36,41 @@ const ROLE_COLORS: Record<string, string> = {
   admin: "bg-slate-100 text-slate-700 border-slate-200",
 };
 
+interface UsersPrefs {
+  viewMode: "table" | "card";
+  pageSize: number;
+  roleFilter: string;
+  statusFilter: string;
+}
+
 export default function Users() {
   const { t } = useTranslation();
   const { toast } = useToast();
   const [, setLocation] = useLocation();
   const queryClient = useQueryClient();
 
-  const [viewMode, setViewMode] = useState<"table" | "card">("table");
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(25);
+  // ── Persisted preferences ──────────────────────────────────────────────
+  const [prefs, setPrefs] = usePagePreferences<UsersPrefs>("users", {
+    viewMode: "table",
+    pageSize: 25,
+    roleFilter: "all",
+    statusFilter: "all",
+  });
+
+  // ── Transient state (search & current page reset on filter change) ──────
   const [search, setSearch] = useState("");
-  const [roleFilter, setRoleFilter] = useState("all");
-  const [statusFilter, setStatusFilter] = useState("all");
+  const [page, setPage] = useState(1);
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
 
+  // ── Derived helpers ────────────────────────────────────────────────────
+  const { viewMode, pageSize, roleFilter, statusFilter } = prefs;
+
+  const setViewMode = (v: "table" | "card") => setPrefs({ viewMode: v });
+  const setPageSize = (s: number) => { setPrefs({ pageSize: s }); setPage(1); };
+  const setRoleFilter = (v: string) => { setPrefs({ roleFilter: v }); setPage(1); };
+  const setStatusFilter = (v: string) => { setPrefs({ statusFilter: v }); setPage(1); };
+
+  // ── Query ──────────────────────────────────────────────────────────────
   const queryParams = {
     page,
     limit: pageSize,
@@ -69,11 +89,7 @@ export default function Users() {
   const total = data?.total ?? 0;
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
 
-  const handleFilter = (setter: (v: string) => void) => (v: string) => {
-    setter(v);
-    setPage(1);
-  };
-
+  // ── Delete ─────────────────────────────────────────────────────────────
   const handleDelete = () => {
     if (!deleteTarget) return;
     deleteMutation.mutate(
@@ -92,6 +108,7 @@ export default function Users() {
     );
   };
 
+  // ── Sub-components ─────────────────────────────────────────────────────
   const StatusBadge = ({ status }: { status: string }) => (
     <span className={cn("inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold border capitalize", STATUS_COLORS[status] ?? "bg-muted text-muted-foreground")}>
       {status}
@@ -126,32 +143,40 @@ export default function Users() {
           <h2 className="text-2xl font-bold tracking-tight">{t("users.title")}</h2>
           <p className="text-sm text-muted-foreground mt-1">{t("users.subtitle")}</p>
         </div>
-        <div className="flex items-center gap-2">
-          <button onClick={() => setLocation("/users/new")} className="flex items-center gap-2 h-9 px-4 rounded-md bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors shadow-sm">
-            <UserPlus className="w-4 h-4" />
-            New User
-          </button>
-        </div>
+        <button onClick={() => setLocation("/users/new")} className="flex items-center gap-2 h-9 px-4 rounded-md bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors shadow-sm">
+          <UserPlus className="w-4 h-4" />
+          New User
+        </button>
       </div>
 
       {/* Filters */}
       <div className="flex flex-wrap items-center gap-3">
         <div className="relative">
           <Search className="w-4 h-4 absolute start-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-          <input type="text" placeholder={t("users.searchPlaceholder")} value={search}
-            onChange={(e) => handleFilter(setSearch)(e.target.value)}
-            className="h-9 ps-9 pe-3 w-80 bg-card border border-input rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-primary transition-all" />
+          <input
+            type="text"
+            placeholder={t("users.searchPlaceholder")}
+            value={search}
+            onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+            className="h-9 ps-9 pe-3 w-80 bg-card border border-input rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-primary transition-all"
+          />
         </div>
-        <select value={roleFilter} onChange={(e) => handleFilter(setRoleFilter)(e.target.value)}
-          className="h-9 px-3 bg-card border border-input rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-primary">
+        <select
+          value={roleFilter}
+          onChange={(e) => setRoleFilter(e.target.value)}
+          className="h-9 px-3 bg-card border border-input rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-primary"
+        >
           <option value="all">All Roles</option>
           <option value="buyer">Buyer</option>
           <option value="seller">Seller</option>
           <option value="broker">Broker</option>
           <option value="admin">Admin</option>
         </select>
-        <select value={statusFilter} onChange={(e) => handleFilter(setStatusFilter)(e.target.value)}
-          className="h-9 px-3 bg-card border border-input rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-primary">
+        <select
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+          className="h-9 px-3 bg-card border border-input rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-primary"
+        >
           <option value="all">All Statuses</option>
           <option value="active">Active</option>
           <option value="restricted">Restricted</option>
@@ -160,10 +185,18 @@ export default function Users() {
         </select>
 
         <div className="ms-auto flex items-center gap-1 bg-muted rounded-md p-1">
-          <button onClick={() => setViewMode("table")} className={cn("h-7 w-7 flex items-center justify-center rounded", viewMode === "table" ? "bg-background shadow-sm" : "text-muted-foreground")}>
+          <button
+            onClick={() => setViewMode("table")}
+            className={cn("h-7 w-7 flex items-center justify-center rounded", viewMode === "table" ? "bg-background shadow-sm" : "text-muted-foreground")}
+            title="Table view"
+          >
             <LayoutList className="w-4 h-4" />
           </button>
-          <button onClick={() => setViewMode("card")} className={cn("h-7 w-7 flex items-center justify-center rounded", viewMode === "card" ? "bg-background shadow-sm" : "text-muted-foreground")}>
+          <button
+            onClick={() => setViewMode("card")}
+            className={cn("h-7 w-7 flex items-center justify-center rounded", viewMode === "card" ? "bg-background shadow-sm" : "text-muted-foreground")}
+            title="Card view"
+          >
             <LayoutGrid className="w-4 h-4" />
           </button>
         </div>
@@ -192,8 +225,11 @@ export default function Users() {
                 {users.length === 0 ? (
                   <tr><td colSpan={6} className="text-center py-12 text-muted-foreground text-sm">No users found.</td></tr>
                 ) : users.map((user) => (
-                  <tr key={user.id} onClick={() => setLocation(`/users/${user.id}`)}
-                    className="hover:bg-muted/30 cursor-pointer transition-colors">
+                  <tr
+                    key={user.id}
+                    onClick={() => setLocation(`/users/${user.id}`)}
+                    className="hover:bg-muted/30 cursor-pointer transition-colors"
+                  >
                     <td className="px-4 py-3">
                       <p className="font-medium">{user.name ?? "—"}</p>
                       <p className="text-xs text-muted-foreground font-mono">{user.phone}</p>
@@ -214,15 +250,16 @@ export default function Users() {
           {users.length === 0 ? (
             <div className="col-span-full text-center py-12 text-muted-foreground text-sm">No users found.</div>
           ) : users.map((user) => (
-            <div key={user.id} onClick={() => setLocation(`/users/${user.id}`)}
-              className="bg-card border rounded-xl p-4 hover:shadow-md cursor-pointer transition-all hover:border-primary/30 space-y-3">
+            <div
+              key={user.id}
+              onClick={() => setLocation(`/users/${user.id}`)}
+              className="bg-card border rounded-xl p-4 hover:shadow-md cursor-pointer transition-all hover:border-primary/30 space-y-3"
+            >
               <div className="flex items-start justify-between">
                 <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm shrink-0">
                   {(user.name ?? user.phone).charAt(0).toUpperCase()}
                 </div>
-                <div className="flex gap-1">
-                  <StatusBadge status={user.status} />
-                </div>
+                <StatusBadge status={user.status} />
               </div>
               <div>
                 <p className="font-semibold text-sm">{user.name ?? "No name"}</p>
@@ -249,29 +286,14 @@ export default function Users() {
       )}
 
       {/* Pagination */}
-      <div className="flex items-center justify-between gap-4 pt-2">
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <span>Rows per page:</span>
-          <select value={pageSize} onChange={(e) => { setPageSize(Number(e.target.value)); setPage(1); }}
-            className="h-8 px-2 bg-card border border-input rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-primary">
-            {PAGE_SIZES.map((s) => <option key={s} value={s}>{s}</option>)}
-          </select>
-        </div>
-        <div className="text-sm text-muted-foreground">
-          {total === 0 ? "No results" : `${(page - 1) * pageSize + 1}–${Math.min(page * pageSize, total)} of ${total}`}
-        </div>
-        <div className="flex items-center gap-1">
-          <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1}
-            className="h-8 w-8 flex items-center justify-center rounded-md border border-input disabled:opacity-40 hover:bg-muted transition-colors">
-            <ChevronLeft className="w-4 h-4" />
-          </button>
-          <span className="text-sm px-3 font-medium">{page} / {totalPages}</span>
-          <button onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={page >= totalPages}
-            className="h-8 w-8 flex items-center justify-center rounded-md border border-input disabled:opacity-40 hover:bg-muted transition-colors">
-            <ChevronRight className="w-4 h-4" />
-          </button>
-        </div>
-      </div>
+      <DataPagination
+        page={page}
+        totalPages={totalPages}
+        total={total}
+        pageSize={pageSize}
+        onPageChange={setPage}
+        onPageSizeChange={setPageSize}
+      />
 
       {/* Delete confirmation */}
       <AlertDialog open={!!deleteTarget} onOpenChange={(o) => !o && setDeleteTarget(null)}>

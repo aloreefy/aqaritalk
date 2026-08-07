@@ -8,7 +8,7 @@ import {
 import { useQueryClient } from "@tanstack/react-query";
 import {
   Search, Plus, LayoutList, LayoutGrid,
-  Eye, Pencil, Trash2, ChevronLeft, ChevronRight,
+  Eye, Pencil, Trash2,
   Building2, MapPin, DollarSign,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -19,8 +19,8 @@ import {
   AlertDialogContent, AlertDialogDescription, AlertDialogFooter,
   AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-
-const PAGE_SIZES = [10, 25, 50, 100];
+import { usePagePreferences } from "@/hooks/use-page-preferences";
+import { DataPagination } from "@/components/ui/data-pagination";
 
 const STATUS_COLORS: Record<string, string> = {
   active: "bg-emerald-100 text-emerald-700 border-emerald-200",
@@ -37,21 +37,44 @@ const PROPERTY_TYPES = [
   "hotel", "hospital", "clinic", "showroom", "mixed", "chalet", "rest_house", "other",
 ];
 
+interface PropertiesPrefs {
+  viewMode: "table" | "card";
+  pageSize: number;
+  statusFilter: string;
+  typeFilter: string;
+  modeFilter: string;
+}
+
 export default function Properties() {
   const { t } = useTranslation();
   const { toast } = useToast();
   const [, setLocation] = useLocation();
   const queryClient = useQueryClient();
 
-  const [viewMode, setViewMode] = useState<"table" | "card">("table");
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(25);
+  // ── Persisted preferences ──────────────────────────────────────────────
+  const [prefs, setPrefs] = usePagePreferences<PropertiesPrefs>("properties", {
+    viewMode: "table",
+    pageSize: 25,
+    statusFilter: "all",
+    typeFilter: "all",
+    modeFilter: "all",
+  });
+
+  // ── Transient state ────────────────────────────────────────────────────
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
-  const [typeFilter, setTypeFilter] = useState("all");
-  const [modeFilter, setModeFilter] = useState("all");
+  const [page, setPage] = useState(1);
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
 
+  // ── Derived helpers ────────────────────────────────────────────────────
+  const { viewMode, pageSize, statusFilter, typeFilter, modeFilter } = prefs;
+
+  const setViewMode = (v: "table" | "card") => setPrefs({ viewMode: v });
+  const setPageSize = (s: number) => { setPrefs({ pageSize: s }); setPage(1); };
+  const setStatusFilter = (v: string) => { setPrefs({ statusFilter: v }); setPage(1); };
+  const setTypeFilter = (v: string) => { setPrefs({ typeFilter: v }); setPage(1); };
+  const setModeFilter = (v: string) => { setPrefs({ modeFilter: v }); setPage(1); };
+
+  // ── Query ──────────────────────────────────────────────────────────────
   const queryParams = {
     page,
     limit: pageSize,
@@ -71,11 +94,7 @@ export default function Properties() {
   const total = data?.total ?? 0;
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
 
-  const handleFilter = (setter: (v: string) => void) => (v: string) => {
-    setter(v);
-    setPage(1);
-  };
-
+  // ── Delete ─────────────────────────────────────────────────────────────
   const handleDelete = () => {
     if (!deleteTarget) return;
     deleteMutation.mutate(
@@ -94,6 +113,7 @@ export default function Properties() {
     );
   };
 
+  // ── Sub-components ─────────────────────────────────────────────────────
   const StatusBadge = ({ status }: { status: string }) => (
     <span className={cn("inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold border capitalize", STATUS_COLORS[status] ?? "bg-muted text-muted-foreground border-border")}>
       {status.replace("_", " ")}
@@ -132,25 +152,38 @@ export default function Properties() {
       <div className="flex flex-wrap items-center gap-3">
         <div className="relative">
           <Search className="w-4 h-4 absolute start-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-          <input type="text" placeholder="Search name or city…" value={search}
-            onChange={(e) => handleFilter(setSearch)(e.target.value)}
-            className="h-9 ps-9 pe-3 w-80 bg-card border border-input rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-primary transition-all" />
+          <input
+            type="text"
+            placeholder="Search name or city…"
+            value={search}
+            onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+            className="h-9 ps-9 pe-3 w-80 bg-card border border-input rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-primary transition-all"
+          />
         </div>
-        <select value={statusFilter} onChange={(e) => handleFilter(setStatusFilter)(e.target.value)}
-          className="h-9 px-3 bg-card border border-input rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-primary">
+        <select
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+          className="h-9 px-3 bg-card border border-input rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-primary"
+        >
           <option value="all">All Statuses</option>
           <option value="active">Active</option>
           <option value="pending_review">Pending Review</option>
           <option value="rejected">Rejected</option>
           <option value="deleted">Deleted</option>
         </select>
-        <select value={typeFilter} onChange={(e) => handleFilter(setTypeFilter)(e.target.value)}
-          className="h-9 px-3 bg-card border border-input rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-primary">
+        <select
+          value={typeFilter}
+          onChange={(e) => setTypeFilter(e.target.value)}
+          className="h-9 px-3 bg-card border border-input rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-primary"
+        >
           <option value="all">All Types</option>
-          {PROPERTY_TYPES.map((t) => <option key={t} value={t}>{t.replace(/_/g, " ")}</option>)}
+          {PROPERTY_TYPES.map((tp) => <option key={tp} value={tp}>{tp.replace(/_/g, " ")}</option>)}
         </select>
-        <select value={modeFilter} onChange={(e) => handleFilter(setModeFilter)(e.target.value)}
-          className="h-9 px-3 bg-card border border-input rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-primary">
+        <select
+          value={modeFilter}
+          onChange={(e) => setModeFilter(e.target.value)}
+          className="h-9 px-3 bg-card border border-input rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-primary"
+        >
           <option value="all">All Modes</option>
           <option value="sale">Sale</option>
           <option value="rent">Rent</option>
@@ -158,10 +191,18 @@ export default function Properties() {
         </select>
 
         <div className="ms-auto flex items-center gap-1 bg-muted rounded-md p-1">
-          <button onClick={() => setViewMode("table")} className={cn("h-7 w-7 flex items-center justify-center rounded", viewMode === "table" ? "bg-background shadow-sm" : "text-muted-foreground")}>
+          <button
+            onClick={() => setViewMode("table")}
+            className={cn("h-7 w-7 flex items-center justify-center rounded", viewMode === "table" ? "bg-background shadow-sm" : "text-muted-foreground")}
+            title="Table view"
+          >
             <LayoutList className="w-4 h-4" />
           </button>
-          <button onClick={() => setViewMode("card")} className={cn("h-7 w-7 flex items-center justify-center rounded", viewMode === "card" ? "bg-background shadow-sm" : "text-muted-foreground")}>
+          <button
+            onClick={() => setViewMode("card")}
+            className={cn("h-7 w-7 flex items-center justify-center rounded", viewMode === "card" ? "bg-background shadow-sm" : "text-muted-foreground")}
+            title="Card view"
+          >
             <LayoutGrid className="w-4 h-4" />
           </button>
         </div>
@@ -192,8 +233,11 @@ export default function Properties() {
                 {properties.length === 0 ? (
                   <tr><td colSpan={8} className="text-center py-12 text-muted-foreground text-sm">No listings found.</td></tr>
                 ) : properties.map((prop) => (
-                  <tr key={prop.id} onClick={() => setLocation(`/properties/${prop.id}`)}
-                    className="hover:bg-muted/30 cursor-pointer transition-colors">
+                  <tr
+                    key={prop.id}
+                    onClick={() => setLocation(`/properties/${prop.id}`)}
+                    className="hover:bg-muted/30 cursor-pointer transition-colors"
+                  >
                     <td className="px-4 py-3">
                       <p className="font-medium truncate max-w-[160px]">{prop.listingName ?? "Untitled"}</p>
                       <p className="text-xs text-muted-foreground font-mono">{prop.id.slice(0, 8)}…</p>
@@ -220,8 +264,11 @@ export default function Properties() {
           {properties.length === 0 ? (
             <div className="col-span-full text-center py-12 text-muted-foreground text-sm">No listings found.</div>
           ) : properties.map((prop) => (
-            <div key={prop.id} onClick={() => setLocation(`/properties/${prop.id}`)}
-              className="bg-card border rounded-xl overflow-hidden hover:shadow-md cursor-pointer transition-all hover:border-primary/30">
+            <div
+              key={prop.id}
+              onClick={() => setLocation(`/properties/${prop.id}`)}
+              className="bg-card border rounded-xl overflow-hidden hover:shadow-md cursor-pointer transition-all hover:border-primary/30"
+            >
               <div className="h-32 bg-muted flex items-center justify-center text-muted-foreground">
                 {prop.images?.[0] ? (
                   <img src={prop.images[0].path} alt="" className="w-full h-full object-cover" />
@@ -253,29 +300,14 @@ export default function Properties() {
       )}
 
       {/* Pagination */}
-      <div className="flex items-center justify-between gap-4 pt-2">
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <span>Rows per page:</span>
-          <select value={pageSize} onChange={(e) => { setPageSize(Number(e.target.value)); setPage(1); }}
-            className="h-8 px-2 bg-card border border-input rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-primary">
-            {PAGE_SIZES.map((s) => <option key={s} value={s}>{s}</option>)}
-          </select>
-        </div>
-        <div className="text-sm text-muted-foreground">
-          {total === 0 ? "No results" : `${(page - 1) * pageSize + 1}–${Math.min(page * pageSize, total)} of ${total}`}
-        </div>
-        <div className="flex items-center gap-1">
-          <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1}
-            className="h-8 w-8 flex items-center justify-center rounded-md border border-input disabled:opacity-40 hover:bg-muted transition-colors">
-            <ChevronLeft className="w-4 h-4" />
-          </button>
-          <span className="text-sm px-3 font-medium">{page} / {totalPages}</span>
-          <button onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={page >= totalPages}
-            className="h-8 w-8 flex items-center justify-center rounded-md border border-input disabled:opacity-40 hover:bg-muted transition-colors">
-            <ChevronRight className="w-4 h-4" />
-          </button>
-        </div>
-      </div>
+      <DataPagination
+        page={page}
+        totalPages={totalPages}
+        total={total}
+        pageSize={pageSize}
+        onPageChange={setPage}
+        onPageSizeChange={setPageSize}
+      />
 
       {/* Delete confirmation */}
       <AlertDialog open={!!deleteTarget} onOpenChange={(o) => !o && setDeleteTarget(null)}>
