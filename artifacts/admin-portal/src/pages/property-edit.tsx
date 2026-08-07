@@ -244,10 +244,10 @@ export default function PropertyEdit() {
                 <FormField control={form.control} name="furnishedStatus" render={({ field }) => (
                   <FormItem>
                     <FormLabel>Furnished</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value ?? ""}>
+                    <Select onValueChange={(v) => field.onChange(v === "__none__" ? undefined : v)} value={field.value ?? "__none__"}>
                       <FormControl><SelectTrigger><SelectValue placeholder="—" /></SelectTrigger></FormControl>
                       <SelectContent>
-                        <SelectItem value="">—</SelectItem>
+                        <SelectItem value="__none__">—</SelectItem>
                         <SelectItem value="furnished">Furnished</SelectItem>
                         <SelectItem value="semi_furnished">Semi-Furnished</SelectItem>
                         <SelectItem value="unfurnished">Unfurnished</SelectItem>
@@ -259,10 +259,10 @@ export default function PropertyEdit() {
                 <FormField control={form.control} name="condition" render={({ field }) => (
                   <FormItem>
                     <FormLabel>Condition</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value ?? ""}>
+                    <Select onValueChange={(v) => field.onChange(v === "__none__" ? undefined : v)} value={field.value ?? "__none__"}>
                       <FormControl><SelectTrigger><SelectValue placeholder="—" /></SelectTrigger></FormControl>
                       <SelectContent>
-                        <SelectItem value="">—</SelectItem>
+                        <SelectItem value="__none__">—</SelectItem>
                         <SelectItem value="new">New</SelectItem>
                         <SelectItem value="excellent">Excellent</SelectItem>
                         <SelectItem value="good">Good</SelectItem>
