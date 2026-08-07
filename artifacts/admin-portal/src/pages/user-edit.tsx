@@ -40,7 +40,10 @@ const schema = z.object({
   role: z.enum(["buyer", "seller", "broker", "admin"]),
   status: z.enum(["active", "restricted", "suspended", "banned"]),
   market: z.enum(["JO", "SA", "AE", "EG", "KW", "QA", "BH", "OM", "MA", "LB", "IQ"]),
-  avatarUrl: z.string().url("Must be a valid URL").optional().or(z.literal("")),
+  avatarUrl: z.string().optional().refine(
+    (v) => !v || v.startsWith("/") || /^https?:\/\//.test(v),
+    { message: "Must be a URL or a storage path" }
+  ),
   preferredCurrency: z.string().optional(),
 });
 type FormValues = z.infer<typeof schema>;
