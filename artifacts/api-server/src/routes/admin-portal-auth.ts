@@ -1,7 +1,7 @@
 import { Router, type IRouter } from "express";
 import { db, usersTable } from "@workspace/db";
-import { eq } from "drizzle-orm";
-import crypto from "crypto";
+import { eq, or } from "drizzle-orm";
+import bcrypt from "bcryptjs";
 import { AdminPortalLoginBody, AdminPortalLoginResponse } from "@workspace/api-zod";
 import { signToken } from "../lib/jwt";
 
@@ -14,53 +14,47 @@ router.post("/admin/portal/login", async (req, res): Promise<void> => {
     return;
   }
 
-  const adminPassword = process.env.ADMIN_PASSWORD;
-  if (!adminPassword) {
-    res.status(503).json({ error: "Admin portal not configured — set ADMIN_PASSWORD secret" });
-    return;
-  }
+  const { login, password } = parsed.data;
 
-  const provided = Buffer.from(parsed.data.password);
-  const stored = Buffer.from(adminPassword);
-  const valid =
-    provided.length === stored.length &&
-    crypto.timingSafeEqual(provided, stored);
-
-  if (!valid) {
-    // Constant-delay response to slow brute-force
+  const fail = async (msg: string) => {
+    // Constant-delay to slow brute-force
     await new Promise((r) => setTimeout(r, 500));
-    res.status(401).json({ error: "Invalid password" });
-    return;
-  }
+    res.status(401).json({ error: msg });
+  };
 
-  const [admin] = await db
+  // Look up by username OR phone
+  const [user] = await db
     .select()
     .from(usersTable)
-    .where(eq(usersTable.role, "admin"))
+    .where(or(eq(usersTable.username, login), eq(usersTable.phone, login)))
     .limit(1);
 
-  if (!admin) {
-    res.status(401).json({ error: "No admin account found in database" });
-    return;
-  }
+  if (!user) return void (await fail("Invalid credentials"));
+  if (user.role !== "admin") return void (await fail("Not authorized"));
+  if (user.status !== "active") return void (await fail("Account suspended"));
+  if (!user.passwordHash) return void (await fail("No password set for this account. Ask your system administrator."));
 
-  const token = signToken({ userId: admin.id, role: admin.role, phone: admin.phone });
+  const valid = await bcrypt.compare(password, user.passwordHash);
+  if (!valid) return void (await fail("Invalid credentials"));
+
+  const token = signToken({ userId: user.id, role: user.role, phone: user.phone });
 
   res.json(
     AdminPortalLoginResponse.parse({
       token,
       user: {
-        id: admin.id,
-        phone: admin.phone,
-        name: admin.name ?? null,
-        role: admin.role,
-        market: admin.market,
-        language: admin.language,
-        verificationStatus: admin.verificationStatus,
-        status: admin.status,
-        autoSendVoice: admin.autoSendVoice,
-        createdAt: admin.createdAt,
-        updatedAt: admin.updatedAt,
+        id: user.id,
+        phone: user.phone,
+        name: user.name ?? null,
+        username: user.username ?? null,
+        role: user.role,
+        market: user.market,
+        language: user.language,
+        verificationStatus: user.verificationStatus,
+        status: user.status,
+        autoSendVoice: user.autoSendVoice,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
       },
       isNewUser: false,
     }),

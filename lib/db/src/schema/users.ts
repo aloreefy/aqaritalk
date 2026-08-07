@@ -55,6 +55,8 @@ export const usersTable = pgTable("users", {
     .notNull()
     .default("unverified"),
   status: userStatusEnum("status").notNull().default("active"),
+  username: varchar("username", { length: 100 }).unique(),
+  passwordHash: varchar("password_hash", { length: 255 }),
   avatarUrl: varchar("avatar_url", { length: 500 }),
   preferredCurrency: varchar("preferred_currency", { length: 10 }),
   autoSendVoice: boolean("auto_send_voice").notNull().default(false),

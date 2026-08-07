@@ -2,11 +2,12 @@ import { useState } from "react";
 import { useLocation } from "wouter";
 import { useAdminPortalLogin } from "@workspace/api-client-react";
 import { useToast } from "@/hooks/use-toast";
-import { Building, Lock, ShieldAlert } from "lucide-react";
+import { Building, Lock, User, ShieldAlert } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 export default function Login() {
   const { t } = useTranslation();
+  const [login, setLogin] = useState("");
   const [password, setPassword] = useState("");
   const [, setLocation] = useLocation();
   const { toast } = useToast();
@@ -14,17 +15,17 @@ export default function Login() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!password) return;
+    if (!login || !password) return;
 
-    loginMutation.mutate({ data: { password } }, {
+    loginMutation.mutate({ data: { login, password } }, {
       onSuccess: (res) => {
         localStorage.setItem("admin_token", res.token);
         setLocation("/");
       },
       onError: (err) => {
         toast({
-          title: t('login.toast.errorTitle'),
-          description: (err.data as Record<string, string> | null)?.error ?? err.message ?? t('login.toast.errorFallback'),
+          title: "Login failed",
+          description: (err.data as Record<string, string> | null)?.error ?? err.message ?? "Invalid credentials",
           variant: "destructive",
         });
       }
@@ -34,10 +35,10 @@ export default function Login() {
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-background text-foreground relative overflow-hidden">
       {/* Decorative background grid */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"></div>
-      
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
+
       {/* Ambient glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-primary/20 rounded-full blur-[100px] pointer-events-none"></div>
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-primary/20 rounded-full blur-[100px] pointer-events-none" />
 
       <div className="w-full max-w-sm relative z-10">
         <div className="bg-card border shadow-xl rounded-lg overflow-hidden">
@@ -51,38 +52,53 @@ export default function Login() {
             <p className="text-xs text-muted-foreground text-center mt-1 font-mono uppercase tracking-wider">{t('login.subtitle')}</p>
           </div>
 
-          <form onSubmit={handleSubmit} className="p-6 space-y-6">
+          <form onSubmit={handleSubmit} className="p-6 space-y-4">
+            {/* Username or phone */}
             <div className="space-y-2">
               <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
-                <Lock className="w-3 h-3" /> {t('login.passkeyLabel')}
+                <User className="w-3 h-3" /> Username or Phone
               </label>
-              <div className="relative">
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-background border border-input h-10 px-3 rounded-md text-sm font-mono focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all"
-                  placeholder="••••••••••••"
-                  autoFocus
-                  autoComplete="current-password"
-                  dir="ltr"
-                />
-              </div>
+              <input
+                type="text"
+                value={login}
+                onChange={(e) => setLogin(e.target.value)}
+                className="w-full bg-background border border-input h-10 px-3 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all"
+                placeholder="admin or +962…"
+                autoFocus
+                autoComplete="username"
+                dir="ltr"
+              />
+            </div>
+
+            {/* Password */}
+            <div className="space-y-2">
+              <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+                <Lock className="w-3 h-3" /> Password
+              </label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full bg-background border border-input h-10 px-3 rounded-md text-sm font-mono focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all"
+                placeholder="••••••••••••"
+                autoComplete="current-password"
+                dir="ltr"
+              />
             </div>
 
             <button
               type="submit"
-              disabled={loginMutation.isPending || !password}
-              className="w-full h-10 bg-primary text-primary-foreground text-sm font-semibold rounded-md hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              disabled={loginMutation.isPending || !login || !password}
+              className="w-full h-10 bg-primary text-primary-foreground text-sm font-semibold rounded-md hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-2"
             >
               {loginMutation.isPending ? (
-                <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin"></div>
+                <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
               ) : (
                 t('login.submitButton')
               )}
             </button>
           </form>
-          
+
           <div className="px-6 py-4 bg-muted/50 border-t flex items-start gap-3 text-xs text-muted-foreground">
             <ShieldAlert className="w-4 h-4 shrink-0 text-amber-500 mt-0.5" />
             <p className="leading-relaxed">{t('login.securityNotice')}</p>

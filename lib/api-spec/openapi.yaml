@@ -1077,6 +1077,8 @@ components:
           type: string
         name:
           type: ["string", "null"]
+        username:
+          type: ["string", "null"]
         role:
           type: string
           enum: [buyer, seller, broker, admin]
@@ -1610,6 +1612,12 @@ components:
         preferredCurrency:
           type: string
           nullable: true
+        username:
+          type: string
+          nullable: true
+        password:
+          type: string
+          nullable: true
 
     AdminUserUpdate:
       type: object
@@ -1635,6 +1643,12 @@ components:
           type: string
           nullable: true
         preferredCurrency:
+          type: string
+          nullable: true
+        username:
+          type: string
+          nullable: true
+        password:
           type: string
           nullable: true
 
@@ -1752,8 +1766,11 @@ components:
 
     AdminPortalLoginInput:
       type: object
-      required: [password]
+      required: [login, password]
       properties:
+        login:
+          type: string
+          minLength: 1
         password:
           type: string
           minLength: 1

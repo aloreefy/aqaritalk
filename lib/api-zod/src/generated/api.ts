@@ -53,6 +53,7 @@ export const VerifyOtpResponse = zod.object({
   "id": zod.string(),
   "phone": zod.string(),
   "name": zod.string().nullish(),
+  "username": zod.string().nullish(),
   "role": zod.enum(['buyer', 'seller', 'broker', 'admin']),
   "market": zod.enum(['JO', 'SA', 'AE', 'EG', 'KW', 'QA', 'BH', 'OM', 'MA', 'LB', 'IQ']),
   "language": zod.enum(['ar', 'en']),
@@ -75,6 +76,7 @@ export const GetMeResponse = zod.object({
   "id": zod.string(),
   "phone": zod.string(),
   "name": zod.string().nullish(),
+  "username": zod.string().nullish(),
   "role": zod.enum(['buyer', 'seller', 'broker', 'admin']),
   "market": zod.enum(['JO', 'SA', 'AE', 'EG', 'KW', 'QA', 'BH', 'OM', 'MA', 'LB', 'IQ']),
   "language": zod.enum(['ar', 'en']),
@@ -103,6 +105,7 @@ export const UpdateMeResponse = zod.object({
   "id": zod.string(),
   "phone": zod.string(),
   "name": zod.string().nullish(),
+  "username": zod.string().nullish(),
   "role": zod.enum(['buyer', 'seller', 'broker', 'admin']),
   "market": zod.enum(['JO', 'SA', 'AE', 'EG', 'KW', 'QA', 'BH', 'OM', 'MA', 'LB', 'IQ']),
   "language": zod.enum(['ar', 'en']),
@@ -953,6 +956,7 @@ export const AdminListUsersResponse = zod.object({
   "id": zod.string(),
   "phone": zod.string(),
   "name": zod.string().nullish(),
+  "username": zod.string().nullish(),
   "role": zod.enum(['buyer', 'seller', 'broker', 'admin']),
   "market": zod.enum(['JO', 'SA', 'AE', 'EG', 'KW', 'QA', 'BH', 'OM', 'MA', 'LB', 'IQ']),
   "language": zod.enum(['ar', 'en']),
@@ -980,7 +984,9 @@ export const AdminCreateUserBody = zod.object({
   "market": zod.enum(['JO', 'SA', 'AE', 'EG', 'KW', 'QA', 'BH', 'OM', 'MA', 'LB', 'IQ']).optional(),
   "status": zod.enum(['active', 'restricted', 'suspended', 'banned']).optional(),
   "avatarUrl": zod.string().nullish(),
-  "preferredCurrency": zod.string().nullish()
+  "preferredCurrency": zod.string().nullish(),
+  "username": zod.string().nullish(),
+  "password": zod.string().nullish()
 })
 
 
@@ -995,6 +1001,7 @@ export const AdminGetUserResponse = zod.object({
   "id": zod.string(),
   "phone": zod.string(),
   "name": zod.string().nullish(),
+  "username": zod.string().nullish(),
   "role": zod.enum(['buyer', 'seller', 'broker', 'admin']),
   "market": zod.enum(['JO', 'SA', 'AE', 'EG', 'KW', 'QA', 'BH', 'OM', 'MA', 'LB', 'IQ']),
   "language": zod.enum(['ar', 'en']),
@@ -1023,13 +1030,16 @@ export const AdminUpdateUserBody = zod.object({
   "market": zod.enum(['JO', 'SA', 'AE', 'EG', 'KW', 'QA', 'BH', 'OM', 'MA', 'LB', 'IQ']).optional(),
   "verificationStatus": zod.enum(['unverified', 'verified']).optional(),
   "avatarUrl": zod.string().nullish(),
-  "preferredCurrency": zod.string().nullish()
+  "preferredCurrency": zod.string().nullish(),
+  "username": zod.string().nullish(),
+  "password": zod.string().nullish()
 })
 
 export const AdminUpdateUserResponse = zod.object({
   "id": zod.string(),
   "phone": zod.string(),
   "name": zod.string().nullish(),
+  "username": zod.string().nullish(),
   "role": zod.enum(['buyer', 'seller', 'broker', 'admin']),
   "market": zod.enum(['JO', 'SA', 'AE', 'EG', 'KW', 'QA', 'BH', 'OM', 'MA', 'LB', 'IQ']),
   "language": zod.enum(['ar', 'en']),
@@ -1352,7 +1362,9 @@ export const AdminUpdatePropertyStatusResponse = zod.object({
 
 
 
+
 export const AdminPortalLoginBody = zod.object({
+  "login": zod.string().min(1),
   "password": zod.string().min(1)
 })
 
@@ -1362,6 +1374,7 @@ export const AdminPortalLoginResponse = zod.object({
   "id": zod.string(),
   "phone": zod.string(),
   "name": zod.string().nullish(),
+  "username": zod.string().nullish(),
   "role": zod.enum(['buyer', 'seller', 'broker', 'admin']),
   "market": zod.enum(['JO', 'SA', 'AE', 'EG', 'KW', 'QA', 'BH', 'OM', 'MA', 'LB', 'IQ']),
   "language": zod.enum(['ar', 'en']),

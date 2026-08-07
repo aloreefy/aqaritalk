@@ -7,6 +7,7 @@ import {
   propertyImagesTable,
 } from "@workspace/db";
 import { eq, and, isNull, sql, or, ilike } from "drizzle-orm";
+import bcrypt from "bcryptjs";
 import {
   AdminListUsersQueryParams,
   AdminListUsersResponse,
@@ -93,7 +94,7 @@ router.post("/admin/users", ...adminGuard, async (req, res): Promise<void> => {
     return;
   }
 
-  const { phone, name, role, market, status, avatarUrl, preferredCurrency } = parsed.data;
+  const { phone, name, role, market, status, avatarUrl, preferredCurrency, username, password } = parsed.data;
 
   // Check for duplicate phone
   const existing = await db
@@ -106,6 +107,21 @@ router.post("/admin/users", ...adminGuard, async (req, res): Promise<void> => {
     return;
   }
 
+  // Check username uniqueness
+  if (username) {
+    const usernameConflict = await db
+      .select({ id: usersTable.id })
+      .from(usersTable)
+      .where(eq(usersTable.username, username))
+      .limit(1);
+    if (usernameConflict.length > 0) {
+      res.status(409).json({ error: "Username already taken" });
+      return;
+    }
+  }
+
+  const passwordHash = password ? await bcrypt.hash(password, 10) : null;
+
   const [user] = await db
     .insert(usersTable)
     .values({
@@ -116,6 +132,8 @@ router.post("/admin/users", ...adminGuard, async (req, res): Promise<void> => {
       status: (status as any) ?? "active",
       avatarUrl: avatarUrl ?? null,
       preferredCurrency: preferredCurrency ?? null,
+      username: username ?? null,
+      passwordHash: passwordHash,
       verificationStatus: "verified", // admin-created accounts are auto-verified
     })
     .returning();
@@ -177,6 +195,27 @@ router.put("/admin/users/:id", ...adminGuard, async (req, res): Promise<void> =>
   if (parsed.data.market != null) updates.market = parsed.data.market;
   if (parsed.data.avatarUrl !== undefined) updates.avatarUrl = parsed.data.avatarUrl;
   if (parsed.data.preferredCurrency !== undefined) updates.preferredCurrency = parsed.data.preferredCurrency;
+
+  // Username: check uniqueness (excluding this user)
+  if (parsed.data.username !== undefined) {
+    if (parsed.data.username) {
+      const usernameConflict = await db
+        .select({ id: usersTable.id })
+        .from(usersTable)
+        .where(and(eq(usersTable.username, parsed.data.username), isNull(usersTable.deletedAt)))
+        .limit(1);
+      if (usernameConflict.length > 0 && usernameConflict[0].id !== params.data.id) {
+        res.status(409).json({ error: "Username already taken" });
+        return;
+      }
+    }
+    updates.username = parsed.data.username ?? null;
+  }
+
+  // Password: hash if provided
+  if (parsed.data.password) {
+    updates.passwordHash = await bcrypt.hash(parsed.data.password, 10);
+  }
 
   const [user] = await db
     .update(usersTable)

@@ -109,6 +109,8 @@ export interface User {
   phone: string;
   /** @nullable */
   name?: string | null;
+  /** @nullable */
+  username?: string | null;
   role: UserRole;
   market: UserMarket;
   language: UserLanguage;
@@ -583,6 +585,8 @@ export interface AdminCreateUserBody {
   status?: AdminCreateUserBodyStatus;
   avatarUrl?: string | null;
   preferredCurrency?: string | null;
+  username?: string | null;
+  password?: string | null;
 }
 
 export type AdminUserUpdateRole = typeof AdminUserUpdateRole[keyof typeof AdminUserUpdateRole];
@@ -639,6 +643,8 @@ export interface AdminUserUpdate {
   verificationStatus?: AdminUserUpdateVerificationStatus;
   avatarUrl?: string | null;
   preferredCurrency?: string | null;
+  username?: string | null;
+  password?: string | null;
 }
 
 export interface AdminCreatePropertyBody {
@@ -683,6 +689,8 @@ export interface AdminUpdatePropertyBody {
 }
 
 export interface AdminPortalLoginInput {
+  /** @minLength 1 */
+  login: string;
   /** @minLength 1 */
   password: string;
 }

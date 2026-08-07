@@ -40,6 +40,12 @@ const schema = z.object({
     { message: "Must be a URL or a storage path" }
   ),
   preferredCurrency: z.string().optional(),
+  username: z.string().optional(),
+  password: z.string().optional(),
+  confirmPassword: z.string().optional(),
+}).refine((d) => !d.password || d.password === d.confirmPassword, {
+  message: "Passwords do not match",
+  path: ["confirmPassword"],
 });
 type FormValues = z.infer<typeof schema>;
 
@@ -51,17 +57,22 @@ export default function UserNew() {
 
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
-    defaultValues: { phone: "", name: "", role: "buyer", market: "JO", status: "active", avatarUrl: "", preferredCurrency: "" },
+    defaultValues: { phone: "", name: "", role: "buyer", market: "JO", status: "active", avatarUrl: "", preferredCurrency: "", username: "", password: "", confirmPassword: "" },
   });
 
   const onSubmit = (values: FormValues) => {
     createMutation.mutate(
       {
         data: {
-          ...values,
-          name: values.name || undefined,
+          phone: values.phone,
+          name: values.name || null,
+          role: values.role,
+          market: values.market,
+          status: values.status,
           avatarUrl: values.avatarUrl || null,
           preferredCurrency: values.preferredCurrency || null,
+          username: values.username || null,
+          password: values.password || null,
         } as any,
       },
       {
@@ -196,6 +207,39 @@ export default function UserNew() {
                 </FormItem>
               )} />
             </div>
+
+            {/* Admin credentials — only shown when role = admin */}
+            {form.watch("role") === "admin" && (
+              <div className="border border-dashed rounded-lg p-4 space-y-4 bg-muted/30">
+                <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Portal Credentials (Admin Only)</p>
+
+                <FormField control={form.control} name="username" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Username</FormLabel>
+                    <FormControl><Input {...field} placeholder="e.g. jdoe" dir="ltr" autoComplete="off" /></FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField control={form.control} name="password" render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Password</FormLabel>
+                      <FormControl><Input {...field} type="password" placeholder="••••••••" dir="ltr" autoComplete="new-password" /></FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )} />
+
+                  <FormField control={form.control} name="confirmPassword" render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Confirm Password</FormLabel>
+                      <FormControl><Input {...field} type="password" placeholder="••••••••" dir="ltr" autoComplete="new-password" /></FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )} />
+                </div>
+              </div>
+            )}
 
             <div className="flex items-center gap-3 pt-2">
               <button type="submit" disabled={createMutation.isPending}
