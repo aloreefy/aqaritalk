@@ -34,7 +34,20 @@ export function Header() {
   const { data: me } = useGetMe({ query: { enabled: !!localStorage.getItem("admin_token"), queryKey: getGetMeQueryKey() } });
 
   const routes = t('header.routes', { returnObjects: true }) as Record<string, string>;
-  const currentTitle = routes[location] ?? t('header.fallback');
+
+  // Resolve dynamic sub-page titles (e.g. /users/abc123/edit → "Edit User")
+  const resolveTitle = (loc: string): string => {
+    if (routes[loc]) return routes[loc];
+    if (/^\/users\/new/.test(loc)) return t('header.routes./users/new', 'New User');
+    if (/^\/users\/[^/]+\/edit/.test(loc)) return t('header.routes./users/:id/edit', 'Edit User');
+    if (/^\/users\/[^/]+/.test(loc)) return t('header.routes./users/:id', 'User Details');
+    if (/^\/properties\/new/.test(loc)) return t('header.routes./properties/new', 'New Listing');
+    if (/^\/properties\/[^/]+\/edit/.test(loc)) return t('header.routes./properties/:id/edit', 'Edit Listing');
+    if (/^\/properties\/[^/]+/.test(loc)) return t('header.routes./properties/:id', 'Listing Details');
+    return t('header.fallback');
+  };
+
+  const currentTitle = resolveTitle(location);
 
   // Prefer name if set; fall back to phone number
   const displayName = me?.name || me?.phone || "Admin";

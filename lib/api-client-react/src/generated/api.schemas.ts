@@ -510,6 +510,58 @@ export interface Notification {
   createdAt: string;
 }
 
+export interface UserList {
+  items: User[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+export type AdminCreateUserBodyRole = typeof AdminCreateUserBodyRole[keyof typeof AdminCreateUserBodyRole];
+
+
+export const AdminCreateUserBodyRole = {
+  buyer: 'buyer',
+  seller: 'seller',
+  broker: 'broker',
+  admin: 'admin',
+} as const;
+
+export type AdminCreateUserBodyMarket = typeof AdminCreateUserBodyMarket[keyof typeof AdminCreateUserBodyMarket];
+
+
+export const AdminCreateUserBodyMarket = {
+  JO: 'JO',
+  SA: 'SA',
+  AE: 'AE',
+  EG: 'EG',
+  KW: 'KW',
+  QA: 'QA',
+  BH: 'BH',
+  OM: 'OM',
+  MA: 'MA',
+  LB: 'LB',
+  IQ: 'IQ',
+} as const;
+
+export type AdminCreateUserBodyStatus = typeof AdminCreateUserBodyStatus[keyof typeof AdminCreateUserBodyStatus];
+
+
+export const AdminCreateUserBodyStatus = {
+  active: 'active',
+  restricted: 'restricted',
+  suspended: 'suspended',
+  banned: 'banned',
+} as const;
+
+export interface AdminCreateUserBody {
+  phone: string;
+  name?: string | null;
+  role: AdminCreateUserBodyRole;
+  market?: AdminCreateUserBodyMarket;
+  status?: AdminCreateUserBodyStatus;
+}
+
 export type AdminUserUpdateRole = typeof AdminUserUpdateRole[keyof typeof AdminUserUpdateRole];
 
 
@@ -525,7 +577,26 @@ export type AdminUserUpdateStatus = typeof AdminUserUpdateStatus[keyof typeof Ad
 
 export const AdminUserUpdateStatus = {
   active: 'active',
+  restricted: 'restricted',
   suspended: 'suspended',
+  banned: 'banned',
+} as const;
+
+export type AdminUserUpdateMarket = typeof AdminUserUpdateMarket[keyof typeof AdminUserUpdateMarket];
+
+
+export const AdminUserUpdateMarket = {
+  JO: 'JO',
+  SA: 'SA',
+  AE: 'AE',
+  EG: 'EG',
+  KW: 'KW',
+  QA: 'QA',
+  BH: 'BH',
+  OM: 'OM',
+  MA: 'MA',
+  LB: 'LB',
+  IQ: 'IQ',
 } as const;
 
 export type AdminUserUpdateVerificationStatus = typeof AdminUserUpdateVerificationStatus[keyof typeof AdminUserUpdateVerificationStatus];
@@ -537,9 +608,52 @@ export const AdminUserUpdateVerificationStatus = {
 } as const;
 
 export interface AdminUserUpdate {
+  name?: string | null;
   role?: AdminUserUpdateRole;
   status?: AdminUserUpdateStatus;
+  market?: AdminUserUpdateMarket;
   verificationStatus?: AdminUserUpdateVerificationStatus;
+}
+
+export interface AdminCreatePropertyBody {
+  listingName?: string | null;
+  propertyType: string;
+  transactionMode: string;
+  price?: number | null;
+  priceCurrency?: string | null;
+  priceNegotiable?: boolean | null;
+  country?: string | null;
+  city?: string | null;
+  district?: string | null;
+  street?: string | null;
+  areaSqm?: number | null;
+  rooms?: number | null;
+  bathrooms?: number | null;
+  floorNumber?: number | null;
+  furnishedStatus?: string | null;
+  condition?: string | null;
+  description?: string | null;
+}
+
+export interface AdminUpdatePropertyBody {
+  listingName?: string | null;
+  propertyType?: string | null;
+  transactionMode?: string | null;
+  status?: string | null;
+  price?: number | null;
+  priceCurrency?: string | null;
+  priceNegotiable?: boolean | null;
+  country?: string | null;
+  city?: string | null;
+  district?: string | null;
+  street?: string | null;
+  areaSqm?: number | null;
+  rooms?: number | null;
+  bathrooms?: number | null;
+  floorNumber?: number | null;
+  furnishedStatus?: string | null;
+  condition?: string | null;
+  description?: string | null;
 }
 
 export interface AdminPortalLoginInput {
@@ -895,6 +1009,10 @@ export type AdminListUsersParams = {
 /**
  * @nullable
  */
+search?: string | null;
+/**
+ * @nullable
+ */
 role?: string | null;
 /**
  * @nullable
@@ -908,7 +1026,19 @@ export type AdminListPropertiesParams = {
 /**
  * @nullable
  */
+search?: string | null;
+/**
+ * @nullable
+ */
 status?: string | null;
+/**
+ * @nullable
+ */
+propertyType?: string | null;
+/**
+ * @nullable
+ */
+transactionMode?: string | null;
 page?: number;
 limit?: number;
 };

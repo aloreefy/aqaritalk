@@ -582,6 +582,10 @@ paths:
       security:
         - bearerAuth: []
       parameters:
+        - name: search
+          in: query
+          schema:
+            type: ["string", "null"]
         - name: role
           in: query
           schema:
@@ -599,18 +603,54 @@ paths:
           in: query
           schema:
             type: integer
-            default: 50
+            default: 25
       responses:
         "200":
-          description: Users
+          description: Users (paginated)
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/User"
+                $ref: "#/components/schemas/UserList"
+    post:
+      operationId: adminCreateUser
+      tags: [admin]
+      summary: Create user (admin — bypasses OTP)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminCreateUserBody"
+      responses:
+        "201":
+          description: Created user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
 
   /admin/users/{id}:
+    get:
+      operationId: adminGetUser
+      tags: [admin]
+      summary: Get single user (admin)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: User
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
     put:
       operationId: adminUpdateUser
       tags: [admin]
@@ -636,6 +676,21 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/User"
+    delete:
+      operationId: adminDeleteUser
+      tags: [admin]
+      summary: Soft-delete user (admin)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Deleted
 
   /admin/properties:
     get:
@@ -645,7 +700,19 @@ paths:
       security:
         - bearerAuth: []
       parameters:
+        - name: search
+          in: query
+          schema:
+            type: ["string", "null"]
         - name: status
+          in: query
+          schema:
+            type: ["string", "null"]
+        - name: propertyType
+          in: query
+          schema:
+            type: ["string", "null"]
+        - name: transactionMode
           in: query
           schema:
             type: ["string", "null"]
@@ -658,7 +725,7 @@ paths:
           in: query
           schema:
             type: integer
-            default: 50
+            default: 25
       responses:
         "200":
           description: Properties
@@ -666,6 +733,86 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PropertyList"
+    post:
+      operationId: adminCreateProperty
+      tags: [admin]
+      summary: Create property listing (admin — goes live immediately)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminCreatePropertyBody"
+      responses:
+        "201":
+          description: Created property
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Property"
+
+  /admin/properties/{id}:
+    get:
+      operationId: adminGetProperty
+      tags: [admin]
+      summary: Get single property (admin)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Property
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Property"
+    put:
+      operationId: adminUpdateProperty
+      tags: [admin]
+      summary: Update property (admin)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminUpdatePropertyBody"
+      responses:
+        "200":
+          description: Updated property
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Property"
+    delete:
+      operationId: adminDeleteProperty
+      tags: [admin]
+      summary: Soft-delete property (admin)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Deleted
 
   /admin/properties/{id}/status:
     put:
@@ -1346,18 +1493,170 @@ components:
           format: date-time
 
     # ── Admin schemas ─────────────────────────────────
+    UserList:
+      type: object
+      required: [items, total, page, limit]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/User"
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+
+    AdminCreateUserBody:
+      type: object
+      required: [phone, role]
+      properties:
+        phone:
+          type: string
+        name:
+          type: string
+          nullable: true
+        role:
+          type: string
+          enum: [buyer, seller, broker, admin]
+        market:
+          type: string
+          enum: [JO, SA, AE, EG, KW, QA, BH, OM, MA, LB, IQ]
+        status:
+          type: string
+          enum: [active, restricted, suspended, banned]
+
     AdminUserUpdate:
       type: object
       properties:
+        name:
+          type: string
+          nullable: true
         role:
           type: string
           enum: [buyer, seller, broker, admin]
         status:
           type: string
-          enum: [active, suspended]
+          enum: [active, restricted, suspended, banned]
+        market:
+          type: string
+          enum: [JO, SA, AE, EG, KW, QA, BH, OM, MA, LB, IQ]
         verificationStatus:
           type: string
           enum: [unverified, verified]
+
+    AdminCreatePropertyBody:
+      type: object
+      required: [propertyType, transactionMode]
+      properties:
+        listingName:
+          type: string
+          nullable: true
+        propertyType:
+          type: string
+        transactionMode:
+          type: string
+        price:
+          type: number
+          nullable: true
+        priceCurrency:
+          type: string
+          nullable: true
+        priceNegotiable:
+          type: boolean
+          nullable: true
+        country:
+          type: string
+          nullable: true
+        city:
+          type: string
+          nullable: true
+        district:
+          type: string
+          nullable: true
+        street:
+          type: string
+          nullable: true
+        areaSqm:
+          type: number
+          nullable: true
+        rooms:
+          type: integer
+          nullable: true
+        bathrooms:
+          type: integer
+          nullable: true
+        floorNumber:
+          type: integer
+          nullable: true
+        furnishedStatus:
+          type: string
+          nullable: true
+        condition:
+          type: string
+          nullable: true
+        description:
+          type: string
+          nullable: true
+
+    AdminUpdatePropertyBody:
+      type: object
+      properties:
+        listingName:
+          type: string
+          nullable: true
+        propertyType:
+          type: string
+          nullable: true
+        transactionMode:
+          type: string
+          nullable: true
+        status:
+          type: string
+          nullable: true
+        price:
+          type: number
+          nullable: true
+        priceCurrency:
+          type: string
+          nullable: true
+        priceNegotiable:
+          type: boolean
+          nullable: true
+        country:
+          type: string
+          nullable: true
+        city:
+          type: string
+          nullable: true
+        district:
+          type: string
+          nullable: true
+        street:
+          type: string
+          nullable: true
+        areaSqm:
+          type: number
+          nullable: true
+        rooms:
+          type: integer
+          nullable: true
+        bathrooms:
+          type: integer
+          nullable: true
+        floorNumber:
+          type: integer
+          nullable: true
+        furnishedStatus:
+          type: string
+          nullable: true
+        condition:
+          type: string
+          nullable: true
+        description:
+          type: string
+          nullable: true
 
     AdminPortalLoginInput:
       type: object

@@ -37,7 +37,12 @@ export const userVerificationStatusEnum = pgEnum("user_verification_status", [
   "verified",
 ]);
 
-export const userStatusEnum = pgEnum("user_status", ["active", "suspended"]);
+export const userStatusEnum = pgEnum("user_status", [
+  "active",
+  "restricted",
+  "suspended",
+  "banned",
+]);
 
 export const usersTable = pgTable("users", {
   id: uuid("id").primaryKey().defaultRandom(),

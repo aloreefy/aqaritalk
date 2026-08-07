@@ -9,7 +9,13 @@ import { useEffect } from 'react';
 import Dashboard from './pages/dashboard';
 import Login from './pages/login';
 import Users from './pages/users';
+import UserNew from './pages/user-new';
+import UserPreview from './pages/user-preview';
+import UserEdit from './pages/user-edit';
 import Properties from './pages/properties';
+import PropertyNew from './pages/property-new';
+import PropertyPreview from './pages/property-preview';
+import PropertyEdit from './pages/property-edit';
 import Settings from './pages/settings';
 import Commission from './pages/commission';
 import NotFound from './pages/not-found';
@@ -56,7 +62,13 @@ function Router() {
     <Switch>
       <Route path="/login" component={Login} />
       <ProtectedRoute path="/" component={Dashboard} />
+      <ProtectedRoute path="/users/new" component={UserNew} />
+      <ProtectedRoute path="/users/:id/edit" component={UserEdit} />
+      <ProtectedRoute path="/users/:id" component={UserPreview} />
       <ProtectedRoute path="/users" component={Users} />
+      <ProtectedRoute path="/properties/new" component={PropertyNew} />
+      <ProtectedRoute path="/properties/:id/edit" component={PropertyEdit} />
+      <ProtectedRoute path="/properties/:id" component={PropertyPreview} />
       <ProtectedRoute path="/properties" component={Properties} />
       <ProtectedRoute path="/settings" component={Settings} />
       <ProtectedRoute path="/commission" component={Commission} />
