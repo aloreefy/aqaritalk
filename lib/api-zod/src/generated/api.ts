@@ -57,7 +57,9 @@ export const VerifyOtpResponse = zod.object({
   "market": zod.enum(['JO', 'SA', 'AE', 'EG', 'KW', 'QA', 'BH', 'OM', 'MA', 'LB', 'IQ']),
   "language": zod.enum(['ar', 'en']),
   "verificationStatus": zod.enum(['unverified', 'verified']),
-  "status": zod.enum(['active', 'suspended']),
+  "status": zod.enum(['active', 'restricted', 'suspended', 'banned']),
+  "avatarUrl": zod.string().nullish(),
+  "preferredCurrency": zod.string().nullish(),
   "autoSendVoice": zod.boolean(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date()
@@ -77,7 +79,9 @@ export const GetMeResponse = zod.object({
   "market": zod.enum(['JO', 'SA', 'AE', 'EG', 'KW', 'QA', 'BH', 'OM', 'MA', 'LB', 'IQ']),
   "language": zod.enum(['ar', 'en']),
   "verificationStatus": zod.enum(['unverified', 'verified']),
-  "status": zod.enum(['active', 'suspended']),
+  "status": zod.enum(['active', 'restricted', 'suspended', 'banned']),
+  "avatarUrl": zod.string().nullish(),
+  "preferredCurrency": zod.string().nullish(),
   "autoSendVoice": zod.boolean(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date()
@@ -103,7 +107,9 @@ export const UpdateMeResponse = zod.object({
   "market": zod.enum(['JO', 'SA', 'AE', 'EG', 'KW', 'QA', 'BH', 'OM', 'MA', 'LB', 'IQ']),
   "language": zod.enum(['ar', 'en']),
   "verificationStatus": zod.enum(['unverified', 'verified']),
-  "status": zod.enum(['active', 'suspended']),
+  "status": zod.enum(['active', 'restricted', 'suspended', 'banned']),
+  "avatarUrl": zod.string().nullish(),
+  "preferredCurrency": zod.string().nullish(),
   "autoSendVoice": zod.boolean(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date()
@@ -951,7 +957,9 @@ export const AdminListUsersResponse = zod.object({
   "market": zod.enum(['JO', 'SA', 'AE', 'EG', 'KW', 'QA', 'BH', 'OM', 'MA', 'LB', 'IQ']),
   "language": zod.enum(['ar', 'en']),
   "verificationStatus": zod.enum(['unverified', 'verified']),
-  "status": zod.enum(['active', 'suspended']),
+  "status": zod.enum(['active', 'restricted', 'suspended', 'banned']),
+  "avatarUrl": zod.string().nullish(),
+  "preferredCurrency": zod.string().nullish(),
   "autoSendVoice": zod.boolean(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date()
@@ -970,7 +978,9 @@ export const AdminCreateUserBody = zod.object({
   "name": zod.string().nullish(),
   "role": zod.enum(['buyer', 'seller', 'broker', 'admin']),
   "market": zod.enum(['JO', 'SA', 'AE', 'EG', 'KW', 'QA', 'BH', 'OM', 'MA', 'LB', 'IQ']).optional(),
-  "status": zod.enum(['active', 'restricted', 'suspended', 'banned']).optional()
+  "status": zod.enum(['active', 'restricted', 'suspended', 'banned']).optional(),
+  "avatarUrl": zod.string().nullish(),
+  "preferredCurrency": zod.string().nullish()
 })
 
 
@@ -989,7 +999,9 @@ export const AdminGetUserResponse = zod.object({
   "market": zod.enum(['JO', 'SA', 'AE', 'EG', 'KW', 'QA', 'BH', 'OM', 'MA', 'LB', 'IQ']),
   "language": zod.enum(['ar', 'en']),
   "verificationStatus": zod.enum(['unverified', 'verified']),
-  "status": zod.enum(['active', 'suspended']),
+  "status": zod.enum(['active', 'restricted', 'suspended', 'banned']),
+  "avatarUrl": zod.string().nullish(),
+  "preferredCurrency": zod.string().nullish(),
   "autoSendVoice": zod.boolean(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date()
@@ -1004,11 +1016,14 @@ export const AdminUpdateUserParams = zod.object({
 })
 
 export const AdminUpdateUserBody = zod.object({
+  "phone": zod.string().optional(),
   "name": zod.string().nullish(),
   "role": zod.enum(['buyer', 'seller', 'broker', 'admin']).optional(),
   "status": zod.enum(['active', 'restricted', 'suspended', 'banned']).optional(),
   "market": zod.enum(['JO', 'SA', 'AE', 'EG', 'KW', 'QA', 'BH', 'OM', 'MA', 'LB', 'IQ']).optional(),
-  "verificationStatus": zod.enum(['unverified', 'verified']).optional()
+  "verificationStatus": zod.enum(['unverified', 'verified']).optional(),
+  "avatarUrl": zod.string().nullish(),
+  "preferredCurrency": zod.string().nullish()
 })
 
 export const AdminUpdateUserResponse = zod.object({
@@ -1019,7 +1034,9 @@ export const AdminUpdateUserResponse = zod.object({
   "market": zod.enum(['JO', 'SA', 'AE', 'EG', 'KW', 'QA', 'BH', 'OM', 'MA', 'LB', 'IQ']),
   "language": zod.enum(['ar', 'en']),
   "verificationStatus": zod.enum(['unverified', 'verified']),
-  "status": zod.enum(['active', 'suspended']),
+  "status": zod.enum(['active', 'restricted', 'suspended', 'banned']),
+  "avatarUrl": zod.string().nullish(),
+  "preferredCurrency": zod.string().nullish(),
   "autoSendVoice": zod.boolean(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date()
@@ -1349,7 +1366,9 @@ export const AdminPortalLoginResponse = zod.object({
   "market": zod.enum(['JO', 'SA', 'AE', 'EG', 'KW', 'QA', 'BH', 'OM', 'MA', 'LB', 'IQ']),
   "language": zod.enum(['ar', 'en']),
   "verificationStatus": zod.enum(['unverified', 'verified']),
-  "status": zod.enum(['active', 'suspended']),
+  "status": zod.enum(['active', 'restricted', 'suspended', 'banned']),
+  "avatarUrl": zod.string().nullish(),
+  "preferredCurrency": zod.string().nullish(),
   "autoSendVoice": zod.boolean(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date()

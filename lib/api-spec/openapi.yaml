@@ -1017,7 +1017,11 @@ components:
           enum: [unverified, verified]
         status:
           type: string
-          enum: [active, suspended]
+          enum: [active, restricted, suspended, banned]
+        avatarUrl:
+          type: ["string", "null"]
+        preferredCurrency:
+          type: ["string", "null"]
         autoSendVoice:
           type: boolean
         createdAt:
@@ -1526,10 +1530,18 @@ components:
         status:
           type: string
           enum: [active, restricted, suspended, banned]
+        avatarUrl:
+          type: string
+          nullable: true
+        preferredCurrency:
+          type: string
+          nullable: true
 
     AdminUserUpdate:
       type: object
       properties:
+        phone:
+          type: string
         name:
           type: string
           nullable: true
@@ -1545,6 +1557,12 @@ components:
         verificationStatus:
           type: string
           enum: [unverified, verified]
+        avatarUrl:
+          type: string
+          nullable: true
+        preferredCurrency:
+          type: string
+          nullable: true
 
     AdminCreatePropertyBody:
       type: object

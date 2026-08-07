@@ -84,7 +84,9 @@ export type UserStatus = typeof UserStatus[keyof typeof UserStatus];
 
 export const UserStatus = {
   active: 'active',
+  restricted: 'restricted',
   suspended: 'suspended',
+  banned: 'banned',
 } as const;
 
 export interface User {
@@ -97,6 +99,10 @@ export interface User {
   language: UserLanguage;
   verificationStatus: UserVerificationStatus;
   status: UserStatus;
+  /** @nullable */
+  avatarUrl?: string | null;
+  /** @nullable */
+  preferredCurrency?: string | null;
   autoSendVoice: boolean;
   createdAt: string;
   updatedAt: string;
@@ -560,6 +566,8 @@ export interface AdminCreateUserBody {
   role: AdminCreateUserBodyRole;
   market?: AdminCreateUserBodyMarket;
   status?: AdminCreateUserBodyStatus;
+  avatarUrl?: string | null;
+  preferredCurrency?: string | null;
 }
 
 export type AdminUserUpdateRole = typeof AdminUserUpdateRole[keyof typeof AdminUserUpdateRole];
@@ -608,11 +616,14 @@ export const AdminUserUpdateVerificationStatus = {
 } as const;
 
 export interface AdminUserUpdate {
+  phone?: string;
   name?: string | null;
   role?: AdminUserUpdateRole;
   status?: AdminUserUpdateStatus;
   market?: AdminUserUpdateMarket;
   verificationStatus?: AdminUserUpdateVerificationStatus;
+  avatarUrl?: string | null;
+  preferredCurrency?: string | null;
 }
 
 export interface AdminCreatePropertyBody {

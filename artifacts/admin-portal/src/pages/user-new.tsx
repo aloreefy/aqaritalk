@@ -12,12 +12,30 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 
 const MARKETS = ["JO", "SA", "AE", "EG", "KW", "QA", "BH", "OM", "MA", "LB", "IQ"];
 
+const CURRENCIES = [
+  { value: "JOD", label: "JOD — Jordanian Dinar" },
+  { value: "SAR", label: "SAR — Saudi Riyal" },
+  { value: "AED", label: "AED — UAE Dirham" },
+  { value: "EGP", label: "EGP — Egyptian Pound" },
+  { value: "KWD", label: "KWD — Kuwaiti Dinar" },
+  { value: "QAR", label: "QAR — Qatari Riyal" },
+  { value: "BHD", label: "BHD — Bahraini Dinar" },
+  { value: "OMR", label: "OMR — Omani Rial" },
+  { value: "MAD", label: "MAD — Moroccan Dirham" },
+  { value: "LBP", label: "LBP — Lebanese Pound" },
+  { value: "IQD", label: "IQD — Iraqi Dinar" },
+  { value: "USD", label: "USD — US Dollar" },
+  { value: "EUR", label: "EUR — Euro" },
+];
+
 const schema = z.object({
   phone: z.string().min(7, "Phone required").max(20),
   name: z.string().optional(),
   role: z.enum(["buyer", "seller", "broker", "admin"]),
   market: z.enum(["JO", "SA", "AE", "EG", "KW", "QA", "BH", "OM", "MA", "LB", "IQ"]),
   status: z.enum(["active", "restricted", "suspended", "banned"]),
+  avatarUrl: z.string().url("Must be a valid URL").optional().or(z.literal("")),
+  preferredCurrency: z.string().optional(),
 });
 type FormValues = z.infer<typeof schema>;
 
@@ -29,17 +47,24 @@ export default function UserNew() {
 
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
-    defaultValues: { phone: "", name: "", role: "buyer", market: "JO", status: "active" },
+    defaultValues: { phone: "", name: "", role: "buyer", market: "JO", status: "active", avatarUrl: "", preferredCurrency: "" },
   });
 
   const onSubmit = (values: FormValues) => {
     createMutation.mutate(
-      { data: { ...values, name: values.name || undefined } },
+      {
+        data: {
+          ...values,
+          name: values.name || undefined,
+          avatarUrl: values.avatarUrl || null,
+          preferredCurrency: values.preferredCurrency || null,
+        } as any,
+      },
       {
         onSuccess: (user) => {
-          toast({ title: "User created", description: `${user.name ?? user.phone} added successfully.` });
+          toast({ title: "User created", description: `${(user as any).name ?? (user as any).phone} added successfully.` });
           queryClient.invalidateQueries({ queryKey: getAdminListUsersQueryKey() });
-          setLocation(`/users/${user.id}`);
+          setLocation(`/users/${(user as any).id}`);
         },
         onError: (e: any) => toast({ title: "Error", description: e.message ?? "Failed to create user", variant: "destructive" }),
       },
@@ -63,6 +88,8 @@ export default function UserNew() {
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+
+            {/* Phone */}
             <FormField control={form.control} name="phone" render={({ field }) => (
               <FormItem>
                 <FormLabel>Phone Number *</FormLabel>
@@ -71,6 +98,7 @@ export default function UserNew() {
               </FormItem>
             )} />
 
+            {/* Name */}
             <FormField control={form.control} name="name" render={({ field }) => (
               <FormItem>
                 <FormLabel>Full Name</FormLabel>
@@ -79,6 +107,16 @@ export default function UserNew() {
               </FormItem>
             )} />
 
+            {/* Avatar URL */}
+            <FormField control={form.control} name="avatarUrl" render={({ field }) => (
+              <FormItem>
+                <FormLabel>Avatar URL</FormLabel>
+                <FormControl><Input {...field} placeholder="https://example.com/photo.jpg" dir="ltr" /></FormControl>
+                <FormMessage />
+              </FormItem>
+            )} />
+
+            {/* Role + Status */}
             <div className="grid grid-cols-2 gap-4">
               <FormField control={form.control} name="role" render={({ field }) => (
                 <FormItem>
@@ -113,18 +151,34 @@ export default function UserNew() {
               )} />
             </div>
 
-            <FormField control={form.control} name="market" render={({ field }) => (
-              <FormItem>
-                <FormLabel>Market</FormLabel>
-                <Select onValueChange={field.onChange} value={field.value}>
-                  <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
-                  <SelectContent>
-                    {MARKETS.map((m) => <SelectItem key={m} value={m}>{m}</SelectItem>)}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )} />
+            {/* Market + Currency */}
+            <div className="grid grid-cols-2 gap-4">
+              <FormField control={form.control} name="market" render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Market</FormLabel>
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
+                    <SelectContent>
+                      {MARKETS.map((m) => <SelectItem key={m} value={m}>{m}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )} />
+
+              <FormField control={form.control} name="preferredCurrency" render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Preferred Currency</FormLabel>
+                  <Select onValueChange={field.onChange} value={field.value ?? ""}>
+                    <FormControl><SelectTrigger><SelectValue placeholder="Select currency" /></SelectTrigger></FormControl>
+                    <SelectContent>
+                      {CURRENCIES.map((c) => <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )} />
+            </div>
 
             <div className="flex items-center gap-3 pt-2">
               <button type="submit" disabled={createMutation.isPending}
