@@ -122,7 +122,6 @@ export default function UserPreview() {
 
       {/* Details */}
       <div className="bg-card border rounded-xl p-6 grid grid-cols-2 md:grid-cols-3 gap-6">
-        <Field label="User ID" value={user.id} />
         {user.role === "admin" && <Field label="Username" value={(user as any).username ?? "—"} />}
         <Field label="Market" value={user.market} />
         <Field label="Language" value={user.language?.toUpperCase()} />

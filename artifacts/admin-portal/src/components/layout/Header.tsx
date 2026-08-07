@@ -73,8 +73,8 @@ export function Header() {
             <span className="text-[10px] text-muted-foreground leading-none mt-1 font-mono">{displaySub}</span>
           </div>
           <div className="w-8 h-8 rounded-md bg-primary/10 border border-primary/20 flex items-center justify-center text-primary overflow-hidden">
-            {me?.photoUrl ? (
-              <img src={me.photoUrl} alt="" className="w-full h-full object-cover" />
+            {me?.avatarUrl ? (
+              <img src={me.avatarUrl} alt="" className="w-full h-full object-cover" />
             ) : (
               <UserIcon className="w-4 h-4" />
             )}
