@@ -84,8 +84,23 @@ export default function UserPreview() {
 
       {/* Profile card */}
       <div className="bg-card border rounded-xl p-6 flex items-center gap-5">
-        <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-2xl shrink-0">
-          {(user.name ?? user.phone).charAt(0).toUpperCase()}
+        <div className="w-16 h-16 rounded-full shrink-0 overflow-hidden bg-primary/10 flex items-center justify-center">
+          {user.avatarUrl ? (
+            <img
+              src={user.avatarUrl}
+              alt={user.name ?? user.phone}
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                const el = e.currentTarget;
+                el.style.display = "none";
+                el.parentElement!.innerHTML = `<span class="text-primary font-bold text-2xl">${(user.name ?? user.phone).charAt(0).toUpperCase()}</span>`;
+              }}
+            />
+          ) : (
+            <span className="text-primary font-bold text-2xl">
+              {(user.name ?? user.phone).charAt(0).toUpperCase()}
+            </span>
+          )}
         </div>
         <div className="flex-1 min-w-0">
           <h1 className="text-xl font-bold">{user.name ?? "No name"}</h1>
