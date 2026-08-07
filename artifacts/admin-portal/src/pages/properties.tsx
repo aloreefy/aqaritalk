@@ -134,7 +134,7 @@ export default function Properties() {
           <Search className="w-4 h-4 absolute start-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
           <input type="text" placeholder="Search name or city…" value={search}
             onChange={(e) => handleFilter(setSearch)(e.target.value)}
-            className="h-9 ps-9 pe-3 w-56 bg-card border border-input rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-primary transition-all" />
+            className="h-9 ps-9 pe-3 w-80 bg-card border border-input rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-primary transition-all" />
         </div>
         <select value={statusFilter} onChange={(e) => handleFilter(setStatusFilter)(e.target.value)}
           className="h-9 px-3 bg-card border border-input rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-primary">
