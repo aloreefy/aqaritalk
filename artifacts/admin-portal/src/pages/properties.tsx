@@ -240,7 +240,7 @@ export default function Properties() {
                   >
                     <td className="px-4 py-3">
                       <p className="font-medium truncate max-w-[160px]">{prop.listingName ?? "Untitled"}</p>
-                      <p className="text-xs text-muted-foreground font-mono">{prop.id.slice(0, 8)}…</p>
+                      <p className="text-xs text-muted-foreground">{[prop.city, prop.district].filter(Boolean).join(", ") || prop.propertyType?.replace(/_/g, " ") || "—"}</p>
                     </td>
                     <td className="px-4 py-3 text-xs capitalize">{prop.propertyType?.replace(/_/g, " ")}</td>
                     <td className="px-4 py-3 text-xs capitalize">{prop.transactionMode}</td>

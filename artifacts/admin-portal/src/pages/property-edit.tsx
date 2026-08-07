@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { useLocation, useParams } from "wouter";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -8,6 +7,7 @@ import {
   useAdminUpdateProperty,
   getAdminGetPropertyQueryKey,
   getAdminListPropertiesQueryKey,
+  AdminGetProperty200,
 } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft, Save } from "lucide-react";
@@ -40,52 +40,43 @@ const schema = z.object({
   rooms: z.coerce.number().int().positive().optional().or(z.literal("")),
   bathrooms: z.coerce.number().int().positive().optional().or(z.literal("")),
   floorNumber: z.coerce.number().int().optional().or(z.literal("")),
-  furnishedStatus: z.enum(["furnished", "semi_furnished", "unfurnished", ""]).optional(),
-  condition: z.enum(["new", "excellent", "good", "needs_renovation", ""]).optional(),
+  furnishedStatus: z.enum(["furnished", "semi_furnished", "unfurnished"]).optional(),
+  condition: z.enum(["new", "excellent", "good", "needs_renovation"]).optional(),
   description: z.string().optional(),
 });
 type FormValues = z.infer<typeof schema>;
 
-export default function PropertyEdit() {
-  const { id } = useParams<{ id: string }>();
+// ─── Inner form — only mounts after `prop` is guaranteed non-null ──────────────
+// defaultValues are populated directly from prop so Selects mount with the
+// correct value and never need a programmatic reset().
+function PropertyEditForm({ prop, id }: { prop: AdminGetProperty200; id: string }) {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-
-  const { data: prop, isLoading } = useAdminGetProperty(id!, {
-    query: { queryKey: getAdminGetPropertyQueryKey(id!) },
-  });
-
   const updateMutation = useAdminUpdateProperty();
 
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
-    defaultValues: { listingName: "", propertyType: "apartment", transactionMode: "sale", status: "active", priceCurrency: "JOD" },
+    defaultValues: {
+      listingName: prop.listingName ?? "",
+      propertyType: prop.propertyType ?? "apartment",
+      transactionMode: (prop.transactionMode as any) ?? "sale",
+      status: (prop.status as any) ?? "active",
+      price: prop.price ? Number(prop.price) : "",
+      priceCurrency: prop.priceCurrency ?? "JOD",
+      country: prop.country ?? "",
+      city: prop.city ?? "",
+      district: prop.district ?? "",
+      street: (prop as any).street ?? "",
+      areaSqm: prop.areaSqm ? Number(prop.areaSqm) : "",
+      rooms: prop.rooms ?? "",
+      bathrooms: prop.bathrooms ?? "",
+      floorNumber: prop.floorNumber ?? "",
+      furnishedStatus: (prop.furnishedStatus as any) || undefined,
+      condition: (prop.condition as any) || undefined,
+      description: prop.description ?? "",
+    },
   });
-
-  useEffect(() => {
-    if (prop) {
-      form.reset({
-        listingName: prop.listingName ?? "",
-        propertyType: prop.propertyType ?? "apartment",
-        transactionMode: (prop.transactionMode as any) ?? "sale",
-        status: (prop.status as any) ?? "active",
-        price: prop.price ? Number(prop.price) : "",
-        priceCurrency: prop.priceCurrency ?? "JOD",
-        country: prop.country ?? "",
-        city: prop.city ?? "",
-        district: prop.district ?? "",
-        street: (prop as any).street ?? "",
-        areaSqm: prop.areaSqm ? Number(prop.areaSqm) : "",
-        rooms: prop.rooms ?? "",
-        bathrooms: prop.bathrooms ?? "",
-        floorNumber: prop.floorNumber ?? "",
-        furnishedStatus: (prop.furnishedStatus as any) ?? "",
-        condition: (prop.condition as any) ?? "",
-        description: prop.description ?? "",
-      });
-    }
-  }, [prop, form]);
 
   const onSubmit = (values: FormValues) => {
     const payload: any = {
@@ -109,11 +100,11 @@ export default function PropertyEdit() {
     };
 
     updateMutation.mutate(
-      { id: id!, data: payload },
+      { id, data: payload },
       {
         onSuccess: (updated) => {
           toast({ title: "Listing updated", description: `"${updated.listingName ?? updated.propertyType}" saved.` });
-          queryClient.invalidateQueries({ queryKey: getAdminGetPropertyQueryKey(id!) });
+          queryClient.invalidateQueries({ queryKey: getAdminGetPropertyQueryKey(id) });
           queryClient.invalidateQueries({ queryKey: getAdminListPropertiesQueryKey() });
           setLocation(`/properties/${id}`);
         },
@@ -121,9 +112,6 @@ export default function PropertyEdit() {
       },
     );
   };
-
-  if (isLoading) return <div className="animate-pulse space-y-4"><div className="h-10 bg-muted rounded" /><div className="h-[600px] bg-card border rounded-xl" /></div>;
-  if (!prop) return <div className="text-center py-20 text-muted-foreground">Property not found.</div>;
 
   return (
     <div className="space-y-6 max-w-3xl">
@@ -301,4 +289,22 @@ export default function PropertyEdit() {
       </div>
     </div>
   );
+}
+
+// ─── Outer shell — handles loading / not-found, then mounts the form ──────────
+export default function PropertyEdit() {
+  const { id } = useParams<{ id: string }>();
+  const { data: prop, isLoading } = useAdminGetProperty(id!, {
+    query: { queryKey: getAdminGetPropertyQueryKey(id!) },
+  });
+
+  if (isLoading) return (
+    <div className="animate-pulse space-y-4 max-w-3xl">
+      <div className="h-10 bg-muted rounded" />
+      <div className="h-[600px] bg-card border rounded-xl" />
+    </div>
+  );
+  if (!prop) return <div className="text-center py-20 text-muted-foreground">Property not found.</div>;
+
+  return <PropertyEditForm prop={prop} id={id!} />;
 }

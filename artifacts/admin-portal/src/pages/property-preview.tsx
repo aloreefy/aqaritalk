@@ -120,7 +120,6 @@ export default function PropertyPreview() {
 
       {/* Details */}
       <div className="bg-card border rounded-xl p-6 grid grid-cols-2 md:grid-cols-3 gap-6">
-        <Field label="Property ID" value={prop.id} />
         <Field label="Type" value={prop.propertyType?.replace(/_/g, " ")} />
         <Field label="Transaction" value={prop.transactionMode} />
         <Field label="Direction" value={prop.listingDirection} />
