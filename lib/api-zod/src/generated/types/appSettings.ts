@@ -5,8 +5,16 @@
  * AqariTalk API — AI-guided real estate workflow platform
  * OpenAPI spec version: 0.1.0
  */
+import type { AppSettingsMapProvider } from './appSettingsMapProvider';
 import type { AppSettingsVoiceCtaStyle } from './appSettingsVoiceCtaStyle';
 
 export interface AppSettings {
   voiceCtaStyle: AppSettingsVoiceCtaStyle;
+  mapProvider: AppSettingsMapProvider;
+  /** The API key for the configured map provider (Mapbox token or Google Maps key). Null for OSM. */
+  mapApiKey?: string | null;
+  featureMapView: boolean;
+  featureVoiceInput: boolean;
+  featureContactRelease: boolean;
+  featureSellerWizard: boolean;
 }

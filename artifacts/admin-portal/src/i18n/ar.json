@@ -1,6 +1,6 @@
 {
   "sidebar": {
-    "brand": "مركز تحكم عقاري توك",
+    "brand": "AqariTalk Control",
     "platform": "المنصة",
     "nav": {
       "overview": "نظرة عامة",
@@ -22,14 +22,14 @@
     "fallback": "لوحة التحكم"
   },
   "login": {
-    "title": "مركز عقاري توك",
-    "subtitle": "وصول مشغّل مقيّد",
-    "passkeyLabel": "كلمة المرور",
-    "submitButton": "تسجيل الدخول",
-    "securityNotice": "هذا النظام مقيّد للمشغّلين المعتمدين فقط. يتم تسجيل جميع الإجراءات ومراجعتها.",
+    "title": "مركز AqariTalk",
+    "subtitle": "وصول محظور للمشغّلين المصرّح لهم",
+    "passkeyLabel": "كلمة المرور مطلوبة",
+    "submitButton": "المصادقة والبدء",
+    "securityNotice": "هذا النظام مقيّد للمدراء المصرّح لهم فقط. جميع الإجراءات مُسجَّلة ومُدقَّقة.",
     "toast": {
-      "errorTitle": "تم رفض الوصول",
-      "errorFallback": "بيانات تسجيل الدخول غير صحيحة."
+      "errorTitle": "رُفض الوصول",
+      "errorFallback": "بيانات المشغّل غير صحيحة."
     }
   },
   "dashboard": {
@@ -40,28 +40,28 @@
       "totalUsers": "إجمالي المستخدمين المسجّلين",
       "totalUsersDesc": "عبر جميع الأسواق",
       "activeProperties": "العقارات النشطة",
-      "activePropertiesDesc": "مباشر على المنصة",
+      "activePropertiesDesc": "مباشرة على المنصة",
       "pendingReviews": "المراجعات المعلّقة",
-      "pendingReviewsDesc": "يتطلب إجراءً",
+      "pendingReviewsDesc": "تتطلب إجراء",
       "contactReleases": "إصدارات التواصل",
       "contactReleasesDesc": "هذا الشهر"
     },
     "distribution": {
       "title": "توزيع المستخدمين",
-      "subtitle": "تصنيف حسب الدور",
+      "subtitle": "تصنيف حسب الدور المعيّن",
       "buyers": "المشترون",
       "sellers": "البائعون",
       "brokers": "الوسطاء"
     },
     "analytics": {
-      "title": "تحليلات تفصيلية",
-      "offline": "استكشاف المقاييس الكاملة والرسوم البيانية التاريخية غير متاح حالياً للصيانة. المؤشرات الأساسية تعمل بشكل طبيعي."
+      "title": "تحليلات مفصّلة",
+      "offline": "استكشاف المقاييس الكامل والرسوم البيانية التاريخية متوقف مؤقتاً للصيانة. المؤشرات الأساسية تعمل بشكل طبيعي."
     }
   },
   "users": {
-    "title": "دليل المشغّلين",
-    "subtitle": "إدارة تصاريح الموظفين ومتجهات الوصول.",
-    "searchPlaceholder": "بحث بالاسم أو رقم الهاتف...",
+    "title": "دليل المستخدمين",
+    "subtitle": "إدارة صلاحيات المستخدمين ومتجهات الوصول.",
+    "searchPlaceholder": "ابحث بالمعرّف أو رقم الهاتف...",
     "filters": {
       "allClearances": "جميع الأدوار",
       "buyer": "مشترٍ",
@@ -73,22 +73,13 @@
       "suspended": "موقوف"
     },
     "table": {
-      "identity": "الهوية",
-      "commLink": "رقم الهاتف",
+      "identity": "المعرّف",
+      "commLink": "الهاتف",
       "clearance": "الدور",
       "state": "الحالة",
       "sector": "السوق",
+      "joined": "تاريخ الانضمام",
       "actions": "الإجراءات"
-    },
-    "empty": "لم يتم العثور على موظفين مطابقين في الدليل.",
-    "unknownIdentity": "هوية غير معروفة",
-    "dropdown": {
-      "label": "تحكم بالمشغّل",
-      "stateOverride": "تغيير الحالة",
-      "reinstate": "إعادة تفعيل المشغّل",
-      "suspend": "تعليق المشغّل",
-      "clearanceOverride": "تغيير الدور",
-      "setAs": "تعيين كـ {{role}}"
     },
     "roles": {
       "buyer": "مشترٍ",
@@ -96,48 +87,55 @@
       "broker": "وسيط",
       "admin": "مدير"
     },
-    "toast": {
-      "statusTitle": "تم تسجيل الإجراء",
-      "statusDesc": "تم تحديث حالة المستخدم إلى {{status}}.",
-      "roleTitle": "تم تحديث الدور",
-      "roleDesc": "تم تعديل دور المستخدم إلى {{role}}."
+    "status": {
+      "active": "نشط",
+      "suspended": "موقوف"
+    },
+    "actions": {
+      "suspend": "إيقاف",
+      "reinstate": "إعادة تفعيل",
+      "makeAdmin": "ترقية إلى مدير",
+      "makeBroker": "تعيين وسيطاً"
+    },
+    "empty": "لا توجد سجلات مستخدمين تطابق البحث.",
+    "pagination": {
+      "showing": "عرض {{count}} من {{total}} مستخدم",
+      "previous": "السابق",
+      "next": "التالي"
     }
   },
   "properties": {
-    "title": "سجل الأصول",
-    "subtitle": "مراقبة قوائم العقارات واعتدالها.",
+    "title": "سجل العقارات",
+    "subtitle": "إدارة وإشراف على جميع عقارات المنصة.",
+    "searchPlaceholder": "ابحث بمعرّف العقار أو الموقع...",
     "filters": {
-      "allStates": "جميع الحالات",
-      "pendingReview": "قيد المراجعة",
+      "allStatuses": "جميع الحالات",
       "active": "نشط",
-      "draft": "مسودة",
-      "sold": "مباع",
-      "rented": "مؤجَّر",
+      "pendingReview": "قيد المراجعة",
       "rejected": "مرفوض",
       "deleted": "محذوف"
     },
     "table": {
-      "assetId": "معرّف الأصل",
-      "classification": "التصنيف",
-      "valuation": "القيمة",
+      "listing": "الإعلان",
+      "type": "النوع",
       "location": "الموقع",
-      "state": "الحالة",
+      "price": "السعر",
+      "status": "الحالة",
+      "submitted": "تاريخ الإرسال",
       "actions": "الإجراءات"
     },
-    "empty": "لم يتم العثور على أصول مطابقة للمعايير الحالية.",
-    "by": "بواسطة:",
-    "tbd": "غير محدد",
-    "unspecified": "غير محدد",
-    "dropdown": {
-      "label": "إجراءات الأصل",
-      "authorize": "اعتماد ونشر",
-      "reject": "رفض الأصل",
-      "markDeleted": "وضع علامة محذوف"
+    "status": {
+      "active": "نشط",
+      "pending_review": "قيد المراجعة",
+      "rejected": "مرفوض",
+      "deleted": "محذوف"
     },
-    "toast": {
-      "title": "تم تحديث سجل الأصل",
-      "desc": "تم تغيير حالة الأصل إلى {{status}}."
+    "actions": {
+      "approve": "موافقة",
+      "reject": "رفض",
+      "delete": "حذف"
     },
+    "empty": "لا توجد عقارات تطابق الفلتر الحالي.",
     "pagination": {
       "showing": "عرض {{count}} من {{total}} أصل",
       "previous": "السابق",
@@ -179,11 +177,11 @@
     },
     "engine": {
       "model": "نموذج الاستنتاج",
-      "modelDesc": "معرّف المزوّد (مثلاً: gpt-4o, claude-3-opus).",
+      "modelDesc": "معرّف نموذج المزوّد (مثلاً: gpt-4o، gemini-2.5-flash). التغييرات تسري خلال 5 دقائق.",
       "temperature": "درجة الإبداع",
-      "temperatureDesc": "الإبداع مقابل الدقة (0.0 إلى 1.0). القيم الأدنى أكثر حتمية.",
+      "temperatureDesc": "الإبداع مقابل الدقة (0.0 = حتمي، 1.0 = أكثر إبداعاً).",
       "maxTurns": "الحد الأقصى لأدوار المحادثة",
-      "maxTurnsDesc": "حد صارم لمنع الحلقات اللانهائية.",
+      "maxTurnsDesc": "حد صارم لعدد التبادلات في الجلسة الواحدة.",
       "guardrail": "صرامة الحراسة",
       "guardrailDesc": "يتحكم في مدى حدة الكشف عن المواضيع الخارجة عن النطاق.",
       "guardrailOptions": {
@@ -196,7 +194,23 @@
       "otpExpiry": "انتهاء صلاحية OTP (دقيقة)",
       "maxAttempts": "الحد الأقصى لمحاولات OTP",
       "rateLimitCap": "حد معدل الطلبات",
-      "rateLimitWindow": "نافذة معدل الطلبات (دقيقة)"
+      "rateLimitWindow": "نافذة معدل الطلبات (دقيقة)",
+      "otpProvider": "مزوّد رسائل OTP",
+      "otpProviderDesc": "بوابة الرسائل القصيرة المستخدمة لإرسال رموز التحقق للمستخدمين.",
+      "otpProviders": {
+        "console": "Console — تطوير / بدون SMS (تُسجَّل الرموز في السيرفر)",
+        "twilio": "Twilio",
+        "unifonic": "Unifonic",
+        "msegat": "Msegat"
+      },
+      "credentialsTitle": "بيانات اعتماد المزوّد",
+      "twilioAccountSid": "Account SID",
+      "twilioAuthToken": "Auth Token",
+      "twilioFromNumber": "رقم الإرسال (E.164)",
+      "unifonicAppSid": "App SID",
+      "unifonicSender": "معرّف المُرسِل",
+      "msegatApiKey": "مفتاح API",
+      "msegatSender": "اسم المستخدم / المُرسِل"
     },
     "features": {
       "voiceInput": "إدخال الصوت",
@@ -221,11 +235,24 @@
       "localeEn": "الإنجليزية (أمريكا)",
       "localeAr": "العربية (الفصحى)",
       "baseCurrency": "العملة الأساسية",
+      "currencySearch": "ابحث عن عملة...",
+      "currencyNotFound": "لم يُعثر على عملة.",
       "maxImages": "الحد الأقصى للصور لكل عقار",
       "listingTtl": "مدة العقار (أيام)",
       "listingTtlDesc": "الأيام حتى الأرشفة التلقائية.",
       "autoApprove": "الموافقة التلقائية على العقارات",
-      "autoApproveDesc": "تجاوز مراجعة المدير اليدوية للعقارات الجديدة."
+      "autoApproveDesc": "تجاوز مراجعة المدير اليدوية للعقارات الجديدة.",
+      "mapProvider": "مزوّد الخريطة",
+      "mapProviderDesc": "محرك الخريطة المعروض في صفحة قوائم العقارات العامة.",
+      "mapProviders": {
+        "osm": "OpenStreetMap (مجاني — لا يتطلب مفتاح API)",
+        "mapbox": "Mapbox",
+        "google": "Google Maps"
+      },
+      "mapboxApiKey": "رمز وصول Mapbox",
+      "googleMapsApiKey": "مفتاح Google Maps API",
+      "mapKeyPlaceholder": "الصق مفتاح API هنا",
+      "mapKeyNote": "يُخزَّن على السيرفر. يُحدَّث عند الحفظ."
     },
     "system": {
       "maintenanceTitle": "وضع صيانة المنصة",

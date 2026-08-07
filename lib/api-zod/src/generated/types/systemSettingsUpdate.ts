@@ -8,6 +8,8 @@
 import type { SystemSettingsUpdateAiGuardrailLevel } from './systemSettingsUpdateAiGuardrailLevel';
 import type { SystemSettingsUpdateDefaultCurrency } from './systemSettingsUpdateDefaultCurrency';
 import type { SystemSettingsUpdateDefaultLanguage } from './systemSettingsUpdateDefaultLanguage';
+import type { SystemSettingsUpdateMapProvider } from './systemSettingsUpdateMapProvider';
+import type { SystemSettingsUpdateOtpProvider } from './systemSettingsUpdateOtpProvider';
 import type { SystemSettingsUpdateVoiceCtaStyle } from './systemSettingsUpdateVoiceCtaStyle';
 
 export interface SystemSettingsUpdate {
@@ -62,4 +64,15 @@ export interface SystemSettingsUpdate {
   featureMapView?: boolean;
   featureContactRelease?: boolean;
   featureSellerWizard?: boolean;
+  mapProvider?: SystemSettingsUpdateMapProvider;
+  mapboxApiKey?: string | null;
+  googleMapsApiKey?: string | null;
+  otpProvider?: SystemSettingsUpdateOtpProvider;
+  twilioAccountSid?: string | null;
+  twilioAuthToken?: string | null;
+  twilioFromNumber?: string | null;
+  unifonicAppSid?: string | null;
+  unifonicSender?: string | null;
+  msegatApiKey?: string | null;
+  msegatSender?: string | null;
 }

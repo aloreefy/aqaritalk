@@ -3,9 +3,14 @@ import multer, { type FileFilterCallback } from "multer";
 import sharp from "sharp";
 import path from "path";
 import fs from "fs/promises";
-import { db, propertyImagesTable, propertiesTable } from "@workspace/db";
+import { db, propertyImagesTable, propertiesTable, systemSettingsTable } from "@workspace/db";
 import { eq, and, isNull, count } from "drizzle-orm";
 import { authenticate } from "../middleware/authenticate";
+
+async function getMaxImagesPerProperty(): Promise<number> {
+  const rows = await db.select({ maxImagesPerProperty: systemSettingsTable.maxImagesPerProperty }).from(systemSettingsTable).limit(1);
+  return rows[0]?.maxImagesPerProperty ?? 20;
+}
 
 type MulterRequest = Request & { file?: Express.Multer.File };
 
@@ -62,8 +67,9 @@ router.post(
       .from(propertyImagesTable)
       .where(eq(propertyImagesTable.propertyId, propertyId));
 
-    if (Number(imageCount) >= 20) {
-      res.status(400).json({ error: "Maximum 20 images per property" });
+    const maxImages = await getMaxImagesPerProperty();
+    if (Number(imageCount) >= maxImages) {
+      res.status(400).json({ error: `Maximum ${maxImages} images per property` });
       return;
     }
 

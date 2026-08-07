@@ -585,8 +585,24 @@ export const AppSettingsVoiceCtaStyle = {
   sonar: 'sonar',
 } as const;
 
+export type AppSettingsMapProvider = typeof AppSettingsMapProvider[keyof typeof AppSettingsMapProvider];
+
+
+export const AppSettingsMapProvider = {
+  osm: 'osm',
+  mapbox: 'mapbox',
+  google: 'google',
+} as const;
+
 export interface AppSettings {
   voiceCtaStyle: AppSettingsVoiceCtaStyle;
+  mapProvider: AppSettingsMapProvider;
+  /** The API key for the configured map provider (Mapbox token or Google Maps key). Null for OSM. */
+  mapApiKey?: string | null;
+  featureMapView: boolean;
+  featureVoiceInput: boolean;
+  featureContactRelease: boolean;
+  featureSellerWizard: boolean;
 }
 
 export type SystemSettingsAiGuardrailLevel = typeof SystemSettingsAiGuardrailLevel[keyof typeof SystemSettingsAiGuardrailLevel];
@@ -633,6 +649,25 @@ export const SystemSettingsVoiceCtaStyle = {
   sonar: 'sonar',
 } as const;
 
+export type SystemSettingsMapProvider = typeof SystemSettingsMapProvider[keyof typeof SystemSettingsMapProvider];
+
+
+export const SystemSettingsMapProvider = {
+  osm: 'osm',
+  mapbox: 'mapbox',
+  google: 'google',
+} as const;
+
+export type SystemSettingsOtpProvider = typeof SystemSettingsOtpProvider[keyof typeof SystemSettingsOtpProvider];
+
+
+export const SystemSettingsOtpProvider = {
+  console: 'console',
+  twilio: 'twilio',
+  unifonic: 'unifonic',
+  msegat: 'msegat',
+} as const;
+
 export interface SystemSettings {
   id: string;
   otpExpiryMinutes: number;
@@ -654,6 +689,17 @@ export interface SystemSettings {
   featureContactRelease: boolean;
   featureSellerWizard: boolean;
   voiceCtaStyle: SystemSettingsVoiceCtaStyle;
+  mapProvider: SystemSettingsMapProvider;
+  mapboxApiKey?: string | null;
+  googleMapsApiKey?: string | null;
+  otpProvider: SystemSettingsOtpProvider;
+  twilioAccountSid?: string | null;
+  twilioAuthToken?: string | null;
+  twilioFromNumber?: string | null;
+  unifonicAppSid?: string | null;
+  unifonicSender?: string | null;
+  msegatApiKey?: string | null;
+  msegatSender?: string | null;
   updatedAt: string;
 }
 
@@ -699,6 +745,25 @@ export const SystemSettingsUpdateDefaultCurrency = {
   MAD: 'MAD',
   LBP: 'LBP',
   IQD: 'IQD',
+} as const;
+
+export type SystemSettingsUpdateMapProvider = typeof SystemSettingsUpdateMapProvider[keyof typeof SystemSettingsUpdateMapProvider];
+
+
+export const SystemSettingsUpdateMapProvider = {
+  osm: 'osm',
+  mapbox: 'mapbox',
+  google: 'google',
+} as const;
+
+export type SystemSettingsUpdateOtpProvider = typeof SystemSettingsUpdateOtpProvider[keyof typeof SystemSettingsUpdateOtpProvider];
+
+
+export const SystemSettingsUpdateOtpProvider = {
+  console: 'console',
+  twilio: 'twilio',
+  unifonic: 'unifonic',
+  msegat: 'msegat',
 } as const;
 
 export interface SystemSettingsUpdate {
@@ -753,6 +818,17 @@ export interface SystemSettingsUpdate {
   featureMapView?: boolean;
   featureContactRelease?: boolean;
   featureSellerWizard?: boolean;
+  mapProvider?: SystemSettingsUpdateMapProvider;
+  mapboxApiKey?: string | null;
+  googleMapsApiKey?: string | null;
+  otpProvider?: SystemSettingsUpdateOtpProvider;
+  twilioAccountSid?: string | null;
+  twilioAuthToken?: string | null;
+  twilioFromNumber?: string | null;
+  unifonicAppSid?: string | null;
+  unifonicSender?: string | null;
+  msegatApiKey?: string | null;
+  msegatSender?: string | null;
 }
 
 export type ListPropertiesParams = {

@@ -316,7 +316,12 @@ export default function HomePage() {
         {/* Content */}
         {viewMode === "map" ? (
           <div className="mx-4 mt-3 mb-6 relative h-[60vh] rounded-3xl overflow-hidden border border-border">
-            <MapView properties={properties} onBoundsChange={handleBoundsChange} />
+            <MapView
+               properties={properties}
+               onBoundsChange={handleBoundsChange}
+               mapProvider={appSettings?.mapProvider ?? "osm"}
+               mapApiKey={appSettings?.mapApiKey ?? null}
+             />
             <div className="absolute top-3 left-1/2 -translate-x-1/2 bg-card/90 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-md text-xs font-medium text-foreground">
               {isLoading
                 ? "جاري البحث..."

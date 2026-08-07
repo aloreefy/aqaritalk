@@ -78,66 +78,64 @@
       "clearance": "Clearance",
       "state": "State",
       "sector": "Sector",
+      "joined": "Joined",
       "actions": "Actions"
-    },
-    "empty": "No matching personnel found in directory.",
-    "unknownIdentity": "Unknown Identity",
-    "dropdown": {
-      "label": "Operator Controls",
-      "stateOverride": "State Override",
-      "reinstate": "Reinstate Operator",
-      "suspend": "Suspend Operator",
-      "clearanceOverride": "Clearance Override",
-      "setAs": "Set as {{role}}"
     },
     "roles": {
       "buyer": "Buyer",
       "seller": "Seller",
       "broker": "Broker",
-      "admin": "Admin"
+      "admin": "Administrator"
     },
-    "toast": {
-      "statusTitle": "Operator logged",
-      "statusDesc": "User status updated to {{status}}.",
-      "roleTitle": "Clearance updated",
-      "roleDesc": "User role modified to {{role}}."
+    "status": {
+      "active": "Active",
+      "suspended": "Suspended"
+    },
+    "actions": {
+      "suspend": "Suspend",
+      "reinstate": "Reinstate",
+      "makeAdmin": "Elevate to Admin",
+      "makeBroker": "Assign Broker"
+    },
+    "empty": "No personnel records match the query.",
+    "pagination": {
+      "showing": "Showing {{count}} of {{total}} personnel",
+      "previous": "Previous",
+      "next": "Next"
     }
   },
   "properties": {
-    "title": "Asset Registry",
-    "subtitle": "Monitor and moderate platform real estate listings.",
+    "title": "Property Registry",
+    "subtitle": "Manage and moderate all property listings on the platform.",
+    "searchPlaceholder": "Search property ID or location...",
     "filters": {
-      "allStates": "All States",
-      "pendingReview": "Pending Review",
+      "allStatuses": "All Statuses",
       "active": "Active",
-      "draft": "Draft",
-      "sold": "Sold",
-      "rented": "Rented",
+      "pendingReview": "Pending Review",
       "rejected": "Rejected",
       "deleted": "Deleted"
     },
     "table": {
-      "assetId": "Asset ID",
-      "classification": "Classification",
-      "valuation": "Valuation",
+      "listing": "Listing",
+      "type": "Type",
       "location": "Location",
-      "state": "State",
+      "price": "Price",
+      "status": "Status",
+      "submitted": "Submitted",
       "actions": "Actions"
     },
-    "empty": "No assets found matching current parameters.",
-    "by": "By:",
-    "tbd": "TBD",
-    "unspecified": "Unspecified",
-    "dropdown": {
-      "label": "Asset Directives",
-      "authorize": "Authorize & Publish",
-      "reject": "Reject Asset",
-      "markDeleted": "Mark Deleted"
+    "status": {
+      "active": "Active",
+      "pending_review": "Pending Review",
+      "rejected": "Rejected",
+      "deleted": "Deleted"
     },
-    "toast": {
-      "title": "Asset record updated",
-      "desc": "Asset status changed to {{status}}."
+    "actions": {
+      "approve": "Approve",
+      "reject": "Reject",
+      "delete": "Delete"
     },
+    "empty": "No properties match the current filter.",
     "pagination": {
       "showing": "Showing {{count}} of {{total}} assets",
       "previous": "Previous",
@@ -179,11 +177,11 @@
     },
     "engine": {
       "model": "Inference Model",
-      "modelDesc": "Provider identifier (e.g. gpt-4o, claude-3-opus).",
+      "modelDesc": "Provider model identifier (e.g. gpt-4o, gemini-2.5-flash). Changes take effect within 5 minutes.",
       "temperature": "Temperature",
-      "temperatureDesc": "Creativity vs precision (0.0 to 1.0). Lower is more deterministic.",
+      "temperatureDesc": "Creativity vs precision (0.0 = deterministic, 1.0 = most creative).",
       "maxTurns": "Max Conversation Turns",
-      "maxTurnsDesc": "Hard limit to prevent infinite loops.",
+      "maxTurnsDesc": "Hard limit on back-and-forth exchanges per session.",
       "guardrail": "Guardrail Strictness",
       "guardrailDesc": "Controls off-topic detection aggressiveness.",
       "guardrailOptions": {
@@ -196,7 +194,23 @@
       "otpExpiry": "OTP Expiry (Min)",
       "maxAttempts": "Max OTP Attempts",
       "rateLimitCap": "Rate Limit Cap",
-      "rateLimitWindow": "Rate Limit Window (Min)"
+      "rateLimitWindow": "Rate Limit Window (Min)",
+      "otpProvider": "OTP Provider",
+      "otpProviderDesc": "The SMS gateway used to deliver one-time passwords to users.",
+      "otpProviders": {
+        "console": "Console — Dev / No SMS (codes logged to server)",
+        "twilio": "Twilio",
+        "unifonic": "Unifonic",
+        "msegat": "Msegat"
+      },
+      "credentialsTitle": "Provider Credentials",
+      "twilioAccountSid": "Account SID",
+      "twilioAuthToken": "Auth Token",
+      "twilioFromNumber": "From Number (E.164)",
+      "unifonicAppSid": "App SID",
+      "unifonicSender": "Sender ID",
+      "msegatApiKey": "API Key",
+      "msegatSender": "Username / Sender ID"
     },
     "features": {
       "voiceInput": "Voice Input",
@@ -221,11 +235,24 @@
       "localeEn": "English (US)",
       "localeAr": "Arabic (Standard)",
       "baseCurrency": "Base Currency",
+      "currencySearch": "Search currency...",
+      "currencyNotFound": "No currency found.",
       "maxImages": "Max Assets per Listing",
       "listingTtl": "Listing TTL (Days)",
       "listingTtlDesc": "Days until automatic archival.",
       "autoApprove": "Auto-Approve Listings",
-      "autoApproveDesc": "Bypass manual administrator review for new properties."
+      "autoApproveDesc": "Bypass manual administrator review for new properties.",
+      "mapProvider": "Map Provider",
+      "mapProviderDesc": "Map engine rendered in the public listings view.",
+      "mapProviders": {
+        "osm": "OpenStreetMap (Free — no API key required)",
+        "mapbox": "Mapbox",
+        "google": "Google Maps"
+      },
+      "mapboxApiKey": "Mapbox Access Token",
+      "googleMapsApiKey": "Google Maps API Key",
+      "mapKeyPlaceholder": "Paste your API key here",
+      "mapKeyNote": "Stored server-side. Rotated whenever you save."
     },
     "system": {
       "maintenanceTitle": "Platform Maintenance Mode",

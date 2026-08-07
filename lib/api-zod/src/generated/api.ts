@@ -1161,7 +1161,13 @@ export const GetAdminStatsResponse = zod.object({
  * @summary Get public app settings (no auth required)
  */
 export const GetAppSettingsResponse = zod.object({
-  "voiceCtaStyle": zod.enum(['green_card', 'orb', 'waveform', 'sonar'])
+  "voiceCtaStyle": zod.enum(['green_card', 'orb', 'waveform', 'sonar']),
+  "mapProvider": zod.enum(['osm', 'mapbox', 'google']),
+  "mapApiKey": zod.string().nullish().describe('The API key for the configured map provider (Mapbox token or Google Maps key). Null for OSM.'),
+  "featureMapView": zod.boolean(),
+  "featureVoiceInput": zod.boolean(),
+  "featureContactRelease": zod.boolean(),
+  "featureSellerWizard": zod.boolean()
 })
 
 
@@ -1189,6 +1195,17 @@ export const GetAdminSettingsResponse = zod.object({
   "featureContactRelease": zod.boolean(),
   "featureSellerWizard": zod.boolean(),
   "voiceCtaStyle": zod.enum(['green_card', 'orb', 'waveform', 'sonar']),
+  "mapProvider": zod.enum(['osm', 'mapbox', 'google']),
+  "mapboxApiKey": zod.string().nullish(),
+  "googleMapsApiKey": zod.string().nullish(),
+  "otpProvider": zod.enum(['console', 'twilio', 'unifonic', 'msegat']),
+  "twilioAccountSid": zod.string().nullish(),
+  "twilioAuthToken": zod.string().nullish(),
+  "twilioFromNumber": zod.string().nullish(),
+  "unifonicAppSid": zod.string().nullish(),
+  "unifonicSender": zod.string().nullish(),
+  "msegatApiKey": zod.string().nullish(),
+  "msegatSender": zod.string().nullish(),
   "updatedAt": zod.coerce.date()
 })
 
@@ -1234,7 +1251,18 @@ export const UpdateAdminSettingsBody = zod.object({
   "featureVoiceInput": zod.boolean().optional(),
   "featureMapView": zod.boolean().optional(),
   "featureContactRelease": zod.boolean().optional(),
-  "featureSellerWizard": zod.boolean().optional()
+  "featureSellerWizard": zod.boolean().optional(),
+  "mapProvider": zod.enum(['osm', 'mapbox', 'google']).optional(),
+  "mapboxApiKey": zod.string().nullish(),
+  "googleMapsApiKey": zod.string().nullish(),
+  "otpProvider": zod.enum(['console', 'twilio', 'unifonic', 'msegat']).optional(),
+  "twilioAccountSid": zod.string().nullish(),
+  "twilioAuthToken": zod.string().nullish(),
+  "twilioFromNumber": zod.string().nullish(),
+  "unifonicAppSid": zod.string().nullish(),
+  "unifonicSender": zod.string().nullish(),
+  "msegatApiKey": zod.string().nullish(),
+  "msegatSender": zod.string().nullish()
 })
 
 export const UpdateAdminSettingsResponse = zod.object({
@@ -1258,6 +1286,17 @@ export const UpdateAdminSettingsResponse = zod.object({
   "featureContactRelease": zod.boolean(),
   "featureSellerWizard": zod.boolean(),
   "voiceCtaStyle": zod.enum(['green_card', 'orb', 'waveform', 'sonar']),
+  "mapProvider": zod.enum(['osm', 'mapbox', 'google']),
+  "mapboxApiKey": zod.string().nullish(),
+  "googleMapsApiKey": zod.string().nullish(),
+  "otpProvider": zod.enum(['console', 'twilio', 'unifonic', 'msegat']),
+  "twilioAccountSid": zod.string().nullish(),
+  "twilioAuthToken": zod.string().nullish(),
+  "twilioFromNumber": zod.string().nullish(),
+  "unifonicAppSid": zod.string().nullish(),
+  "unifonicSender": zod.string().nullish(),
+  "msegatApiKey": zod.string().nullish(),
+  "msegatSender": zod.string().nullish(),
   "updatedAt": zod.coerce.date()
 })
 

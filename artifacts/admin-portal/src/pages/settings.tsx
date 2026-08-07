@@ -1,7 +1,7 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useGetAdminSettings, useUpdateAdminSettings, getGetAdminSettingsQueryKey } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
-import { Save, Server, Shield, BrainCircuit, Globe, LayoutGrid, Mic, Bot, ArrowLeft } from "lucide-react";
+import { Save, Server, Shield, BrainCircuit, Globe, LayoutGrid, Mic, Bot, ArrowLeft, Check, ChevronsUpDown, Eye, EyeOff, Key } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
@@ -12,6 +12,9 @@ import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Slider } from "@/components/ui/slider";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useTranslation } from "react-i18next";
 
 // AqariTalk brand emerald — matches the public app's --primary token
@@ -21,7 +24,6 @@ const EM35 = "hsl(161 100% 21% / 0.35)";
 const EM30 = "hsl(161 100% 21% / 0.30)";
 const EM10 = "hsl(161 100% 21% / 0.10)";
 
-// Animations copied verbatim from the public app's index.css
 const VP_STYLES = `
   @keyframes vpa-orb-breathe { 0%,100%{transform:scale(1)} 50%{transform:scale(1.09)} }
   @keyframes vpa-ring-ripple { 0%{transform:scale(1);opacity:0.75} 100%{transform:scale(2.6);opacity:0} }
@@ -61,20 +63,10 @@ function VoiceStylePreview({ style }: { style: string }) {
   return (
     <div className="flex flex-col gap-2 shrink-0" style={{ width: 210 }}>
       <style>{VP_STYLES}</style>
-
-      {/* ── container matches the actual component's outer shape ── */}
       <div className="rounded-3xl overflow-hidden" style={{ height: 96 }}>
-
-        {/* GREEN CARD — emerald bg, dot-grid, Bot icon, Arabic text, white arrow */}
         {style === 'green_card' && (
           <div className="relative h-full flex items-center gap-3 px-4" style={{ background: EM }}>
-            <div
-              className="absolute inset-0 opacity-10 pointer-events-none"
-              style={{
-                backgroundImage: "radial-gradient(circle at 100% 100%, #fff 0, #fff 3px, transparent 3px)",
-                backgroundSize: "20px 20px",
-              }}
-            />
+            <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: "radial-gradient(circle at 100% 100%, #fff 0, #fff 3px, transparent 3px)", backgroundSize: "20px 20px" }} />
             <div className="relative z-10 flex-1 min-w-0" dir="rtl">
               <div className="flex items-center gap-1 mb-1" style={{ color: "rgba(255,255,255,0.8)" }}>
                 <Bot className="w-3 h-3 shrink-0" />
@@ -83,73 +75,37 @@ function VoiceStylePreview({ style }: { style: string }) {
               <p className="text-white font-extrabold text-[11px] leading-tight mb-0.5">تحدث مع وكيلك الذكي</p>
               <p className="text-[9px] leading-tight" style={{ color: "rgba(255,255,255,0.7)" }}>صِف ما تبحث عنه بالصوت</p>
             </div>
-            <div
-              className="relative z-10 w-8 h-8 rounded-full flex items-center justify-center shrink-0 shadow-md"
-              style={{ background: "white", color: EM }}
-            >
+            <div className="relative z-10 w-8 h-8 rounded-full flex items-center justify-center shrink-0 shadow-md" style={{ background: "white", color: EM }}>
               <ArrowLeft className="w-4 h-4" />
             </div>
           </div>
         )}
-
-        {/* ORB — dark gradient canvas, emerald orb with radial gradient + glow, 3 ripple rings */}
         {style === 'orb' && (
-          <div
-            className="h-full flex flex-col items-center justify-center gap-2"
-            style={{ background: "linear-gradient(160deg, #0d1a12 0%, #0a1a0e 100%)" }}
-          >
+          <div className="h-full flex flex-col items-center justify-center gap-2" style={{ background: "linear-gradient(160deg, #0d1a12 0%, #0a1a0e 100%)" }}>
             <div className="relative flex items-center justify-center" style={{ width: 48, height: 48 }}>
-              <div className="vpa-ring" />
-              <div className="vpa-ring vpa-ring-2" />
-              <div className="vpa-ring vpa-ring-3" />
-              <div
-                className="vpa-orb relative z-10 rounded-full flex items-center justify-center"
-                style={{
-                  width: 48, height: 48,
-                  background: `radial-gradient(circle at 35% 35%, ${EM}, ${EM55})`,
-                  boxShadow: `0 0 20px 6px ${EM35}`,
-                }}
-              >
+              <div className="vpa-ring" /><div className="vpa-ring vpa-ring-2" /><div className="vpa-ring vpa-ring-3" />
+              <div className="vpa-orb relative z-10 rounded-full flex items-center justify-center" style={{ width: 48, height: 48, background: `radial-gradient(circle at 35% 35%, ${EM}, ${EM55})`, boxShadow: `0 0 20px 6px ${EM35}` }}>
                 <Mic size={20} className="text-white" strokeWidth={1.75} />
               </div>
             </div>
             <p className="text-white font-extrabold text-sm tracking-tight">كلّمني</p>
           </div>
         )}
-
-        {/* WAVEFORM — card bg, 24 emerald bars with bar-wave animation */}
         {style === 'waveform' && (
           <div className="h-full bg-card border flex flex-col items-center justify-center gap-2 px-3">
             <p className="font-extrabold text-foreground text-[11px]">اسألني عن أي عقار</p>
             <div className="flex items-end justify-center gap-[2.5px]" style={{ height: 28 }}>
               {Array.from({ length: 24 }).map((_, i) => (
-                <div
-                  key={i}
-                  className="vpa-bar"
-                  style={{
-                    height: 28,
-                    animationDelay:    `${((i * 1.1) / 24).toFixed(3)}s`,
-                    animationDuration: `${0.9 + (i % 5) * 0.08}s`,
-                    opacity: 0.4 + 0.6 * Math.abs(Math.sin((i / 24) * Math.PI)),
-                  }}
-                />
+                <div key={i} className="vpa-bar" style={{ height: 28, animationDelay: `${((i * 1.1) / 24).toFixed(3)}s`, animationDuration: `${0.9 + (i % 5) * 0.08}s`, opacity: 0.4 + 0.6 * Math.abs(Math.sin((i / 24) * Math.PI)) }} />
               ))}
             </div>
           </div>
         )}
-
-        {/* SONAR — card bg, 4 radar-ping rings, primary/10 circle, mic icon, text */}
         {style === 'sonar' && (
           <div className="h-full bg-card border flex items-center gap-4 px-4">
             <div className="relative flex items-center justify-center shrink-0" style={{ width: 40, height: 40 }}>
-              <div className="vpa-radar" />
-              <div className="vpa-radar vpa-radar-2" />
-              <div className="vpa-radar vpa-radar-3" />
-              <div className="vpa-radar vpa-radar-4" />
-              <div
-                className="relative z-10 rounded-full flex items-center justify-center"
-                style={{ width: 40, height: 40, background: EM10, border: `1px solid ${EM30}` }}
-              >
+              <div className="vpa-radar" /><div className="vpa-radar vpa-radar-2" /><div className="vpa-radar vpa-radar-3" /><div className="vpa-radar vpa-radar-4" />
+              <div className="relative z-10 rounded-full flex items-center justify-center" style={{ width: 40, height: 40, background: EM10, border: `1px solid ${EM30}` }}>
                 <Mic size={18} style={{ color: EM }} strokeWidth={1.75} />
               </div>
             </div>
@@ -160,7 +116,6 @@ function VoiceStylePreview({ style }: { style: string }) {
           </div>
         )}
       </div>
-
       <div>
         <p className="text-xs font-semibold">{meta?.label}</p>
         <p className="text-[10px] text-muted-foreground">{meta?.description}</p>
@@ -169,6 +124,41 @@ function VoiceStylePreview({ style }: { style: string }) {
   );
 }
 
+// ── Currencies ────────────────────────────────────────────────────────────
+const CURRENCIES = ['JOD', 'SAR', 'AED', 'EGP', 'KWD', 'QAR', 'BHD', 'OMR', 'MAD', 'LBP', 'IQD'] as const;
+type Currency = typeof CURRENCIES[number];
+
+// ── Password field with show/hide toggle ──────────────────────────────────
+function SecretInput({ value, onChange, placeholder, dir = "ltr" }: {
+  value: string | null | undefined;
+  onChange: (v: string | null) => void;
+  placeholder?: string;
+  dir?: string;
+}) {
+  const [show, setShow] = useState(false);
+  return (
+    <div className="relative">
+      <Input
+        type={show ? "text" : "password"}
+        value={value ?? ""}
+        onChange={(e) => onChange(e.target.value || null)}
+        placeholder={placeholder}
+        className="font-mono bg-muted/30 pe-10"
+        dir={dir}
+      />
+      <button
+        type="button"
+        onClick={() => setShow((s) => !s)}
+        className="absolute inset-y-0 end-0 flex items-center pe-3 text-muted-foreground hover:text-foreground transition-colors"
+        tabIndex={-1}
+      >
+        {show ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+      </button>
+    </div>
+  );
+}
+
+// ── Zod schema ────────────────────────────────────────────────────────────
 const settingsSchema = z.object({
   otpExpiryMinutes: z.coerce.number().min(1).max(60),
   otpMaxAttempts: z.coerce.number().min(1).max(10),
@@ -189,23 +179,35 @@ const settingsSchema = z.object({
   featureContactRelease: z.boolean(),
   featureSellerWizard: z.boolean(),
   voiceCtaStyle: z.enum(['green_card', 'orb', 'waveform', 'sonar']),
+  // Map provider
+  mapProvider: z.enum(['osm', 'mapbox', 'google']),
+  mapboxApiKey: z.string().nullable().optional(),
+  googleMapsApiKey: z.string().nullable().optional(),
+  // OTP provider
+  otpProvider: z.enum(['console', 'twilio', 'unifonic', 'msegat']),
+  twilioAccountSid: z.string().nullable().optional(),
+  twilioAuthToken: z.string().nullable().optional(),
+  twilioFromNumber: z.string().nullable().optional(),
+  unifonicAppSid: z.string().nullable().optional(),
+  unifonicSender: z.string().nullable().optional(),
+  msegatApiKey: z.string().nullable().optional(),
+  msegatSender: z.string().nullable().optional(),
 });
 
 type SettingsFormValues = z.infer<typeof settingsSchema>;
 
+// ── Page component ────────────────────────────────────────────────────────
 export default function Settings() {
   const { t } = useTranslation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  
+
   const { data: settings, isLoading } = useGetAdminSettings({
-    query: {
-      queryKey: getGetAdminSettingsQueryKey()
-    }
+    query: { queryKey: getGetAdminSettingsQueryKey() }
   });
 
   const updateMutation = useUpdateAdminSettings();
-  
+
   const form = useForm<SettingsFormValues>({
     resolver: zodResolver(settingsSchema),
     defaultValues: {
@@ -213,26 +215,44 @@ export default function Settings() {
       otpMaxAttempts: 3,
       otpRateLimitCount: 3,
       otpRateLimitWindowMinutes: 60,
-      aiModel: "gpt-4o",
+      aiModel: "gpt-4o-mini",
       aiTemperature: 0.3,
       aiMaxTurns: 10,
       aiGuardrailLevel: "balanced",
-      defaultLanguage: "en",
-      defaultCurrency: "AED",
+      defaultLanguage: "ar",
+      defaultCurrency: "JOD",
       maxImagesPerProperty: 10,
       autoApproveListings: false,
-      listingExpiryDays: 30,
+      listingExpiryDays: 90,
       maintenanceMode: false,
       featureVoiceInput: true,
       featureMapView: true,
       featureContactRelease: true,
       featureSellerWizard: true,
       voiceCtaStyle: "waveform",
+      mapProvider: "osm",
+      mapboxApiKey: null,
+      googleMapsApiKey: null,
+      otpProvider: "console",
+      twilioAccountSid: null,
+      twilioAuthToken: null,
+      twilioFromNumber: null,
+      unifonicAppSid: null,
+      unifonicSender: null,
+      msegatApiKey: null,
+      msegatSender: null,
     }
   });
 
+  // Watch reactive fields for conditional rendering
+  const otpProvider = form.watch('otpProvider');
+  const mapProvider = form.watch('mapProvider');
+
+  // Currency combobox state
+  const [currencyOpen, setCurrencyOpen] = useState(false);
+
   const initialized = useRef(false);
-  
+
   useEffect(() => {
     if (settings && !initialized.current) {
       form.reset({
@@ -255,6 +275,17 @@ export default function Settings() {
         featureContactRelease: settings.featureContactRelease,
         featureSellerWizard: settings.featureSellerWizard,
         voiceCtaStyle: settings.voiceCtaStyle,
+        mapProvider: (settings.mapProvider ?? "osm") as "osm" | "mapbox" | "google",
+        mapboxApiKey: settings.mapboxApiKey ?? null,
+        googleMapsApiKey: settings.googleMapsApiKey ?? null,
+        otpProvider: (settings.otpProvider ?? "console") as "console" | "twilio" | "unifonic" | "msegat",
+        twilioAccountSid: settings.twilioAccountSid ?? null,
+        twilioAuthToken: settings.twilioAuthToken ?? null,
+        twilioFromNumber: settings.twilioFromNumber ?? null,
+        unifonicAppSid: settings.unifonicAppSid ?? null,
+        unifonicSender: settings.unifonicSender ?? null,
+        msegatApiKey: settings.msegatApiKey ?? null,
+        msegatSender: settings.msegatSender ?? null,
       });
       initialized.current = true;
     }
@@ -297,13 +328,13 @@ export default function Settings() {
           disabled={updateMutation.isPending || !form.formState.isDirty}
           className={cn(
             "flex items-center gap-2 h-9 px-4 rounded-md text-sm font-medium transition-all shadow-sm",
-            form.formState.isDirty 
-              ? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-primary/20" 
+            form.formState.isDirty
+              ? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-primary/20"
               : "bg-muted text-muted-foreground cursor-not-allowed border"
           )}
         >
           {updateMutation.isPending ? (
-            <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin"></div>
+            <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
           ) : (
             <Save className="w-4 h-4" />
           )}
@@ -334,9 +365,11 @@ export default function Settings() {
               </TabsList>
             </div>
 
-            {/* AI Engine Tab */}
+            {/* ── AI Engine Tab ────────────────────────────────────────── */}
             <TabsContent value="engine" className="p-6 m-0 focus-visible:outline-none">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+
+                {/* Model */}
                 <FormField control={form.control} name="aiModel" render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">{t('settings.engine.model')}</FormLabel>
@@ -348,17 +381,42 @@ export default function Settings() {
                   </FormItem>
                 )} />
 
+                {/* Temperature — slider + number input */}
                 <FormField control={form.control} name="aiTemperature" render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">{t('settings.engine.temperature')}</FormLabel>
+                    <FormLabel className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">
+                      {t('settings.engine.temperature')}
+                      <span className="ms-2 font-bold text-primary tabular-nums">{Number(field.value).toFixed(1)}</span>
+                    </FormLabel>
                     <FormControl>
-                      <Input type="number" step="0.1" min="0" max="1" className="font-mono bg-muted/30" dir="ltr" {...field} />
+                      <div className="space-y-3">
+                        <Slider
+                          value={[Number(field.value)]}
+                          onValueChange={([v]) => field.onChange(v)}
+                          min={0} max={1} step={0.1}
+                          className="w-full"
+                        />
+                        <div className="flex items-center gap-2">
+                          <span className="text-[10px] text-muted-foreground tabular-nums w-6">0.0</span>
+                          <div className="flex-1" />
+                          <span className="text-[10px] text-muted-foreground tabular-nums w-6 text-end">1.0</span>
+                          <Input
+                            type="number"
+                            step="0.1" min="0" max="1"
+                            value={field.value}
+                            onChange={(e) => field.onChange(parseFloat(e.target.value))}
+                            className="w-20 font-mono bg-muted/30 text-sm h-8"
+                            dir="ltr"
+                          />
+                        </div>
+                      </div>
                     </FormControl>
                     <p className="text-[10px] text-muted-foreground">{t('settings.engine.temperatureDesc')}</p>
                     <FormMessage />
                   </FormItem>
                 )} />
 
+                {/* Max Turns */}
                 <FormField control={form.control} name="aiMaxTurns" render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">{t('settings.engine.maxTurns')}</FormLabel>
@@ -370,10 +428,11 @@ export default function Settings() {
                   </FormItem>
                 )} />
 
+                {/* Guardrail */}
                 <FormField control={form.control} name="aiGuardrailLevel" render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">{t('settings.engine.guardrail')}</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger className="bg-muted/30 font-mono text-sm">
                           <SelectValue />
@@ -392,101 +451,191 @@ export default function Settings() {
               </div>
             </TabsContent>
 
-            {/* Security Tab */}
-            <TabsContent value="security" className="p-6 m-0 focus-visible:outline-none">
+            {/* ── Security & Auth Tab ──────────────────────────────────── */}
+            <TabsContent value="security" className="p-6 m-0 focus-visible:outline-none space-y-6">
+              {/* OTP timing fields */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <FormField control={form.control} name="otpExpiryMinutes" render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">{t('settings.security.otpExpiry')}</FormLabel>
-                    <FormControl>
-                      <Input type="number" className="font-mono bg-muted/30" dir="ltr" {...field} />
-                    </FormControl>
+                    <FormControl><Input type="number" className="font-mono bg-muted/30" dir="ltr" {...field} /></FormControl>
                     <FormMessage />
                   </FormItem>
                 )} />
-
                 <FormField control={form.control} name="otpMaxAttempts" render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">{t('settings.security.maxAttempts')}</FormLabel>
-                    <FormControl>
-                      <Input type="number" className="font-mono bg-muted/30" dir="ltr" {...field} />
-                    </FormControl>
+                    <FormControl><Input type="number" className="font-mono bg-muted/30" dir="ltr" {...field} /></FormControl>
                     <FormMessage />
                   </FormItem>
                 )} />
-
                 <FormField control={form.control} name="otpRateLimitCount" render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">{t('settings.security.rateLimitCap')}</FormLabel>
-                    <FormControl>
-                      <Input type="number" className="font-mono bg-muted/30" dir="ltr" {...field} />
-                    </FormControl>
+                    <FormControl><Input type="number" className="font-mono bg-muted/30" dir="ltr" {...field} /></FormControl>
                     <FormMessage />
                   </FormItem>
                 )} />
-
                 <FormField control={form.control} name="otpRateLimitWindowMinutes" render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">{t('settings.security.rateLimitWindow')}</FormLabel>
-                    <FormControl>
-                      <Input type="number" className="font-mono bg-muted/30" dir="ltr" {...field} />
-                    </FormControl>
+                    <FormControl><Input type="number" className="font-mono bg-muted/30" dir="ltr" {...field} /></FormControl>
                     <FormMessage />
                   </FormItem>
                 )} />
               </div>
+
+              {/* OTP Provider selection */}
+              <div className="border-t pt-6 space-y-5">
+                <FormField control={form.control} name="otpProvider" render={({ field }) => (
+                  <FormItem className="max-w-sm">
+                    <FormLabel className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">{t('settings.security.otpProvider')}</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger className="bg-muted/30 text-sm">
+                          <SelectValue />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="console">{t('settings.security.otpProviders.console')}</SelectItem>
+                        <SelectItem value="twilio">{t('settings.security.otpProviders.twilio')}</SelectItem>
+                        <SelectItem value="unifonic">{t('settings.security.otpProviders.unifonic')}</SelectItem>
+                        <SelectItem value="msegat">{t('settings.security.otpProviders.msegat')}</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <p className="text-[10px] text-muted-foreground">{t('settings.security.otpProviderDesc')}</p>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+
+                {/* Conditional credentials — Twilio */}
+                {otpProvider === 'twilio' && (
+                  <div className="rounded-lg border bg-muted/10 p-5 space-y-4">
+                    <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
+                      <Key className="w-4 h-4 text-primary" />
+                      {t('settings.security.credentialsTitle')} — Twilio
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <FormField control={form.control} name="twilioAccountSid" render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-xs text-muted-foreground">{t('settings.security.twilioAccountSid')}</FormLabel>
+                          <FormControl>
+                            <SecretInput value={field.value} onChange={field.onChange} placeholder="ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )} />
+                      <FormField control={form.control} name="twilioAuthToken" render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-xs text-muted-foreground">{t('settings.security.twilioAuthToken')}</FormLabel>
+                          <FormControl>
+                            <SecretInput value={field.value} onChange={field.onChange} placeholder="••••••••••••••••••••••••••••••••" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )} />
+                      <FormField control={form.control} name="twilioFromNumber" render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-xs text-muted-foreground">{t('settings.security.twilioFromNumber')}</FormLabel>
+                          <FormControl>
+                            <Input value={field.value ?? ""} onChange={(e) => field.onChange(e.target.value || null)} placeholder="+1234567890" className="font-mono bg-muted/30" dir="ltr" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )} />
+                    </div>
+                  </div>
+                )}
+
+                {/* Conditional credentials — Unifonic */}
+                {otpProvider === 'unifonic' && (
+                  <div className="rounded-lg border bg-muted/10 p-5 space-y-4">
+                    <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
+                      <Key className="w-4 h-4 text-primary" />
+                      {t('settings.security.credentialsTitle')} — Unifonic
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <FormField control={form.control} name="unifonicAppSid" render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-xs text-muted-foreground">{t('settings.security.unifonicAppSid')}</FormLabel>
+                          <FormControl>
+                            <SecretInput value={field.value} onChange={field.onChange} placeholder="Your Unifonic App SID" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )} />
+                      <FormField control={form.control} name="unifonicSender" render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-xs text-muted-foreground">{t('settings.security.unifonicSender')}</FormLabel>
+                          <FormControl>
+                            <Input value={field.value ?? ""} onChange={(e) => field.onChange(e.target.value || null)} placeholder="AqariTalk" className="font-mono bg-muted/30" dir="ltr" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )} />
+                    </div>
+                  </div>
+                )}
+
+                {/* Conditional credentials — Msegat */}
+                {otpProvider === 'msegat' && (
+                  <div className="rounded-lg border bg-muted/10 p-5 space-y-4">
+                    <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
+                      <Key className="w-4 h-4 text-primary" />
+                      {t('settings.security.credentialsTitle')} — Msegat
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <FormField control={form.control} name="msegatApiKey" render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-xs text-muted-foreground">{t('settings.security.msegatApiKey')}</FormLabel>
+                          <FormControl>
+                            <SecretInput value={field.value} onChange={field.onChange} placeholder="Your Msegat API Key" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )} />
+                      <FormField control={form.control} name="msegatSender" render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-xs text-muted-foreground">{t('settings.security.msegatSender')}</FormLabel>
+                          <FormControl>
+                            <Input value={field.value ?? ""} onChange={(e) => field.onChange(e.target.value || null)} placeholder="AqariTalk" className="font-mono bg-muted/30" dir="ltr" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )} />
+                    </div>
+                  </div>
+                )}
+              </div>
             </TabsContent>
 
-            {/* Features Tab */}
+            {/* ── Feature Flags Tab ────────────────────────────────────── */}
             <TabsContent value="features" className="p-6 m-0 focus-visible:outline-none space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <FormField control={form.control} name="featureVoiceInput" render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 bg-muted/10">
-                    <div className="space-y-0.5">
-                      <FormLabel className="text-sm font-semibold">{t('settings.features.voiceInput')}</FormLabel>
-                      <p className="text-xs text-muted-foreground">{t('settings.features.voiceInputDesc')}</p>
-                    </div>
-                    <FormControl>
-                      <Switch checked={field.value} onCheckedChange={field.onChange} />
-                    </FormControl>
-                  </FormItem>
-                )} />
-
-                <FormField control={form.control} name="featureMapView" render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 bg-muted/10">
-                    <div className="space-y-0.5">
-                      <FormLabel className="text-sm font-semibold">{t('settings.features.mapView')}</FormLabel>
-                      <p className="text-xs text-muted-foreground">{t('settings.features.mapViewDesc')}</p>
-                    </div>
-                    <FormControl>
-                      <Switch checked={field.value} onCheckedChange={field.onChange} />
-                    </FormControl>
-                  </FormItem>
-                )} />
-
-                <FormField control={form.control} name="featureContactRelease" render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 bg-muted/10">
-                    <div className="space-y-0.5">
-                      <FormLabel className="text-sm font-semibold">{t('settings.features.contactRelease')}</FormLabel>
-                      <p className="text-xs text-muted-foreground">{t('settings.features.contactReleaseDesc')}</p>
-                    </div>
-                    <FormControl>
-                      <Switch checked={field.value} onCheckedChange={field.onChange} />
-                    </FormControl>
-                  </FormItem>
-                )} />
-
-                <FormField control={form.control} name="featureSellerWizard" render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 bg-muted/10">
-                    <div className="space-y-0.5">
-                      <FormLabel className="text-sm font-semibold">{t('settings.features.sellerWizard')}</FormLabel>
-                      <p className="text-xs text-muted-foreground">{t('settings.features.sellerWizardDesc')}</p>
-                    </div>
-                    <FormControl>
-                      <Switch checked={field.value} onCheckedChange={field.onChange} />
-                    </FormControl>
-                  </FormItem>
-                )} />
+                {(["featureVoiceInput", "featureMapView", "featureContactRelease", "featureSellerWizard"] as const).map((name) => {
+                  const key = name.replace("feature", "").charAt(0).toLowerCase() + name.replace("feature", "").slice(1);
+                  const labelKey = key.charAt(0).toLowerCase() + key.slice(1);
+                  const featureKeys: Record<string, { label: string; desc: string }> = {
+                    voiceInput: { label: t('settings.features.voiceInput'), desc: t('settings.features.voiceInputDesc') },
+                    mapView: { label: t('settings.features.mapView'), desc: t('settings.features.mapViewDesc') },
+                    contactRelease: { label: t('settings.features.contactRelease'), desc: t('settings.features.contactReleaseDesc') },
+                    sellerWizard: { label: t('settings.features.sellerWizard'), desc: t('settings.features.sellerWizardDesc') },
+                  };
+                  const meta = featureKeys[labelKey] ?? { label: name, desc: "" };
+                  return (
+                    <FormField key={name} control={form.control} name={name} render={({ field }) => (
+                      <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 bg-muted/10">
+                        <div className="space-y-0.5">
+                          <FormLabel className="text-sm font-semibold">{meta.label}</FormLabel>
+                          <p className="text-xs text-muted-foreground">{meta.desc}</p>
+                        </div>
+                        <FormControl>
+                          <Switch checked={field.value} onCheckedChange={field.onChange} />
+                        </FormControl>
+                      </FormItem>
+                    )} />
+                  );
+                })}
               </div>
 
               <div className="border-t pt-6">
@@ -497,9 +646,7 @@ export default function Settings() {
                       <div className="flex-1 max-w-xs space-y-2">
                         <Select onValueChange={field.onChange} value={field.value}>
                           <FormControl>
-                            <SelectTrigger className="bg-muted/30">
-                              <SelectValue />
-                            </SelectTrigger>
+                            <SelectTrigger className="bg-muted/30"><SelectValue /></SelectTrigger>
                           </FormControl>
                           <SelectContent>
                             <SelectItem value="green_card">{t('settings.features.voiceStyles.greenCard')}</SelectItem>
@@ -518,17 +665,16 @@ export default function Settings() {
               </div>
             </TabsContent>
 
-            {/* Platform Tab */}
-            <TabsContent value="platform" className="p-6 m-0 focus-visible:outline-none">
+            {/* ── Regional & Rules Tab ─────────────────────────────────── */}
+            <TabsContent value="platform" className="p-6 m-0 focus-visible:outline-none space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {/* Default Locale */}
                 <FormField control={form.control} name="defaultLanguage" render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">{t('settings.platform.defaultLocale')}</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
-                        <SelectTrigger className="bg-muted/30">
-                          <SelectValue />
-                        </SelectTrigger>
+                        <SelectTrigger className="bg-muted/30"><SelectValue /></SelectTrigger>
                       </FormControl>
                       <SelectContent>
                         <SelectItem value="en">{t('settings.platform.localeEn')}</SelectItem>
@@ -539,46 +685,68 @@ export default function Settings() {
                   </FormItem>
                 )} />
 
+                {/* Base Currency — searchable combobox */}
                 <FormField control={form.control} name="defaultCurrency" render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">{t('settings.platform.baseCurrency')}</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger className="bg-muted/30 font-mono">
-                          <SelectValue />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {['JOD', 'SAR', 'AED', 'EGP', 'KWD', 'QAR', 'BHD', 'OMR', 'MAD', 'LBP', 'IQD'].map(c => (
-                          <SelectItem key={c} value={c}>{c}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <Popover open={currencyOpen} onOpenChange={setCurrencyOpen}>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <button
+                            type="button"
+                            className={cn(
+                              "flex w-full items-center justify-between h-10 rounded-md border border-input bg-muted/30 px-3 py-2 text-sm font-mono ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                            )}
+                          >
+                            <span>{field.value || t('settings.platform.baseCurrency')}</span>
+                            <ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50" />
+                          </button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-[200px] p-0" align="start">
+                        <Command>
+                          <CommandInput placeholder={t('settings.platform.currencySearch')} />
+                          <CommandEmpty>{t('settings.platform.currencyNotFound')}</CommandEmpty>
+                          <CommandGroup className="max-h-52 overflow-y-auto">
+                            {CURRENCIES.map((c) => (
+                              <CommandItem
+                                key={c}
+                                value={c}
+                                onSelect={() => { field.onChange(c as Currency); setCurrencyOpen(false); }}
+                                className="font-mono"
+                              >
+                                <Check className={cn("me-2 h-4 w-4", field.value === c ? "opacity-100" : "opacity-0")} />
+                                {c}
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
                     <FormMessage />
                   </FormItem>
                 )} />
 
+                {/* Max Images */}
                 <FormField control={form.control} name="maxImagesPerProperty" render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">{t('settings.platform.maxImages')}</FormLabel>
-                    <FormControl>
-                      <Input type="number" className="font-mono bg-muted/30" dir="ltr" {...field} />
-                    </FormControl>
+                    <FormControl><Input type="number" className="font-mono bg-muted/30" dir="ltr" {...field} /></FormControl>
                     <FormMessage />
                   </FormItem>
                 )} />
 
+                {/* Listing TTL */}
                 <FormField control={form.control} name="listingExpiryDays" render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">{t('settings.platform.listingTtl')}</FormLabel>
-                    <FormControl>
-                      <Input type="number" className="font-mono bg-muted/30" dir="ltr" {...field} />
-                    </FormControl>
+                    <FormControl><Input type="number" className="font-mono bg-muted/30" dir="ltr" {...field} /></FormControl>
                     <p className="text-[10px] text-muted-foreground">{t('settings.platform.listingTtlDesc')}</p>
                     <FormMessage />
                   </FormItem>
                 )} />
 
+                {/* Auto-approve */}
                 <FormField control={form.control} name="autoApproveListings" render={({ field }) => (
                   <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 bg-muted/10 col-span-1 md:col-span-2">
                     <div className="space-y-0.5">
@@ -591,9 +759,66 @@ export default function Settings() {
                   </FormItem>
                 )} />
               </div>
+
+              {/* Map Provider section */}
+              <div className="border-t pt-6 space-y-5">
+                <FormField control={form.control} name="mapProvider" render={({ field }) => (
+                  <FormItem className="max-w-sm">
+                    <FormLabel className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">{t('settings.platform.mapProvider')}</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger className="bg-muted/30 text-sm"><SelectValue /></SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="osm">{t('settings.platform.mapProviders.osm')}</SelectItem>
+                        <SelectItem value="mapbox">{t('settings.platform.mapProviders.mapbox')}</SelectItem>
+                        <SelectItem value="google">{t('settings.platform.mapProviders.google')}</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <p className="text-[10px] text-muted-foreground">{t('settings.platform.mapProviderDesc')}</p>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+
+                {mapProvider === 'mapbox' && (
+                  <div className="rounded-lg border bg-muted/10 p-5 space-y-2">
+                    <div className="flex items-center gap-2 text-sm font-semibold text-foreground mb-3">
+                      <Key className="w-4 h-4 text-primary" />
+                      {t('settings.platform.mapboxApiKey')}
+                    </div>
+                    <FormField control={form.control} name="mapboxApiKey" render={({ field }) => (
+                      <FormItem className="max-w-lg">
+                        <FormControl>
+                          <SecretInput value={field.value} onChange={field.onChange} placeholder={t('settings.platform.mapKeyPlaceholder')} />
+                        </FormControl>
+                        <p className="text-[10px] text-muted-foreground">{t('settings.platform.mapKeyNote')}</p>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
+                  </div>
+                )}
+
+                {mapProvider === 'google' && (
+                  <div className="rounded-lg border bg-muted/10 p-5 space-y-2">
+                    <div className="flex items-center gap-2 text-sm font-semibold text-foreground mb-3">
+                      <Key className="w-4 h-4 text-primary" />
+                      {t('settings.platform.googleMapsApiKey')}
+                    </div>
+                    <FormField control={form.control} name="googleMapsApiKey" render={({ field }) => (
+                      <FormItem className="max-w-lg">
+                        <FormControl>
+                          <SecretInput value={field.value} onChange={field.onChange} placeholder={t('settings.platform.mapKeyPlaceholder')} />
+                        </FormControl>
+                        <p className="text-[10px] text-muted-foreground">{t('settings.platform.mapKeyNote')}</p>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
+                  </div>
+                )}
+              </div>
             </TabsContent>
 
-            {/* System Tab */}
+            {/* ── System State Tab ─────────────────────────────────────── */}
             <TabsContent value="system" className="p-6 m-0 focus-visible:outline-none">
               <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-6 flex items-start gap-4">
                 <Server className="w-8 h-8 text-destructive shrink-0" />
@@ -602,18 +827,13 @@ export default function Settings() {
                     <h3 className="text-lg font-bold text-destructive">{t('settings.system.maintenanceTitle')}</h3>
                     <p className="text-sm text-destructive/80 mt-1">{t('settings.system.maintenanceDesc')}</p>
                   </div>
-                  
                   <FormField control={form.control} name="maintenanceMode" render={({ field }) => (
                     <FormItem className="flex flex-row items-center justify-between rounded-md border border-destructive/30 p-4 bg-destructive/5">
                       <div className="space-y-0.5">
                         <FormLabel className="text-sm font-semibold text-destructive">{t('settings.system.engageLockdown')}</FormLabel>
                       </div>
                       <FormControl>
-                        <Switch 
-                          checked={field.value} 
-                          onCheckedChange={field.onChange}
-                          className="data-[state=checked]:bg-destructive" 
-                        />
+                        <Switch checked={field.value} onCheckedChange={field.onChange} className="data-[state=checked]:bg-destructive" />
                       </FormControl>
                     </FormItem>
                   )} />

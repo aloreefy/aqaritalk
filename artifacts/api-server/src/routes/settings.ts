@@ -27,10 +27,25 @@ function toResponse(row: typeof systemSettingsTable.$inferSelect) {
   };
 }
 
+/** Resolve the appropriate map API key for the configured provider. */
+function resolveMapApiKey(row: typeof systemSettingsTable.$inferSelect): string | null {
+  if (row.mapProvider === "mapbox") return row.mapboxApiKey ?? null;
+  if (row.mapProvider === "google") return row.googleMapsApiKey ?? null;
+  return null; // OSM needs no key
+}
+
 // ── Public (no auth) ──────────────────────────────────────────────────────
 router.get("/settings", async (_req, res): Promise<void> => {
   const settings = await getOrCreateSettings();
-  res.json({ voiceCtaStyle: settings.voiceCtaStyle ?? "green_card" });
+  res.json({
+    voiceCtaStyle: settings.voiceCtaStyle ?? "green_card",
+    mapProvider: settings.mapProvider ?? "osm",
+    mapApiKey: resolveMapApiKey(settings),
+    featureMapView: settings.featureMapView,
+    featureVoiceInput: settings.featureVoiceInput,
+    featureContactRelease: settings.featureContactRelease,
+    featureSellerWizard: settings.featureSellerWizard,
+  });
 });
 
 // ── Admin ─────────────────────────────────────────────────────────────────

@@ -17,10 +17,11 @@ import json
 from datetime import datetime
 from typing import TypedDict, Literal, Optional, Annotated
 
+import time
 from dotenv import load_dotenv
 load_dotenv()   # reads .env so OPENAI_API_KEY / DATABASE_URL are in the environment
 
-from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage, ToolMessage
+from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage, ToolMessage, AIMessage
 from langchain_core.tools import tool
 from langchain_openai import ChatOpenAI
 from langgraph.graph import StateGraph, START, END      # the START/END sentinels
@@ -46,9 +47,11 @@ def log(msg: str) -> None:
 
 
 # ============================== 1. THE MODEL ==============================
-# gpt-4o-mini (cloud). The API key is read from OPENAI_API_KEY in .env — not
-# hardcoded here.
-llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
+# The model + temperature are read from the system_settings DB table on each
+# request (cached for 5 minutes so settings changes don't require a restart).
+
+_LLM_CACHE: dict = {"plain": None, "llm_with_tools": None, "max_turns": 10, "ts": 0.0}
+_LLM_TTL = 300  # seconds — helpers defined after `tools` is declared below
 
 
 # ============================== 2. THE TOOLS ==============================
@@ -114,7 +117,31 @@ def create_listing(
 
 
 tools = [search_properties, create_listing]
-llm_with_tools = llm.bind_tools(tools)   # gives the model the tool schemas
+
+# Finish the LLM cache helper now that `tools` is in scope.
+# Calling _get_llm_with_tools() returns the (possibly-refreshed) bound LLM
+# and the current max_turns from DB.
+def _get_llm_with_tools():
+    now = time.time()
+    if _LLM_CACHE["llm_with_tools"] is None or now - _LLM_CACHE["ts"] > _LLM_TTL:
+        settings = db.get_system_settings()
+        _llm = ChatOpenAI(
+            model=settings["ai_model"],
+            temperature=settings["ai_temperature"],
+        )
+        _LLM_CACHE["plain"] = _llm
+        _LLM_CACHE["llm_with_tools"] = _llm.bind_tools(tools)
+        _LLM_CACHE["max_turns"] = settings["ai_max_turns"]
+        _LLM_CACHE["ts"] = now
+        log(
+            f"⚙️  LLM refreshed → model={settings['ai_model']}  "
+            f"temp={settings['ai_temperature']}  max_turns={settings['ai_max_turns']}"
+        )
+    return _LLM_CACHE["llm_with_tools"], _LLM_CACHE["max_turns"]
+
+def _get_plain_llm() -> ChatOpenAI:
+    _get_llm_with_tools()          # triggers refresh if stale
+    return _LLM_CACHE["plain"]
 
 
 # ============================== 3. THE STATE ==============================
@@ -151,7 +178,7 @@ def classify(state: AgentState) -> dict:
         lines.append(f"{who}: {m.content}")
     transcript = "\n".join(lines)
 
-    verdict = llm.invoke([
+    verdict = _get_plain_llm().invoke([
         SystemMessage(
             "صنّف نية العميل بالنظر إلى المحادثة كاملةً، بكلمة واحدة فقط:\n"
             "buy إذا كان يريد الشراء أو الاستئجار،\n"
@@ -185,6 +212,17 @@ CREATE_PROMPT = (
 def agent(state: AgentState) -> dict:
     """The reasoning step. Intent decides which system prompt steers the model."""
     log(f"🤖 NODE agent: thinking (intent={state.get('intent')})...")
+
+    llm_with_tools, max_turns = _get_llm_with_tools()
+
+    # Enforce the admin-configured turn limit
+    human_turns = sum(1 for m in state["messages"] if isinstance(m, HumanMessage))
+    if human_turns > max_turns:
+        log(f"🤖 NODE agent: max_turns ({max_turns}) exceeded — returning soft stop")
+        return {"messages": [AIMessage(
+            "لقد وصلنا إلى الحد الأقصى لهذه المحادثة. يرجى بدء محادثة جديدة."
+        )]}
+
     system = SEARCH_PROMPT if state["intent"] == "buy" else CREATE_PROMPT
     response = llm_with_tools.invoke([SystemMessage(system), *state["messages"]])
 

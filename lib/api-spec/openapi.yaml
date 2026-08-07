@@ -1401,15 +1401,30 @@ components:
 
     AppSettings:
       type: object
-      required: [voiceCtaStyle]
+      required: [voiceCtaStyle, mapProvider, featureMapView, featureVoiceInput, featureContactRelease, featureSellerWizard]
       properties:
         voiceCtaStyle:
           type: string
           enum: [green_card, orb, waveform, sonar]
+        mapProvider:
+          type: string
+          enum: [osm, mapbox, google]
+        mapApiKey:
+          type: string
+          nullable: true
+          description: "The API key for the configured map provider (Mapbox token or Google Maps key). Null for OSM."
+        featureMapView:
+          type: boolean
+        featureVoiceInput:
+          type: boolean
+        featureContactRelease:
+          type: boolean
+        featureSellerWizard:
+          type: boolean
 
     SystemSettings:
       type: object
-      required: [id, otpExpiryMinutes, otpMaxAttempts, otpRateLimitCount, otpRateLimitWindowMinutes, aiModel, aiTemperature, aiMaxTurns, aiGuardrailLevel, defaultLanguage, defaultCurrency, maxImagesPerProperty, autoApproveListings, listingExpiryDays, maintenanceMode, featureVoiceInput, featureMapView, featureContactRelease, featureSellerWizard, voiceCtaStyle, updatedAt]
+      required: [id, otpExpiryMinutes, otpMaxAttempts, otpRateLimitCount, otpRateLimitWindowMinutes, aiModel, aiTemperature, aiMaxTurns, aiGuardrailLevel, defaultLanguage, defaultCurrency, maxImagesPerProperty, autoApproveListings, listingExpiryDays, maintenanceMode, featureVoiceInput, featureMapView, featureContactRelease, featureSellerWizard, voiceCtaStyle, mapProvider, otpProvider, updatedAt]
       properties:
         id:
           type: string
@@ -1455,6 +1470,41 @@ components:
         voiceCtaStyle:
           type: string
           enum: [green_card, orb, waveform, sonar]
+        # ── Map provider ──────────────────────────────
+        mapProvider:
+          type: string
+          enum: [osm, mapbox, google]
+        mapboxApiKey:
+          type: string
+          nullable: true
+        googleMapsApiKey:
+          type: string
+          nullable: true
+        # ── OTP provider ──────────────────────────────
+        otpProvider:
+          type: string
+          enum: [console, twilio, unifonic, msegat]
+        twilioAccountSid:
+          type: string
+          nullable: true
+        twilioAuthToken:
+          type: string
+          nullable: true
+        twilioFromNumber:
+          type: string
+          nullable: true
+        unifonicAppSid:
+          type: string
+          nullable: true
+        unifonicSender:
+          type: string
+          nullable: true
+        msegatApiKey:
+          type: string
+          nullable: true
+        msegatSender:
+          type: string
+          nullable: true
         updatedAt:
           type: string
           format: date-time
@@ -1520,3 +1570,38 @@ components:
           type: boolean
         featureSellerWizard:
           type: boolean
+        # ── Map provider ──────────────────────────────
+        mapProvider:
+          type: string
+          enum: [osm, mapbox, google]
+        mapboxApiKey:
+          type: string
+          nullable: true
+        googleMapsApiKey:
+          type: string
+          nullable: true
+        # ── OTP provider ──────────────────────────────
+        otpProvider:
+          type: string
+          enum: [console, twilio, unifonic, msegat]
+        twilioAccountSid:
+          type: string
+          nullable: true
+        twilioAuthToken:
+          type: string
+          nullable: true
+        twilioFromNumber:
+          type: string
+          nullable: true
+        unifonicAppSid:
+          type: string
+          nullable: true
+        unifonicSender:
+          type: string
+          nullable: true
+        msegatApiKey:
+          type: string
+          nullable: true
+        msegatSender:
+          type: string
+          nullable: true
