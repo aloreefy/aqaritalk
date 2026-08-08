@@ -94,7 +94,9 @@ router.post("/admin/users", ...adminGuard, async (req, res): Promise<void> => {
     return;
   }
 
-  const { phone, name, role, market, status, avatarUrl, preferredCurrency, username, password } = parsed.data;
+  const { phone, name, role, market, status, avatarUrl, preferredCurrency, password } = parsed.data;
+  // Normalise username: lowercase + trim so login is always case-insensitive
+  const username = parsed.data.username ? parsed.data.username.toLowerCase().trim() : undefined;
 
   // Check for duplicate phone
   const existing = await db
@@ -196,20 +198,21 @@ router.put("/admin/users/:id", ...adminGuard, async (req, res): Promise<void> =>
   if (parsed.data.avatarUrl !== undefined) updates.avatarUrl = parsed.data.avatarUrl;
   if (parsed.data.preferredCurrency !== undefined) updates.preferredCurrency = parsed.data.preferredCurrency;
 
-  // Username: check uniqueness (excluding this user)
+  // Username: normalise then check uniqueness (excluding this user)
   if (parsed.data.username !== undefined) {
-    if (parsed.data.username) {
+    const normUsername = parsed.data.username ? parsed.data.username.toLowerCase().trim() : null;
+    if (normUsername) {
       const usernameConflict = await db
         .select({ id: usersTable.id })
         .from(usersTable)
-        .where(and(eq(usersTable.username, parsed.data.username), isNull(usersTable.deletedAt)))
+        .where(and(eq(usersTable.username, normUsername), isNull(usersTable.deletedAt)))
         .limit(1);
       if (usernameConflict.length > 0 && usernameConflict[0].id !== params.data.id) {
         res.status(409).json({ error: "Username already taken" });
         return;
       }
     }
-    updates.username = parsed.data.username ?? null;
+    updates.username = normUsername;
   }
 
   // Password: hash if provided

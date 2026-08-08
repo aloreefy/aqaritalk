@@ -1,6 +1,6 @@
 import { Router, type IRouter } from "express";
 import { db, usersTable } from "@workspace/db";
-import { eq, or } from "drizzle-orm";
+import { eq, or, sql } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 import { AdminPortalLoginBody, AdminPortalLoginResponse } from "@workspace/api-zod";
 import { signToken } from "../lib/jwt";
@@ -22,11 +22,14 @@ router.post("/admin/portal/login", async (req, res): Promise<void> => {
     res.status(401).json({ error: msg });
   };
 
-  // Look up by username OR phone
+  // Look up by username (case-insensitive) OR phone (exact)
   const [user] = await db
     .select()
     .from(usersTable)
-    .where(or(eq(usersTable.username, login), eq(usersTable.phone, login)))
+    .where(or(
+      sql`lower(${usersTable.username}) = lower(${login})`,
+      eq(usersTable.phone, login),
+    ))
     .limit(1);
 
   if (!user) return void (await fail("Invalid credentials"));
