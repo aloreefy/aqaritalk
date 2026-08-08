@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Slider } from "@/components/ui/slider";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
@@ -373,9 +373,36 @@ export default function Settings() {
                 <FormField control={form.control} name="aiModel" render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">{t('settings.engine.model')}</FormLabel>
-                    <FormControl>
-                      <Input className="font-mono bg-muted/30" dir="ltr" {...field} />
-                    </FormControl>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger className="bg-muted/30 font-mono text-sm" dir="ltr">
+                          <SelectValue />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent dir="ltr">
+                        <SelectGroup>
+                          <SelectLabel className="text-[10px] text-muted-foreground font-semibold tracking-wider uppercase px-2 py-1.5">GPT-4o family</SelectLabel>
+                          <SelectItem value="gpt-4o-mini">gpt-4o-mini</SelectItem>
+                          <SelectItem value="gpt-4o">gpt-4o</SelectItem>
+                        </SelectGroup>
+                        <SelectGroup>
+                          <SelectLabel className="text-[10px] text-muted-foreground font-semibold tracking-wider uppercase px-2 py-1.5">GPT-4.1 family</SelectLabel>
+                          <SelectItem value="gpt-4.1-mini">gpt-4.1-mini</SelectItem>
+                          <SelectItem value="gpt-4.1-nano">gpt-4.1-nano</SelectItem>
+                          <SelectItem value="gpt-4.1">gpt-4.1</SelectItem>
+                        </SelectGroup>
+                        <SelectGroup>
+                          <SelectLabel className="text-[10px] text-muted-foreground font-semibold tracking-wider uppercase px-2 py-1.5">GPT-4 Turbo</SelectLabel>
+                          <SelectItem value="gpt-4-turbo">gpt-4-turbo</SelectItem>
+                          <SelectItem value="gpt-4-turbo-preview">gpt-4-turbo-preview</SelectItem>
+                        </SelectGroup>
+                        <SelectGroup>
+                          <SelectLabel className="text-[10px] text-muted-foreground font-semibold tracking-wider uppercase px-2 py-1.5">Reasoning</SelectLabel>
+                          <SelectItem value="o1-mini">o1-mini</SelectItem>
+                          <SelectItem value="o3-mini">o3-mini</SelectItem>
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
                     <p className="text-[10px] text-muted-foreground">{t('settings.engine.modelDesc')}</p>
                     <FormMessage />
                   </FormItem>
