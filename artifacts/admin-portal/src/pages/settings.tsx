@@ -133,6 +133,59 @@ const AI_MODEL_GROUPS: { label: string; models: string[] }[] = [
 ];
 const AI_MODELS_FLAT = AI_MODEL_GROUPS.flatMap((g) => g.models);
 
+// Pricing sourced from https://platform.openai.com/docs/pricing — per 1M tokens (USD)
+const AI_MODEL_PRICING: Record<string, { input: number; output: number; note?: string }> = {
+  "gpt-4o-mini":          { input: 0.15,  output: 0.60  },
+  "gpt-4o":               { input: 2.50,  output: 10.00 },
+  "gpt-4.1-nano":         { input: 0.10,  output: 0.40  },
+  "gpt-4.1-mini":         { input: 0.40,  output: 1.60  },
+  "gpt-4.1":              { input: 2.00,  output: 8.00  },
+  "gpt-4-turbo":          { input: 10.00, output: 30.00 },
+  "gpt-4-turbo-preview":  { input: 10.00, output: 30.00, note: "Legacy alias for gpt-4-turbo" },
+  "o1-mini":              { input: 1.10,  output: 4.40,  note: "Reasoning model — thinking tokens billed as output" },
+  "o3-mini":              { input: 1.10,  output: 4.40,  note: "Reasoning model — thinking tokens billed as output" },
+  "o4-mini":              { input: 1.10,  output: 4.40,  note: "Reasoning model — thinking tokens billed as output" },
+};
+
+function ModelPricingCard({ model }: { model: string }) {
+  const pricing = AI_MODEL_PRICING[model];
+  if (!pricing) return null;
+  return (
+    <div className="mt-3 rounded-lg border bg-muted/20 p-4 space-y-3" dir="ltr">
+      <div className="flex items-center justify-between">
+        <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Token Pricing</span>
+        <a
+          href="https://platform.openai.com/docs/pricing"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-[10px] text-primary hover:underline"
+        >
+          openai.com/api/pricing ↗
+        </a>
+      </div>
+      <div className="grid grid-cols-2 gap-3">
+        <div className="rounded-md bg-background border px-3 py-2.5">
+          <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide mb-1">Input</p>
+          <p className="text-lg font-bold tabular-nums text-foreground">
+            ${pricing.input.toFixed(2)}
+          </p>
+          <p className="text-[10px] text-muted-foreground">per 1M tokens</p>
+        </div>
+        <div className="rounded-md bg-background border px-3 py-2.5">
+          <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide mb-1">Output</p>
+          <p className="text-lg font-bold tabular-nums text-foreground">
+            ${pricing.output.toFixed(2)}
+          </p>
+          <p className="text-[10px] text-muted-foreground">per 1M tokens</p>
+        </div>
+      </div>
+      {pricing.note && (
+        <p className="text-[10px] text-muted-foreground leading-relaxed">{pricing.note}</p>
+      )}
+    </div>
+  );
+}
+
 // ── Currencies ────────────────────────────────────────────────────────────
 const CURRENCIES = ['JOD', 'SAR', 'AED', 'EGP', 'KWD', 'QAR', 'BHD', 'OMR', 'MAD', 'LBP', 'IQD'] as const;
 type Currency = typeof CURRENCIES[number];
@@ -256,6 +309,7 @@ export default function Settings() {
   // Watch reactive fields for conditional rendering
   const otpProvider = form.watch('otpProvider');
   const mapProvider = form.watch('mapProvider');
+  const aiModel = form.watch('aiModel');
 
   // Combobox open states
   const [currencyOpen, setCurrencyOpen] = useState(false);
@@ -423,6 +477,7 @@ export default function Settings() {
                       </PopoverContent>
                     </Popover>
                     <p className="text-[10px] text-muted-foreground">{t('settings.engine.modelDesc')}</p>
+                    <ModelPricingCard model={aiModel} />
                     <FormMessage />
                   </FormItem>
                 )} />
