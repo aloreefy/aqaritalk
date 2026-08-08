@@ -313,31 +313,37 @@ router.post("/admin/properties", ...adminGuard, async (req, res): Promise<void> 
   const user = (req as any).user;
   const data = parsed.data;
 
-  const [row] = await db
-    .insert(propertiesTable)
-    .values({
-      createdBy: user.id,
-      listingDirection: "offering",
-      status: "active", // admin listings go live immediately
-      propertyType: data.propertyType as any,
-      transactionMode: data.transactionMode as any,
-      listingName: data.listingName ?? null,
-      price: data.price ? String(data.price) : null,
-      priceCurrency: data.priceCurrency ?? "JOD",
-      priceNegotiable: data.priceNegotiable ?? false,
-      country: data.country ?? null,
-      city: data.city ?? null,
-      district: data.district ?? null,
-      street: data.street ?? null,
-      areaSqm: data.areaSqm ? String(data.areaSqm) : null,
-      rooms: data.rooms ?? null,
-      bathrooms: data.bathrooms ?? null,
-      floorNumber: data.floorNumber ?? null,
-      furnishedStatus: (data.furnishedStatus as any) ?? null,
-      condition: (data.condition as any) ?? null,
-      description: data.description ?? null,
-    })
-    .returning();
+  let row: any;
+  try {
+    [row] = await db
+      .insert(propertiesTable)
+      .values({
+        createdBy: user.userId,          // JWT payload uses userId, not id
+        listingDirection: "offering",
+        status: "active",                // admin listings go live immediately
+        propertyType: data.propertyType as any,
+        transactionMode: data.transactionMode as any,
+        listingName: data.listingName ?? null,
+        price: data.price ? String(data.price) : null,
+        priceCurrency: data.priceCurrency ?? "JOD",
+        priceNegotiable: data.priceNegotiable ?? false,
+        country: data.country ?? null,
+        city: data.city ?? null,
+        district: data.district ?? null,
+        street: data.street ?? null,
+        areaSqm: data.areaSqm ? String(data.areaSqm) : null,
+        rooms: data.rooms ?? null,
+        bathrooms: data.bathrooms ?? null,
+        floorNumber: data.floorNumber ?? null,
+        furnishedStatus: (data.furnishedStatus as any) ?? null,
+        condition: (data.condition as any) ?? null,
+        description: data.description ?? null,
+      })
+      .returning();
+  } catch (err: any) {
+    res.status(500).json({ error: err?.message ?? "Failed to create listing" });
+    return;
+  }
 
   res.status(201).json(toApiProperty(row));
 });
