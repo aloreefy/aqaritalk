@@ -32,7 +32,7 @@ const schema = z.object({
   status: z.enum(["active", "pending_review", "rejected", "deleted", "draft"]),
   price: z.coerce.number().positive().optional().or(z.literal("")),
   priceCurrency: z.string().default("JOD"),
-  country: z.string().optional(),
+  country: z.string().max(3, "Use a 2-3 letter country code, e.g. JO").optional(),
   city: z.string().optional(),
   district: z.string().optional(),
   street: z.string().optional(),
@@ -179,7 +179,7 @@ function PropertyEditForm({ prop, id }: { prop: AdminGetProperty200; id: string 
               <p className="text-xs uppercase tracking-wider text-muted-foreground font-semibold mb-4">Location</p>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 <FormField control={form.control} name="country" render={({ field }) => (
-                  <FormItem><FormLabel>Country</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
+                  <FormItem><FormLabel>Country Code</FormLabel><FormControl><Input {...field} placeholder="JO" maxLength={3} className="uppercase" /></FormControl><FormMessage /></FormItem>
                 )} />
                 <FormField control={form.control} name="city" render={({ field }) => (
                   <FormItem><FormLabel>City</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>

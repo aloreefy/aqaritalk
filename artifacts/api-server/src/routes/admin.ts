@@ -341,11 +341,17 @@ router.post("/admin/properties", ...adminGuard, async (req, res): Promise<void> 
       })
       .returning();
   } catch (err: any) {
-    res.status(500).json({ error: err?.message ?? "Failed to create listing" });
+    const detail = err?.cause?.message ?? err?.cause?.detail ?? err?.message ?? "Failed to create listing";
+    console.error("[admin/properties POST]", err?.cause ?? err);
+    res.status(500).json({ error: detail });
     return;
   }
 
-  res.status(201).json(toApiProperty(row));
+  try {
+    res.status(201).json(toApiProperty(row));
+  } catch (err: any) {
+    res.status(500).json({ error: err?.message ?? "Failed to serialize listing" });
+  }
 });
 
 router.get("/admin/properties/:id", ...adminGuard, async (req, res): Promise<void> => {

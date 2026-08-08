@@ -23,7 +23,7 @@ const schema = z.object({
   transactionMode: z.enum(["sale", "rent", "lease"]),
   price: z.coerce.number().positive().optional().or(z.literal("")),
   priceCurrency: z.string().default("JOD"),
-  country: z.string().optional(),
+  country: z.string().max(3, "Use a 2-3 letter country code, e.g. JO").optional(),
   city: z.string().optional(),
   district: z.string().optional(),
   areaSqm: z.coerce.number().positive().optional().or(z.literal("")),
@@ -137,7 +137,7 @@ export default function PropertyNew() {
               <p className="text-xs uppercase tracking-wider text-muted-foreground font-semibold mb-4">Location</p>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 <FormField control={form.control} name="country" render={({ field }) => (
-                  <FormItem><FormLabel>Country</FormLabel><FormControl><Input {...field} placeholder="JO" /></FormControl><FormMessage /></FormItem>
+                  <FormItem><FormLabel>Country Code</FormLabel><FormControl><Input {...field} placeholder="JO" maxLength={3} className="uppercase" /></FormControl><FormMessage /></FormItem>
                 )} />
                 <FormField control={form.control} name="city" render={({ field }) => (
                   <FormItem><FormLabel>City</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
