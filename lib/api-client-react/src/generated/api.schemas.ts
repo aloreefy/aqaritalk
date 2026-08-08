@@ -392,12 +392,47 @@ export const ConversationMessageRole = {
   assistant: 'assistant',
 } as const;
 
+export type PropertiesCardType = typeof PropertiesCardType[keyof typeof PropertiesCardType];
+
+
+export const PropertiesCardType = {
+  properties: 'properties',
+} as const;
+
+export interface PropertiesCard {
+  type: PropertiesCardType;
+  properties: Property[];
+}
+
+export type ContactCardType = typeof ContactCardType[keyof typeof ContactCardType];
+
+
+export const ContactCardType = {
+  contact: 'contact',
+} as const;
+
+export type ContactCardContact = {
+  phone?: string;
+  email?: string;
+  whatsapp?: string;
+  hours?: string;
+};
+
+export interface ContactCard {
+  type: ContactCardType;
+  contact: ContactCardContact;
+}
+
+export type MessageCard = PropertiesCard | ContactCard;
+
 export interface ConversationMessage {
   role: ConversationMessageRole;
   content: string;
   timestamp: string;
-  /** Property listings the agent found for this message, rendered as cards in the chat. Present only on assistant messages that returned search results. */
+  /** Legacy card field kept for conversations stored before the cards contract (docs/adr/0001). New messages carry `cards` instead; clients keep rendering this when present. */
   properties?: Property[];
+  /** Rich cards attached to an assistant message, discriminated by `type` (docs/adr/0001). Clients must ignore unknown card types. */
+  cards?: MessageCard[];
 }
 
 export interface Conversation {

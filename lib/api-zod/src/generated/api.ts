@@ -507,7 +507,65 @@ export const ListConversationsResponseItem = zod.object({
   "distance": zod.number().nullish().describe('Distance in km from search center (only present in search results)'),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date()
-})).optional().describe('Property listings the agent found for this message, rendered as cards in the chat. Present only on assistant messages that returned search results.')
+})).optional().describe('Legacy card field kept for conversations stored before the cards contract (docs\/adr\/0001). New messages carry `cards` instead; clients keep rendering this when present.'),
+  "cards": zod.array(zod.union([zod.object({
+  "type": zod.enum(['properties']),
+  "properties": zod.array(zod.object({
+  "id": zod.string(),
+  "createdBy": zod.string(),
+  "listingName": zod.string().nullish(),
+  "listingDirection": zod.enum(['offering', 'seeking']),
+  "propertyType": zod.string(),
+  "transactionMode": zod.enum(['sale', 'rent', 'lease']),
+  "rentalPeriod": zod.string().nullish(),
+  "price": zod.number().nullish(),
+  "priceCurrency": zod.string().optional(),
+  "priceNegotiable": zod.boolean().optional(),
+  "country": zod.string().nullish(),
+  "city": zod.string().nullish(),
+  "district": zod.string().nullish(),
+  "street": zod.string().nullish(),
+  "addressFull": zod.string().nullish(),
+  "latitude": zod.number().nullish(),
+  "longitude": zod.number().nullish(),
+  "locationAccuracy": zod.string().nullish(),
+  "areaSqm": zod.number().nullish(),
+  "rooms": zod.number().nullish(),
+  "bathrooms": zod.number().nullish(),
+  "floorNumber": zod.number().nullish(),
+  "furnishedStatus": zod.string().nullish(),
+  "parking": zod.boolean().nullish(),
+  "hasElevator": zod.boolean().nullish(),
+  "condition": zod.string().nullish(),
+  "description": zod.string().nullish(),
+  "status": zod.enum(['draft', 'pending_review', 'active', 'sold', 'rented', 'expired', 'rejected', 'deleted']),
+  "verified": zod.boolean().optional(),
+  "aiMissingFields": zod.array(zod.string()).nullish(),
+  "contactPreference": zod.string().nullish(),
+  "brokerListing": zod.boolean(),
+  "images": zod.array(zod.object({
+  "id": zod.string(),
+  "propertyId": zod.string(),
+  "path": zod.string(),
+  "gpsLat": zod.number().nullish(),
+  "gpsLng": zod.number().nullish(),
+  "sizeBytes": zod.number().nullish(),
+  "isVoiceNote": zod.boolean(),
+  "createdAt": zod.coerce.date()
+})).optional(),
+  "distance": zod.number().nullish().describe('Distance in km from search center (only present in search results)'),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+}))
+}),zod.object({
+  "type": zod.enum(['contact']),
+  "contact": zod.object({
+  "phone": zod.string().optional(),
+  "email": zod.string().optional(),
+  "whatsapp": zod.string().optional(),
+  "hours": zod.string().optional()
+})
+})])).optional().describe('Rich cards attached to an assistant message, discriminated by `type` (docs\/adr\/0001). Clients must ignore unknown card types.')
 })),
   "extractedData": zod.object({
 
@@ -593,7 +651,65 @@ export const GetConversationResponse = zod.object({
   "distance": zod.number().nullish().describe('Distance in km from search center (only present in search results)'),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date()
-})).optional().describe('Property listings the agent found for this message, rendered as cards in the chat. Present only on assistant messages that returned search results.')
+})).optional().describe('Legacy card field kept for conversations stored before the cards contract (docs\/adr\/0001). New messages carry `cards` instead; clients keep rendering this when present.'),
+  "cards": zod.array(zod.union([zod.object({
+  "type": zod.enum(['properties']),
+  "properties": zod.array(zod.object({
+  "id": zod.string(),
+  "createdBy": zod.string(),
+  "listingName": zod.string().nullish(),
+  "listingDirection": zod.enum(['offering', 'seeking']),
+  "propertyType": zod.string(),
+  "transactionMode": zod.enum(['sale', 'rent', 'lease']),
+  "rentalPeriod": zod.string().nullish(),
+  "price": zod.number().nullish(),
+  "priceCurrency": zod.string().optional(),
+  "priceNegotiable": zod.boolean().optional(),
+  "country": zod.string().nullish(),
+  "city": zod.string().nullish(),
+  "district": zod.string().nullish(),
+  "street": zod.string().nullish(),
+  "addressFull": zod.string().nullish(),
+  "latitude": zod.number().nullish(),
+  "longitude": zod.number().nullish(),
+  "locationAccuracy": zod.string().nullish(),
+  "areaSqm": zod.number().nullish(),
+  "rooms": zod.number().nullish(),
+  "bathrooms": zod.number().nullish(),
+  "floorNumber": zod.number().nullish(),
+  "furnishedStatus": zod.string().nullish(),
+  "parking": zod.boolean().nullish(),
+  "hasElevator": zod.boolean().nullish(),
+  "condition": zod.string().nullish(),
+  "description": zod.string().nullish(),
+  "status": zod.enum(['draft', 'pending_review', 'active', 'sold', 'rented', 'expired', 'rejected', 'deleted']),
+  "verified": zod.boolean().optional(),
+  "aiMissingFields": zod.array(zod.string()).nullish(),
+  "contactPreference": zod.string().nullish(),
+  "brokerListing": zod.boolean(),
+  "images": zod.array(zod.object({
+  "id": zod.string(),
+  "propertyId": zod.string(),
+  "path": zod.string(),
+  "gpsLat": zod.number().nullish(),
+  "gpsLng": zod.number().nullish(),
+  "sizeBytes": zod.number().nullish(),
+  "isVoiceNote": zod.boolean(),
+  "createdAt": zod.coerce.date()
+})).optional(),
+  "distance": zod.number().nullish().describe('Distance in km from search center (only present in search results)'),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+}))
+}),zod.object({
+  "type": zod.enum(['contact']),
+  "contact": zod.object({
+  "phone": zod.string().optional(),
+  "email": zod.string().optional(),
+  "whatsapp": zod.string().optional(),
+  "hours": zod.string().optional()
+})
+})])).optional().describe('Rich cards attached to an assistant message, discriminated by `type` (docs\/adr\/0001). Clients must ignore unknown card types.')
 })),
   "extractedData": zod.object({
 
@@ -671,7 +787,65 @@ export const SendMessageResponse = zod.object({
   "distance": zod.number().nullish().describe('Distance in km from search center (only present in search results)'),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date()
-})).optional().describe('Property listings the agent found for this message, rendered as cards in the chat. Present only on assistant messages that returned search results.')
+})).optional().describe('Legacy card field kept for conversations stored before the cards contract (docs\/adr\/0001). New messages carry `cards` instead; clients keep rendering this when present.'),
+  "cards": zod.array(zod.union([zod.object({
+  "type": zod.enum(['properties']),
+  "properties": zod.array(zod.object({
+  "id": zod.string(),
+  "createdBy": zod.string(),
+  "listingName": zod.string().nullish(),
+  "listingDirection": zod.enum(['offering', 'seeking']),
+  "propertyType": zod.string(),
+  "transactionMode": zod.enum(['sale', 'rent', 'lease']),
+  "rentalPeriod": zod.string().nullish(),
+  "price": zod.number().nullish(),
+  "priceCurrency": zod.string().optional(),
+  "priceNegotiable": zod.boolean().optional(),
+  "country": zod.string().nullish(),
+  "city": zod.string().nullish(),
+  "district": zod.string().nullish(),
+  "street": zod.string().nullish(),
+  "addressFull": zod.string().nullish(),
+  "latitude": zod.number().nullish(),
+  "longitude": zod.number().nullish(),
+  "locationAccuracy": zod.string().nullish(),
+  "areaSqm": zod.number().nullish(),
+  "rooms": zod.number().nullish(),
+  "bathrooms": zod.number().nullish(),
+  "floorNumber": zod.number().nullish(),
+  "furnishedStatus": zod.string().nullish(),
+  "parking": zod.boolean().nullish(),
+  "hasElevator": zod.boolean().nullish(),
+  "condition": zod.string().nullish(),
+  "description": zod.string().nullish(),
+  "status": zod.enum(['draft', 'pending_review', 'active', 'sold', 'rented', 'expired', 'rejected', 'deleted']),
+  "verified": zod.boolean().optional(),
+  "aiMissingFields": zod.array(zod.string()).nullish(),
+  "contactPreference": zod.string().nullish(),
+  "brokerListing": zod.boolean(),
+  "images": zod.array(zod.object({
+  "id": zod.string(),
+  "propertyId": zod.string(),
+  "path": zod.string(),
+  "gpsLat": zod.number().nullish(),
+  "gpsLng": zod.number().nullish(),
+  "sizeBytes": zod.number().nullish(),
+  "isVoiceNote": zod.boolean(),
+  "createdAt": zod.coerce.date()
+})).optional(),
+  "distance": zod.number().nullish().describe('Distance in km from search center (only present in search results)'),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+}))
+}),zod.object({
+  "type": zod.enum(['contact']),
+  "contact": zod.object({
+  "phone": zod.string().optional(),
+  "email": zod.string().optional(),
+  "whatsapp": zod.string().optional(),
+  "hours": zod.string().optional()
+})
+})])).optional().describe('Rich cards attached to an assistant message, discriminated by `type` (docs\/adr\/0001). Clients must ignore unknown card types.')
 }),
   "conversation": zod.object({
   "id": zod.string(),
@@ -729,7 +903,65 @@ export const SendMessageResponse = zod.object({
   "distance": zod.number().nullish().describe('Distance in km from search center (only present in search results)'),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date()
-})).optional().describe('Property listings the agent found for this message, rendered as cards in the chat. Present only on assistant messages that returned search results.')
+})).optional().describe('Legacy card field kept for conversations stored before the cards contract (docs\/adr\/0001). New messages carry `cards` instead; clients keep rendering this when present.'),
+  "cards": zod.array(zod.union([zod.object({
+  "type": zod.enum(['properties']),
+  "properties": zod.array(zod.object({
+  "id": zod.string(),
+  "createdBy": zod.string(),
+  "listingName": zod.string().nullish(),
+  "listingDirection": zod.enum(['offering', 'seeking']),
+  "propertyType": zod.string(),
+  "transactionMode": zod.enum(['sale', 'rent', 'lease']),
+  "rentalPeriod": zod.string().nullish(),
+  "price": zod.number().nullish(),
+  "priceCurrency": zod.string().optional(),
+  "priceNegotiable": zod.boolean().optional(),
+  "country": zod.string().nullish(),
+  "city": zod.string().nullish(),
+  "district": zod.string().nullish(),
+  "street": zod.string().nullish(),
+  "addressFull": zod.string().nullish(),
+  "latitude": zod.number().nullish(),
+  "longitude": zod.number().nullish(),
+  "locationAccuracy": zod.string().nullish(),
+  "areaSqm": zod.number().nullish(),
+  "rooms": zod.number().nullish(),
+  "bathrooms": zod.number().nullish(),
+  "floorNumber": zod.number().nullish(),
+  "furnishedStatus": zod.string().nullish(),
+  "parking": zod.boolean().nullish(),
+  "hasElevator": zod.boolean().nullish(),
+  "condition": zod.string().nullish(),
+  "description": zod.string().nullish(),
+  "status": zod.enum(['draft', 'pending_review', 'active', 'sold', 'rented', 'expired', 'rejected', 'deleted']),
+  "verified": zod.boolean().optional(),
+  "aiMissingFields": zod.array(zod.string()).nullish(),
+  "contactPreference": zod.string().nullish(),
+  "brokerListing": zod.boolean(),
+  "images": zod.array(zod.object({
+  "id": zod.string(),
+  "propertyId": zod.string(),
+  "path": zod.string(),
+  "gpsLat": zod.number().nullish(),
+  "gpsLng": zod.number().nullish(),
+  "sizeBytes": zod.number().nullish(),
+  "isVoiceNote": zod.boolean(),
+  "createdAt": zod.coerce.date()
+})).optional(),
+  "distance": zod.number().nullish().describe('Distance in km from search center (only present in search results)'),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+}))
+}),zod.object({
+  "type": zod.enum(['contact']),
+  "contact": zod.object({
+  "phone": zod.string().optional(),
+  "email": zod.string().optional(),
+  "whatsapp": zod.string().optional(),
+  "hours": zod.string().optional()
+})
+})])).optional().describe('Rich cards attached to an assistant message, discriminated by `type` (docs\/adr\/0001). Clients must ignore unknown card types.')
 })),
   "extractedData": zod.object({
 

@@ -101,6 +101,42 @@ def search_properties(
     return {"count": len(rows), "results": rows}
 
 
+def get_property_details(property_id: str) -> dict:
+    """Full record for one listing, plus its image paths. Never owner contact —
+    contact release is gated in the app (see docs/adr/0002)."""
+    with _connect() as conn, conn.cursor() as cur:
+        cur.execute(
+            "SELECT id, listing_name, listing_direction, property_type, "
+            "transaction_mode, rental_period, price, price_currency, price_per, "
+            "price_negotiable, country, city, district, rooms, bathrooms, "
+            "living_rooms, area_sqm, land_area_sqm, floor_number, "
+            "furnished_status, parking, has_elevator, has_garden, has_pool, "
+            "has_basement, has_rooftop_access, building_age_years, condition, "
+            "view_type, description, status, created_at "
+            "FROM properties "
+            "WHERE id = %s AND status = 'active' AND deleted_at IS NULL",
+            [property_id],
+        )
+        row = cur.fetchone()
+        if row is None:
+            return {"error": "لم يتم العثور على العقار المطلوب."}
+        cur.execute(
+            "SELECT path FROM property_images WHERE property_id = %s "
+            "AND is_voice_note = false ORDER BY created_at LIMIT 10",
+            [property_id],
+        )
+        images = [r["path"] for r in cur.fetchall()]
+
+    row["id"] = str(row["id"])
+    for k in ("price", "area_sqm", "land_area_sqm"):
+        if row.get(k) is not None:
+            row[k] = float(row[k])
+    if row.get("created_at") is not None:
+        row["created_at"] = row["created_at"].isoformat()
+    row["images"] = images
+    return row
+
+
 def _default_owner() -> Optional[str]:
     with _connect() as conn, conn.cursor() as cur:
         cur.execute(

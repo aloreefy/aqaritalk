@@ -92,3 +92,17 @@ React 19 + Vite + Tailwind v4, **RTL Arabic-first**. `pages/` (home, chat, auth,
 ## More context
 
 `replit.md` holds the maintained product/architecture notes (kept in sync with this file). `.agents/memory/` has focused notes on Gemini setup, the dinar-guardrail bug, OTP response shape, and the Vite workflow port.
+
+## Agent skills
+
+### Issue tracker
+
+Issues live in GitHub Issues (`aloreefy/aqaritalk`) via the `gh` CLI. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Default five-label vocabulary (`needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`). See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context: one `CONTEXT.md` + `docs/adr/` at the repo root. See `docs/agents/domain.md`.

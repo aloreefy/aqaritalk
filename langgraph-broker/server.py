@@ -36,13 +36,15 @@ class ChatRequest(BaseModel):
 
 class ChatResponse(BaseModel):
     reply: str
-    propertyIds: list[str] = []
+    # Discriminated-union cards (docs/adr/0001):
+    #   {"type": "properties", "propertyIds": [...]} | {"type": "contact", "contact": {...}}
+    cards: list[dict] = []
 
 
 def to_messages(req: ChatRequest) -> list[BaseMessage]:
     """Turn AqariTalk's {message, history} into LangChain messages.
 
-    The current `message` goes LAST so the graph's `classify` node (which reads
+    The current `message` goes LAST so the agent (which reads
     messages[-1]) sees the user's newest question.
     """
     msgs: list[BaseMessage] = []
@@ -66,16 +68,16 @@ def chat(req: ChatRequest) -> ChatResponse:
     # blocking graph.invoke() doesn't freeze the event loop.
     log("=" * 60)
     log(f"HTTP /chat — message: «{req.message}»  (history: {len(req.history)} turns)")
-    property_ids: list[str] = []
+    cards: list[dict] = []
     try:
         result = graph.invoke({"messages": to_messages(req)})
         reply = result.get("reply") or "عذراً، لم أتمكن من معالجة طلبك."
-        property_ids = result.get("property_ids") or []
+        cards = result.get("cards") or []
     except Exception as e:  # never crash the app's chat; return a safe message
         log(f"❌ /chat error: {e!r}")
         reply = "عذراً، حدث خطأ تقني. حاول مرة أخرى."
-    log(f"HTTP /chat — replying ({len(reply)} chars, {len(property_ids)} card(s))")
-    return ChatResponse(reply=reply, propertyIds=property_ids)
+    log(f"HTTP /chat — replying ({len(reply)} chars, {len(cards)} card(s))")
+    return ChatResponse(reply=reply, cards=cards)
 
 
 if __name__ == "__main__":
