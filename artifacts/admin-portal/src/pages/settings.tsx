@@ -147,13 +147,41 @@ const AI_MODEL_PRICING: Record<string, { input: number; output: number; note?: s
   "o4-mini":              { input: 1.10,  output: 4.40,  note: "Reasoning model — thinking tokens billed as output" },
 };
 
+// Model capabilities — context window, max output, tool calling support
+type ToolSupport = "full" | "limited" | "none";
+const AI_MODEL_META: Record<string, { contextK: number; maxOutputK: number; tools: ToolSupport; toolNote?: string }> = {
+  "gpt-4o-mini":         { contextK: 128,  maxOutputK: 16,  tools: "full" },
+  "gpt-4o":              { contextK: 128,  maxOutputK: 16,  tools: "full" },
+  "gpt-4.1-nano":        { contextK: 1024, maxOutputK: 32,  tools: "full" },
+  "gpt-4.1-mini":        { contextK: 1024, maxOutputK: 32,  tools: "full" },
+  "gpt-4.1":             { contextK: 1024, maxOutputK: 32,  tools: "full" },
+  "gpt-4-turbo":         { contextK: 128,  maxOutputK: 4,   tools: "full" },
+  "gpt-4-turbo-preview": { contextK: 128,  maxOutputK: 4,   tools: "full" },
+  "o1-mini":             { contextK: 128,  maxOutputK: 65,  tools: "limited", toolNote: "No parallel tool calls" },
+  "o3-mini":             { contextK: 200,  maxOutputK: 100, tools: "full" },
+  "o4-mini":             { contextK: 200,  maxOutputK: 100, tools: "full" },
+};
+
+function fmtK(k: number) { return k >= 1024 ? `${k / 1024}M` : `${k}K`; }
+
+const TOOL_BADGE: Record<ToolSupport, { label: string; className: string }> = {
+  full:    { label: "Full support",   className: "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/20" },
+  limited: { label: "Limited",        className: "bg-amber-500/10  text-amber-700  dark:text-amber-400  border-amber-500/20" },
+  none:    { label: "Not supported",  className: "bg-red-500/10    text-red-700    dark:text-red-400    border-red-500/20" },
+};
+
 function ModelPricingCard({ model }: { model: string }) {
   const pricing = AI_MODEL_PRICING[model];
+  const meta    = AI_MODEL_META[model];
   if (!pricing) return null;
+
+  const toolBadge = meta ? TOOL_BADGE[meta.tools] : null;
+
   return (
     <div className="mt-3 rounded-lg border bg-muted/20 p-4 space-y-3" dir="ltr">
+      {/* ── Header ── */}
       <div className="flex items-center justify-between">
-        <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Token Pricing</span>
+        <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Model Details</span>
         <a
           href="https://platform.openai.com/docs/pricing"
           target="_blank"
@@ -163,22 +191,49 @@ function ModelPricingCard({ model }: { model: string }) {
           openai.com/api/pricing ↗
         </a>
       </div>
+
+      {/* ── Pricing row ── */}
       <div className="grid grid-cols-2 gap-3">
         <div className="rounded-md bg-background border px-3 py-2.5">
-          <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide mb-1">Input</p>
-          <p className="text-lg font-bold tabular-nums text-foreground">
-            ${pricing.input.toFixed(2)}
-          </p>
+          <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide mb-1">Input price</p>
+          <p className="text-lg font-bold tabular-nums text-foreground">${pricing.input.toFixed(2)}</p>
           <p className="text-[10px] text-muted-foreground">per 1M tokens</p>
         </div>
         <div className="rounded-md bg-background border px-3 py-2.5">
-          <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide mb-1">Output</p>
-          <p className="text-lg font-bold tabular-nums text-foreground">
-            ${pricing.output.toFixed(2)}
-          </p>
+          <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide mb-1">Output price</p>
+          <p className="text-lg font-bold tabular-nums text-foreground">${pricing.output.toFixed(2)}</p>
           <p className="text-[10px] text-muted-foreground">per 1M tokens</p>
         </div>
       </div>
+
+      {/* ── Capabilities row ── */}
+      {meta && (
+        <div className="grid grid-cols-3 gap-3">
+          <div className="rounded-md bg-background border px-3 py-2.5">
+            <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide mb-1">Context window</p>
+            <p className="text-base font-bold tabular-nums text-foreground">{fmtK(meta.contextK)}</p>
+            <p className="text-[10px] text-muted-foreground">tokens</p>
+          </div>
+          <div className="rounded-md bg-background border px-3 py-2.5">
+            <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide mb-1">Max output</p>
+            <p className="text-base font-bold tabular-nums text-foreground">{fmtK(meta.maxOutputK)}</p>
+            <p className="text-[10px] text-muted-foreground">tokens</p>
+          </div>
+          <div className="rounded-md bg-background border px-3 py-2.5">
+            <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide mb-1">Tool calling</p>
+            {toolBadge && (
+              <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-semibold mt-1 ${toolBadge.className}`}>
+                {toolBadge.label}
+              </span>
+            )}
+            {meta.toolNote && (
+              <p className="text-[10px] text-muted-foreground mt-1 leading-snug">{meta.toolNote}</p>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ── Notes ── */}
       {pricing.note && (
         <p className="text-[10px] text-muted-foreground leading-relaxed">{pricing.note}</p>
       )}
