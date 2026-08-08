@@ -485,10 +485,12 @@ export default function Settings() {
             </div>
 
             {/* ── AI Engine Tab ────────────────────────────────────────── */}
-            <TabsContent value="engine" className="p-6 m-0 focus-visible:outline-none">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <TabsContent value="engine" className="p-6 m-0 focus-visible:outline-none space-y-8">
 
-                {/* Model — searchable combobox */}
+              {/* Row 1: Model (col 1) + Max Turns & Guardrail (col 2) */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+
+                {/* Col 1 — Model combobox + Model Details card */}
                 <FormField control={form.control} name="aiModel" render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">{t('settings.engine.model')}</FormLabel>
@@ -537,7 +539,43 @@ export default function Settings() {
                   </FormItem>
                 )} />
 
-                {/* Temperature — slider + number input */}
+                {/* Col 2 — Max Turns + Guardrail stacked */}
+                <div className="flex flex-col gap-6">
+                  <FormField control={form.control} name="aiMaxTurns" render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">{t('settings.engine.maxTurns')}</FormLabel>
+                      <FormControl>
+                        <Input type="number" className="font-mono bg-muted/30" dir="ltr" {...field} />
+                      </FormControl>
+                      <p className="text-[10px] text-muted-foreground">{t('settings.engine.maxTurnsDesc')}</p>
+                      <FormMessage />
+                    </FormItem>
+                  )} />
+
+                  <FormField control={form.control} name="aiGuardrailLevel" render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">{t('settings.engine.guardrail')}</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <FormControl>
+                          <SelectTrigger className="bg-muted/30 font-mono text-sm">
+                            <SelectValue />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="strict">{t('settings.engine.guardrailOptions.strict')}</SelectItem>
+                          <SelectItem value="balanced">{t('settings.engine.guardrailOptions.balanced')}</SelectItem>
+                          <SelectItem value="relaxed">{t('settings.engine.guardrailOptions.relaxed')}</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <p className="text-[10px] text-muted-foreground">{t('settings.engine.guardrailDesc')}</p>
+                      <FormMessage />
+                    </FormItem>
+                  )} />
+                </div>
+              </div>
+
+              {/* Row 2: Temperature — full width */}
+              <div className="border-t pt-6">
                 <FormField control={form.control} name="aiTemperature" render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">
@@ -545,7 +583,7 @@ export default function Settings() {
                       <span className="ms-2 font-bold text-primary tabular-nums">{Number(field.value).toFixed(1)}</span>
                     </FormLabel>
                     <FormControl>
-                      <div className="space-y-3">
+                      <div className="space-y-3 max-w-lg">
                         <Slider
                           value={[Number(field.value)]}
                           onValueChange={([v]) => field.onChange(v)}
@@ -571,40 +609,8 @@ export default function Settings() {
                     <FormMessage />
                   </FormItem>
                 )} />
-
-                {/* Max Turns */}
-                <FormField control={form.control} name="aiMaxTurns" render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">{t('settings.engine.maxTurns')}</FormLabel>
-                    <FormControl>
-                      <Input type="number" className="font-mono bg-muted/30" dir="ltr" {...field} />
-                    </FormControl>
-                    <p className="text-[10px] text-muted-foreground">{t('settings.engine.maxTurnsDesc')}</p>
-                    <FormMessage />
-                  </FormItem>
-                )} />
-
-                {/* Guardrail */}
-                <FormField control={form.control} name="aiGuardrailLevel" render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">{t('settings.engine.guardrail')}</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger className="bg-muted/30 font-mono text-sm">
-                          <SelectValue />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="strict">{t('settings.engine.guardrailOptions.strict')}</SelectItem>
-                        <SelectItem value="balanced">{t('settings.engine.guardrailOptions.balanced')}</SelectItem>
-                        <SelectItem value="relaxed">{t('settings.engine.guardrailOptions.relaxed')}</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <p className="text-[10px] text-muted-foreground">{t('settings.engine.guardrailDesc')}</p>
-                    <FormMessage />
-                  </FormItem>
-                )} />
               </div>
+
             </TabsContent>
 
             {/* ── Security & Auth Tab ──────────────────────────────────── */}
