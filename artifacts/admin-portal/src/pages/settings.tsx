@@ -539,7 +539,7 @@ export default function Settings() {
                   </FormItem>
                 )} />
 
-                {/* Col 2 — Max Turns + Guardrail stacked */}
+                {/* Col 2 — Max Turns + Guardrail + Temperature stacked */}
                 <div className="flex flex-col gap-6">
                   <FormField control={form.control} name="aiMaxTurns" render={({ field }) => (
                     <FormItem>
@@ -571,44 +571,41 @@ export default function Settings() {
                       <FormMessage />
                     </FormItem>
                   )} />
-                </div>
-              </div>
 
-              {/* Row 2: Temperature — full width */}
-              <div className="border-t pt-6">
-                <FormField control={form.control} name="aiTemperature" render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">
-                      {t('settings.engine.temperature')}
-                      <span className="ms-2 font-bold text-primary tabular-nums">{Number(field.value).toFixed(1)}</span>
-                    </FormLabel>
-                    <FormControl>
-                      <div className="space-y-3 max-w-lg">
-                        <Slider
-                          value={[Number(field.value)]}
-                          onValueChange={([v]) => field.onChange(v)}
-                          min={0} max={1} step={0.1}
-                          className="w-full"
-                        />
-                        <div className="flex items-center gap-2">
-                          <span className="text-[10px] text-muted-foreground tabular-nums w-6">0.0</span>
-                          <div className="flex-1" />
-                          <span className="text-[10px] text-muted-foreground tabular-nums w-6 text-end">1.0</span>
-                          <Input
-                            type="number"
-                            step="0.1" min="0" max="1"
-                            value={field.value}
-                            onChange={(e) => field.onChange(parseFloat(e.target.value))}
-                            className="w-20 font-mono bg-muted/30 text-sm h-8"
-                            dir="ltr"
+                  <FormField control={form.control} name="aiTemperature" render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">
+                        {t('settings.engine.temperature')}
+                        <span className="ms-2 font-bold text-primary tabular-nums">{Number(field.value).toFixed(1)}</span>
+                      </FormLabel>
+                      <FormControl>
+                        <div className="space-y-3">
+                          <Slider
+                            value={[Number(field.value)]}
+                            onValueChange={([v]) => field.onChange(v)}
+                            min={0} max={1} step={0.1}
+                            className="w-full"
                           />
+                          <div className="flex items-center gap-2">
+                            <span className="text-[10px] text-muted-foreground tabular-nums w-6">0.0</span>
+                            <div className="flex-1" />
+                            <span className="text-[10px] text-muted-foreground tabular-nums w-6 text-end">1.0</span>
+                            <Input
+                              type="number"
+                              step="0.1" min="0" max="1"
+                              value={field.value}
+                              onChange={(e) => field.onChange(parseFloat(e.target.value))}
+                              className="w-20 font-mono bg-muted/30 text-sm h-8"
+                              dir="ltr"
+                            />
+                          </div>
                         </div>
-                      </div>
-                    </FormControl>
-                    <p className="text-[10px] text-muted-foreground">{t('settings.engine.temperatureDesc')}</p>
-                    <FormMessage />
-                  </FormItem>
-                )} />
+                      </FormControl>
+                      <p className="text-[10px] text-muted-foreground">{t('settings.engine.temperatureDesc')}</p>
+                      <FormMessage />
+                    </FormItem>
+                  )} />
+                </div>
               </div>
 
             </TabsContent>
