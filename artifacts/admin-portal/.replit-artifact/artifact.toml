@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/admin-portal/"
+title = "AqariTalk Admin Portal"
+description = "A standalone desktop-first admin portal for AqariTalk operators. Completely separate from the public buyer/seller app. Features password-based login, sidebar navigation, and full control over users, properties, platform settings, and commission configuration."
+version = "1.0.0"
+id = "artifacts/admin-portal"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/admin-portal/" ]
+localPort = 25580
+
+[services.development]
+run = "pnpm --filter @workspace/admin-portal run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/admin-portal", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/admin-portal/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "25580"
+BASE_PATH = "/admin-portal/"

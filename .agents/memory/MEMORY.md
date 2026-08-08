@@ -2,3 +2,11 @@
 - [OTP verify response shape](otp-verify-response.md) — VerifyOtpResponse requires isNewUser + user.createdAt/updatedAt; omitting any causes a 500 Zod parse error.
 - [Gemini SDK and model config](gemini-config.md) — AQ. prefix keys require @google/genai v1.x; gemini-2.0-flash has quota=0 on this key; gemini-2.5-flash works.
 - [Guardrail false positive: دين in دينار](guardrail-dinar-bug.md) — Arabic substring "دين" (religion keyword) matched inside "دينار" (JOD currency), silently triggering off-topic guard on every price mention. Fixed with explicit full-form keywords.
+- [api-server zod import rule](api-server-zod-import.md) — Use generated schemas from @workspace/api-zod, never import zod/v4 directly; esbuild cannot resolve the zod/v4 subpath export.
+- [System settings table](system-settings-table.md) — system_settings is a single-row table (get-or-create pattern); covers OTP, AI broker, market, listings, and feature flags.
+- [Vite cannot dynamically import CSS from node_modules](vite-dynamic-css-import.md) — import("some-pkg/dist/style.css") in a dynamic import block throws at scan time; always use a top-level static import instead.
+- [maplibre-gl not pre-installed in web artifact](maplibre-gl-install.md) — Despite being referenced in sessions, maplibre-gl was absent from artifacts/web; must install explicitly (pnpm --filter @workspace/web add maplibre-gl).
+- [LangGraph broker LLM is DB-driven with 5-min cache](broker-llm-cache.md) — Model, temperature, max_turns, and guardrail_level are read from system_settings via db.get_system_settings(); cached 5 min in module-level _LLM_CACHE dict; plain LLM (for classify) via _get_plain_llm(), tool-bound via _get_llm_with_tools().
+- [Orval zod schemas option causes duplicate exports](orval-zod-schemas-conflict.md) — The `schemas` option in orval's zod output config regenerates TypeScript interfaces that collide with zod schema names; remove it.
+- [Admin portal login path](admin-portal-login-path.md) — Admin portal password login is POST /api/admin/portal/login (not /api/admin-portal/login); registered via admin-portal-auth.ts.
+- [Admin portal UI rules](admin-portal-ui-rules.md) — All modules follow New/Edit/Preview sub-pages, table+card toggle, pagination 10/25/50/100, soft-delete only, AlertDialog for delete, actions column with Eye/Pencil/Trash2.

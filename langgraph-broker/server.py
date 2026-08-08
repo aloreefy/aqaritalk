@@ -84,5 +84,5 @@ if __name__ == "__main__":
     import uvicorn
 
     port = int(os.environ.get("PORT", "8000"))
-    print(f"AqariTalk LangGraph broker listening on http://127.0.0.1:{port}", file=sys.stderr)
-    uvicorn.run(app, host="127.0.0.1", port=port, log_level="warning")
+    print(f"AqariTalk LangGraph broker listening on http://0.0.0.0:{port}", file=sys.stderr)
+    uvicorn.run(app, host="0.0.0.0", port=port, log_level="warning")

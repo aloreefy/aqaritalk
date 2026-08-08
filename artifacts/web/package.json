@@ -78,6 +78,7 @@
   "dependencies": {
     "i18next": "^26.3.0",
     "mapbox-gl": "^3.24.0",
+    "maplibre-gl": "^6.1.0",
     "react-i18next": "^17.0.8",
     "react-map-gl": "^8.1.1"
   }

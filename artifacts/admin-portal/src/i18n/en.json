@@ -1,0 +1,280 @@
+{
+  "sidebar": {
+    "brand": "AqariTalk Control",
+    "platform": "Platform",
+    "nav": {
+      "overview": "Overview",
+      "users": "Users",
+      "listings": "Listings",
+      "commissions": "Commissions",
+      "systemConfig": "System Config"
+    },
+    "logout": "Logout"
+  },
+  "header": {
+    "routes": {
+      "/": "Overview",
+      "/users": "User Directory",
+      "/properties": "Property Registry",
+      "/commission": "Commission Tables",
+      "/settings": "System Config"
+    },
+    "fallback": "Dashboard"
+  },
+  "login": {
+    "title": "AqariTalk Central",
+    "subtitle": "Restricted Operator Access",
+    "passkeyLabel": "Passkey Required",
+    "submitButton": "Authenticate & Initialize",
+    "securityNotice": "This system is restricted to authorized administrative personnel. All actions are logged and audited.",
+    "toast": {
+      "errorTitle": "Access Denied",
+      "errorFallback": "Invalid operator credentials."
+    }
+  },
+  "dashboard": {
+    "title": "System Telemetry",
+    "subtitle": "Real-time overview of platform activity and health.",
+    "error": "Failed to retrieve system telemetry.",
+    "cards": {
+      "totalUsers": "Total Registered Users",
+      "totalUsersDesc": "Across all markets",
+      "activeProperties": "Active Properties",
+      "activePropertiesDesc": "Live on platform",
+      "pendingReviews": "Pending Reviews",
+      "pendingReviewsDesc": "Requires action",
+      "contactReleases": "Contact Releases",
+      "contactReleasesDesc": "This month"
+    },
+    "distribution": {
+      "title": "User Distribution",
+      "subtitle": "Breakdown by assigned role",
+      "buyers": "Buyers",
+      "sellers": "Sellers",
+      "brokers": "Brokers"
+    },
+    "analytics": {
+      "title": "Detailed Analytics",
+      "offline": "Full metric exploration and historical charting is currently offline for maintenance. Core vitals are reported nominally."
+    }
+  },
+  "users": {
+    "title": "Operator Directory",
+    "subtitle": "Manage personnel clearance and access vectors.",
+    "searchPlaceholder": "Query identifier or comm-link...",
+    "filters": {
+      "allClearances": "All Clearances",
+      "buyer": "Buyer",
+      "seller": "Seller",
+      "broker": "Broker",
+      "administrator": "Administrator",
+      "allStates": "All States",
+      "active": "Active",
+      "suspended": "Suspended"
+    },
+    "table": {
+      "identity": "Identity",
+      "commLink": "Comm-Link",
+      "clearance": "Clearance",
+      "state": "State",
+      "sector": "Sector",
+      "joined": "Joined",
+      "actions": "Actions"
+    },
+    "roles": {
+      "buyer": "Buyer",
+      "seller": "Seller",
+      "broker": "Broker",
+      "admin": "Administrator"
+    },
+    "status": {
+      "active": "Active",
+      "suspended": "Suspended"
+    },
+    "actions": {
+      "suspend": "Suspend",
+      "reinstate": "Reinstate",
+      "makeAdmin": "Elevate to Admin",
+      "makeBroker": "Assign Broker"
+    },
+    "empty": "No personnel records match the query.",
+    "pagination": {
+      "showing": "Showing {{count}} of {{total}} personnel",
+      "previous": "Previous",
+      "next": "Next"
+    }
+  },
+  "properties": {
+    "title": "Property Registry",
+    "subtitle": "Manage and moderate all property listings on the platform.",
+    "searchPlaceholder": "Search property ID or location...",
+    "filters": {
+      "allStatuses": "All Statuses",
+      "active": "Active",
+      "pendingReview": "Pending Review",
+      "rejected": "Rejected",
+      "deleted": "Deleted"
+    },
+    "table": {
+      "listing": "Listing",
+      "type": "Type",
+      "location": "Location",
+      "price": "Price",
+      "status": "Status",
+      "submitted": "Submitted",
+      "actions": "Actions"
+    },
+    "status": {
+      "active": "Active",
+      "pending_review": "Pending Review",
+      "rejected": "Rejected",
+      "deleted": "Deleted"
+    },
+    "actions": {
+      "approve": "Approve",
+      "reject": "Reject",
+      "delete": "Delete"
+    },
+    "empty": "No properties match the current filter.",
+    "pagination": {
+      "showing": "Showing {{count}} of {{total}} assets",
+      "previous": "Previous",
+      "next": "Next"
+    }
+  },
+  "commission": {
+    "title": "Commission Architecture",
+    "subtitle": "Configure global fee structures for platform transactions.",
+    "warning": {
+      "title": "Global Revenue Impact",
+      "body": "Modifications to these parameters immediately affect all new contact releases and smart contracts. Existing agreements are locked at their historical rates."
+    },
+    "feeParams": "Fee Parameters",
+    "fields": {
+      "buyerPct": "Buyer Commission (%)",
+      "buyerPctDesc": "Standard fee applied to the buyer side.",
+      "sellerPct": "Seller Commission (%)",
+      "sellerPctDesc": "Standard fee applied to the seller side.",
+      "negotiable": "Agent Negotiation Authority",
+      "negotiableDesc": "Allow the AI broker to dynamically adjust commission rates during negotiation to secure agreements."
+    },
+    "submit": "Commit Configuration",
+    "toast": {
+      "title": "Configuration Updated",
+      "desc": "Commission rates have been synchronized."
+    }
+  },
+  "settings": {
+    "title": "System Configuration",
+    "subtitle": "Core platform parameters, AI model tuning, and feature flags.",
+    "submit": "Commit Changes",
+    "tabs": {
+      "engine": "AI Engine",
+      "security": "Security & Auth",
+      "features": "Feature Flags",
+      "platform": "Regional & Rules",
+      "system": "System State"
+    },
+    "engine": {
+      "model": "Inference Model",
+      "modelDesc": "Provider model identifier (e.g. gpt-4o, gemini-2.5-flash). Changes take effect within 5 minutes.",
+      "temperature": "Temperature",
+      "temperatureDesc": "Creativity vs precision (0.0 = deterministic, 1.0 = most creative).",
+      "maxTurns": "Max Conversation Turns",
+      "maxTurnsDesc": "Hard limit on back-and-forth exchanges per session.",
+      "guardrail": "Guardrail Strictness",
+      "guardrailDesc": "Controls off-topic detection aggressiveness.",
+      "guardrailOptions": {
+        "strict": "Strict (Blocks all edge cases)",
+        "balanced": "Balanced (Recommended)",
+        "relaxed": "Relaxed (Fluid conversation)"
+      }
+    },
+    "security": {
+      "otpExpiry": "OTP Expiry (Min)",
+      "maxAttempts": "Max OTP Attempts",
+      "rateLimitCap": "Rate Limit Cap",
+      "rateLimitWindow": "Rate Limit Window (Min)",
+      "otpProvider": "OTP Provider",
+      "otpProviderDesc": "The SMS gateway used to deliver one-time passwords to users.",
+      "otpProviders": {
+        "console": "Console — Dev / No SMS (codes logged to server)",
+        "twilio": "Twilio",
+        "unifonic": "Unifonic",
+        "msegat": "Msegat"
+      },
+      "credentialsTitle": "Provider Credentials",
+      "twilioAccountSid": "Account SID",
+      "twilioAuthToken": "Auth Token",
+      "twilioFromNumber": "From Number (E.164)",
+      "unifonicAppSid": "App SID",
+      "unifonicSender": "Sender ID",
+      "msegatApiKey": "API Key",
+      "msegatSender": "Username / Sender ID"
+    },
+    "features": {
+      "voiceInput": "Voice Input",
+      "voiceInputDesc": "Allow voice recording for AI interaction.",
+      "mapView": "Interactive Map",
+      "mapViewDesc": "Show map visualization for search results.",
+      "contactRelease": "Contact Release Contract",
+      "contactReleaseDesc": "Enable digital commission agreements.",
+      "sellerWizard": "AI Seller Wizard",
+      "sellerWizardDesc": "Allow property addition via conversational AI.",
+      "voiceAesthetic": "Voice Interface Aesthetic",
+      "voiceAestheticDesc": "Visual style of the main AI interaction component.",
+      "voiceStyles": {
+        "greenCard": "Green Card (Classic)",
+        "orb": "Floating Orb (Modern)",
+        "waveform": "Waveform (Technical)",
+        "sonar": "Sonar Pulse (Dynamic)"
+      }
+    },
+    "platform": {
+      "defaultLocale": "Default Locale",
+      "localeEn": "English (US)",
+      "localeAr": "Arabic (Standard)",
+      "baseCurrency": "Base Currency",
+      "currencySearch": "Search currency...",
+      "currencyNotFound": "No currency found.",
+      "maxImages": "Max Assets per Listing",
+      "listingTtl": "Listing TTL (Days)",
+      "listingTtlDesc": "Days until automatic archival.",
+      "autoApprove": "Auto-Approve Listings",
+      "autoApproveDesc": "Bypass manual administrator review for new properties.",
+      "mapProvider": "Map Provider",
+      "mapProviderDesc": "Map engine rendered in the public listings view.",
+      "mapProviders": {
+        "osm": "OpenStreetMap (Free — no API key required)",
+        "mapbox": "Mapbox",
+        "google": "Google Maps"
+      },
+      "mapboxApiKey": "Mapbox Access Token",
+      "googleMapsApiKey": "Google Maps API Key",
+      "mapKeyPlaceholder": "Paste your API key here",
+      "mapKeyNote": "Stored server-side. Rotated whenever you save."
+    },
+    "system": {
+      "maintenanceTitle": "Platform Maintenance Mode",
+      "maintenanceDesc": "Engaging maintenance mode will immediately suspend all active user sessions and disable API access for non-administrators.",
+      "engageLockdown": "Engage Lockdown"
+    },
+    "toast": {
+      "successTitle": "Configuration Updated",
+      "successDesc": "System parameters successfully applied.",
+      "errorTitle": "Configuration Error",
+      "errorDesc": "Failed to apply parameters"
+    },
+    "voiceMeta": {
+      "green_card": { "label": "Green Card", "description": "Full-width emerald CTA card" },
+      "orb":        { "label": "Floating Orb", "description": "Dark canvas with glowing orb" },
+      "waveform":   { "label": "Waveform", "description": "Animated frequency bars" },
+      "sonar":      { "label": "Sonar Pulse", "description": "Radar rings around mic icon" }
+    }
+  },
+  "notFound": {
+    "title": "Sector Not Found",
+    "subtitle": "The requested administrative module is offline or does not exist.",
+    "returnButton": "Return to Dashboard"
+  }
+}

@@ -5,6 +5,21 @@
  * AqariTalk API — AI-guided real estate workflow platform
  * OpenAPI spec version: 0.1.0
  */
+export interface UploadUrlRequest {
+  /** @minLength 1 */
+  name: string;
+  /** @minimum 1 */
+  size: number;
+  /** @minLength 1 */
+  contentType: string;
+}
+
+export interface UploadUrlResponse {
+  uploadURL: string;
+  objectPath: string;
+  metadata?: UploadUrlRequest;
+}
+
 export interface HealthStatus {
   status: string;
 }
@@ -84,7 +99,9 @@ export type UserStatus = typeof UserStatus[keyof typeof UserStatus];
 
 export const UserStatus = {
   active: 'active',
+  restricted: 'restricted',
   suspended: 'suspended',
+  banned: 'banned',
 } as const;
 
 export interface User {
@@ -92,11 +109,17 @@ export interface User {
   phone: string;
   /** @nullable */
   name?: string | null;
+  /** @nullable */
+  username?: string | null;
   role: UserRole;
   market: UserMarket;
   language: UserLanguage;
   verificationStatus: UserVerificationStatus;
   status: UserStatus;
+  /** @nullable */
+  avatarUrl?: string | null;
+  /** @nullable */
+  preferredCurrency?: string | null;
   autoSendVoice: boolean;
   createdAt: string;
   updatedAt: string;
@@ -545,6 +568,62 @@ export interface Notification {
   createdAt: string;
 }
 
+export interface UserList {
+  items: User[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+export type AdminCreateUserBodyRole = typeof AdminCreateUserBodyRole[keyof typeof AdminCreateUserBodyRole];
+
+
+export const AdminCreateUserBodyRole = {
+  buyer: 'buyer',
+  seller: 'seller',
+  broker: 'broker',
+  admin: 'admin',
+} as const;
+
+export type AdminCreateUserBodyMarket = typeof AdminCreateUserBodyMarket[keyof typeof AdminCreateUserBodyMarket];
+
+
+export const AdminCreateUserBodyMarket = {
+  JO: 'JO',
+  SA: 'SA',
+  AE: 'AE',
+  EG: 'EG',
+  KW: 'KW',
+  QA: 'QA',
+  BH: 'BH',
+  OM: 'OM',
+  MA: 'MA',
+  LB: 'LB',
+  IQ: 'IQ',
+} as const;
+
+export type AdminCreateUserBodyStatus = typeof AdminCreateUserBodyStatus[keyof typeof AdminCreateUserBodyStatus];
+
+
+export const AdminCreateUserBodyStatus = {
+  active: 'active',
+  restricted: 'restricted',
+  suspended: 'suspended',
+  banned: 'banned',
+} as const;
+
+export interface AdminCreateUserBody {
+  phone: string;
+  name?: string | null;
+  role: AdminCreateUserBodyRole;
+  market?: AdminCreateUserBodyMarket;
+  status?: AdminCreateUserBodyStatus;
+  avatarUrl?: string | null;
+  preferredCurrency?: string | null;
+  username?: string | null;
+  password?: string | null;
+}
+
 export type AdminUserUpdateRole = typeof AdminUserUpdateRole[keyof typeof AdminUserUpdateRole];
 
 
@@ -560,7 +639,26 @@ export type AdminUserUpdateStatus = typeof AdminUserUpdateStatus[keyof typeof Ad
 
 export const AdminUserUpdateStatus = {
   active: 'active',
+  restricted: 'restricted',
   suspended: 'suspended',
+  banned: 'banned',
+} as const;
+
+export type AdminUserUpdateMarket = typeof AdminUserUpdateMarket[keyof typeof AdminUserUpdateMarket];
+
+
+export const AdminUserUpdateMarket = {
+  JO: 'JO',
+  SA: 'SA',
+  AE: 'AE',
+  EG: 'EG',
+  KW: 'KW',
+  QA: 'QA',
+  BH: 'BH',
+  OM: 'OM',
+  MA: 'MA',
+  LB: 'LB',
+  IQ: 'IQ',
 } as const;
 
 export type AdminUserUpdateVerificationStatus = typeof AdminUserUpdateVerificationStatus[keyof typeof AdminUserUpdateVerificationStatus];
@@ -572,9 +670,64 @@ export const AdminUserUpdateVerificationStatus = {
 } as const;
 
 export interface AdminUserUpdate {
+  phone?: string;
+  name?: string | null;
   role?: AdminUserUpdateRole;
   status?: AdminUserUpdateStatus;
+  market?: AdminUserUpdateMarket;
   verificationStatus?: AdminUserUpdateVerificationStatus;
+  avatarUrl?: string | null;
+  preferredCurrency?: string | null;
+  username?: string | null;
+  password?: string | null;
+}
+
+export interface AdminCreatePropertyBody {
+  listingName?: string | null;
+  propertyType: string;
+  transactionMode: string;
+  price?: number | null;
+  priceCurrency?: string | null;
+  priceNegotiable?: boolean | null;
+  country?: string | null;
+  city?: string | null;
+  district?: string | null;
+  street?: string | null;
+  areaSqm?: number | null;
+  rooms?: number | null;
+  bathrooms?: number | null;
+  floorNumber?: number | null;
+  furnishedStatus?: string | null;
+  condition?: string | null;
+  description?: string | null;
+}
+
+export interface AdminUpdatePropertyBody {
+  listingName?: string | null;
+  propertyType?: string | null;
+  transactionMode?: string | null;
+  status?: string | null;
+  price?: number | null;
+  priceCurrency?: string | null;
+  priceNegotiable?: boolean | null;
+  country?: string | null;
+  city?: string | null;
+  district?: string | null;
+  street?: string | null;
+  areaSqm?: number | null;
+  rooms?: number | null;
+  bathrooms?: number | null;
+  floorNumber?: number | null;
+  furnishedStatus?: string | null;
+  condition?: string | null;
+  description?: string | null;
+}
+
+export interface AdminPortalLoginInput {
+  /** @minLength 1 */
+  login: string;
+  /** @minLength 1 */
+  password: string;
 }
 
 export type AdminPropertyStatusUpdateStatus = typeof AdminPropertyStatusUpdateStatus[keyof typeof AdminPropertyStatusUpdateStatus];
@@ -603,6 +756,262 @@ export interface AdminStats {
   contactReleasesThisMonth: number;
   pendingReview: number;
   usersByRole?: AdminStatsUsersByRole;
+}
+
+export type AppSettingsVoiceCtaStyle = typeof AppSettingsVoiceCtaStyle[keyof typeof AppSettingsVoiceCtaStyle];
+
+
+export const AppSettingsVoiceCtaStyle = {
+  green_card: 'green_card',
+  orb: 'orb',
+  waveform: 'waveform',
+  sonar: 'sonar',
+} as const;
+
+export type AppSettingsMapProvider = typeof AppSettingsMapProvider[keyof typeof AppSettingsMapProvider];
+
+
+export const AppSettingsMapProvider = {
+  osm: 'osm',
+  mapbox: 'mapbox',
+  google: 'google',
+} as const;
+
+export interface AppSettings {
+  voiceCtaStyle: AppSettingsVoiceCtaStyle;
+  mapProvider: AppSettingsMapProvider;
+  /** The API key for the configured map provider (Mapbox token or Google Maps key). Null for OSM. */
+  mapApiKey?: string | null;
+  featureMapView: boolean;
+  featureVoiceInput: boolean;
+  featureContactRelease: boolean;
+  featureSellerWizard: boolean;
+}
+
+export type SystemSettingsAiGuardrailLevel = typeof SystemSettingsAiGuardrailLevel[keyof typeof SystemSettingsAiGuardrailLevel];
+
+
+export const SystemSettingsAiGuardrailLevel = {
+  strict: 'strict',
+  balanced: 'balanced',
+  relaxed: 'relaxed',
+} as const;
+
+export type SystemSettingsDefaultLanguage = typeof SystemSettingsDefaultLanguage[keyof typeof SystemSettingsDefaultLanguage];
+
+
+export const SystemSettingsDefaultLanguage = {
+  ar: 'ar',
+  en: 'en',
+} as const;
+
+export type SystemSettingsDefaultCurrency = typeof SystemSettingsDefaultCurrency[keyof typeof SystemSettingsDefaultCurrency];
+
+
+export const SystemSettingsDefaultCurrency = {
+  JOD: 'JOD',
+  SAR: 'SAR',
+  AED: 'AED',
+  EGP: 'EGP',
+  KWD: 'KWD',
+  QAR: 'QAR',
+  BHD: 'BHD',
+  OMR: 'OMR',
+  MAD: 'MAD',
+  LBP: 'LBP',
+  IQD: 'IQD',
+} as const;
+
+export type SystemSettingsVoiceCtaStyle = typeof SystemSettingsVoiceCtaStyle[keyof typeof SystemSettingsVoiceCtaStyle];
+
+
+export const SystemSettingsVoiceCtaStyle = {
+  green_card: 'green_card',
+  orb: 'orb',
+  waveform: 'waveform',
+  sonar: 'sonar',
+} as const;
+
+export type SystemSettingsMapProvider = typeof SystemSettingsMapProvider[keyof typeof SystemSettingsMapProvider];
+
+
+export const SystemSettingsMapProvider = {
+  osm: 'osm',
+  mapbox: 'mapbox',
+  google: 'google',
+} as const;
+
+export type SystemSettingsOtpProvider = typeof SystemSettingsOtpProvider[keyof typeof SystemSettingsOtpProvider];
+
+
+export const SystemSettingsOtpProvider = {
+  console: 'console',
+  twilio: 'twilio',
+  unifonic: 'unifonic',
+  msegat: 'msegat',
+} as const;
+
+export interface SystemSettings {
+  id: string;
+  otpExpiryMinutes: number;
+  otpMaxAttempts: number;
+  otpRateLimitCount: number;
+  otpRateLimitWindowMinutes: number;
+  aiModel: string;
+  aiTemperature: number;
+  aiMaxTurns: number;
+  aiGuardrailLevel: SystemSettingsAiGuardrailLevel;
+  defaultLanguage: SystemSettingsDefaultLanguage;
+  defaultCurrency: SystemSettingsDefaultCurrency;
+  maxImagesPerProperty: number;
+  autoApproveListings: boolean;
+  listingExpiryDays: number;
+  maintenanceMode: boolean;
+  featureVoiceInput: boolean;
+  featureMapView: boolean;
+  featureContactRelease: boolean;
+  featureSellerWizard: boolean;
+  voiceCtaStyle: SystemSettingsVoiceCtaStyle;
+  mapProvider: SystemSettingsMapProvider;
+  mapboxApiKey?: string | null;
+  googleMapsApiKey?: string | null;
+  otpProvider: SystemSettingsOtpProvider;
+  twilioAccountSid?: string | null;
+  twilioAuthToken?: string | null;
+  twilioFromNumber?: string | null;
+  unifonicAppSid?: string | null;
+  unifonicSender?: string | null;
+  msegatApiKey?: string | null;
+  msegatSender?: string | null;
+  updatedAt: string;
+}
+
+export type SystemSettingsUpdateVoiceCtaStyle = typeof SystemSettingsUpdateVoiceCtaStyle[keyof typeof SystemSettingsUpdateVoiceCtaStyle];
+
+
+export const SystemSettingsUpdateVoiceCtaStyle = {
+  green_card: 'green_card',
+  orb: 'orb',
+  waveform: 'waveform',
+  sonar: 'sonar',
+} as const;
+
+export type SystemSettingsUpdateAiGuardrailLevel = typeof SystemSettingsUpdateAiGuardrailLevel[keyof typeof SystemSettingsUpdateAiGuardrailLevel];
+
+
+export const SystemSettingsUpdateAiGuardrailLevel = {
+  strict: 'strict',
+  balanced: 'balanced',
+  relaxed: 'relaxed',
+} as const;
+
+export type SystemSettingsUpdateDefaultLanguage = typeof SystemSettingsUpdateDefaultLanguage[keyof typeof SystemSettingsUpdateDefaultLanguage];
+
+
+export const SystemSettingsUpdateDefaultLanguage = {
+  ar: 'ar',
+  en: 'en',
+} as const;
+
+export type SystemSettingsUpdateDefaultCurrency = typeof SystemSettingsUpdateDefaultCurrency[keyof typeof SystemSettingsUpdateDefaultCurrency];
+
+
+export const SystemSettingsUpdateDefaultCurrency = {
+  JOD: 'JOD',
+  SAR: 'SAR',
+  AED: 'AED',
+  EGP: 'EGP',
+  KWD: 'KWD',
+  QAR: 'QAR',
+  BHD: 'BHD',
+  OMR: 'OMR',
+  MAD: 'MAD',
+  LBP: 'LBP',
+  IQD: 'IQD',
+} as const;
+
+export type SystemSettingsUpdateMapProvider = typeof SystemSettingsUpdateMapProvider[keyof typeof SystemSettingsUpdateMapProvider];
+
+
+export const SystemSettingsUpdateMapProvider = {
+  osm: 'osm',
+  mapbox: 'mapbox',
+  google: 'google',
+} as const;
+
+export type SystemSettingsUpdateOtpProvider = typeof SystemSettingsUpdateOtpProvider[keyof typeof SystemSettingsUpdateOtpProvider];
+
+
+export const SystemSettingsUpdateOtpProvider = {
+  console: 'console',
+  twilio: 'twilio',
+  unifonic: 'unifonic',
+  msegat: 'msegat',
+} as const;
+
+export interface SystemSettingsUpdate {
+  voiceCtaStyle?: SystemSettingsUpdateVoiceCtaStyle;
+  /**
+     * @minimum 1
+     * @maximum 60
+     */
+  otpExpiryMinutes?: number;
+  /**
+     * @minimum 1
+     * @maximum 10
+     */
+  otpMaxAttempts?: number;
+  /**
+     * @minimum 1
+     * @maximum 10
+     */
+  otpRateLimitCount?: number;
+  /**
+     * @minimum 1
+     * @maximum 60
+     */
+  otpRateLimitWindowMinutes?: number;
+  aiModel?: string;
+  /**
+     * @minimum 0
+     * @maximum 1
+     */
+  aiTemperature?: number;
+  /**
+     * @minimum 1
+     * @maximum 20
+     */
+  aiMaxTurns?: number;
+  aiGuardrailLevel?: SystemSettingsUpdateAiGuardrailLevel;
+  defaultLanguage?: SystemSettingsUpdateDefaultLanguage;
+  defaultCurrency?: SystemSettingsUpdateDefaultCurrency;
+  /**
+     * @minimum 1
+     * @maximum 50
+     */
+  maxImagesPerProperty?: number;
+  autoApproveListings?: boolean;
+  /**
+     * @minimum 1
+     * @maximum 365
+     */
+  listingExpiryDays?: number;
+  maintenanceMode?: boolean;
+  featureVoiceInput?: boolean;
+  featureMapView?: boolean;
+  featureContactRelease?: boolean;
+  featureSellerWizard?: boolean;
+  mapProvider?: SystemSettingsUpdateMapProvider;
+  mapboxApiKey?: string | null;
+  googleMapsApiKey?: string | null;
+  otpProvider?: SystemSettingsUpdateOtpProvider;
+  twilioAccountSid?: string | null;
+  twilioAuthToken?: string | null;
+  twilioFromNumber?: string | null;
+  unifonicAppSid?: string | null;
+  unifonicSender?: string | null;
+  msegatApiKey?: string | null;
+  msegatSender?: string | null;
 }
 
 export type ListPropertiesParams = {
@@ -669,6 +1078,10 @@ export type AdminListUsersParams = {
 /**
  * @nullable
  */
+search?: string | null;
+/**
+ * @nullable
+ */
 role?: string | null;
 /**
  * @nullable
@@ -682,7 +1095,19 @@ export type AdminListPropertiesParams = {
 /**
  * @nullable
  */
+search?: string | null;
+/**
+ * @nullable
+ */
 status?: string | null;
+/**
+ * @nullable
+ */
+propertyType?: string | null;
+/**
+ * @nullable
+ */
+transactionMode?: string | null;
 page?: number;
 limit?: number;
 };

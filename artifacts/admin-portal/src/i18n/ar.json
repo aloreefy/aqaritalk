@@ -1,0 +1,280 @@
+{
+  "sidebar": {
+    "brand": "AqariTalk Control",
+    "platform": "المنصة",
+    "nav": {
+      "overview": "نظرة عامة",
+      "users": "المستخدمون",
+      "listings": "العقارات",
+      "commissions": "العمولات",
+      "systemConfig": "إعدادات النظام"
+    },
+    "logout": "تسجيل الخروج"
+  },
+  "header": {
+    "routes": {
+      "/": "نظرة عامة",
+      "/users": "دليل المستخدمين",
+      "/properties": "سجل العقارات",
+      "/commission": "جداول العمولات",
+      "/settings": "إعدادات النظام"
+    },
+    "fallback": "لوحة التحكم"
+  },
+  "login": {
+    "title": "مركز AqariTalk",
+    "subtitle": "وصول محظور للمشغّلين المصرّح لهم",
+    "passkeyLabel": "كلمة المرور مطلوبة",
+    "submitButton": "المصادقة والبدء",
+    "securityNotice": "هذا النظام مقيّد للمدراء المصرّح لهم فقط. جميع الإجراءات مُسجَّلة ومُدقَّقة.",
+    "toast": {
+      "errorTitle": "رُفض الوصول",
+      "errorFallback": "بيانات المشغّل غير صحيحة."
+    }
+  },
+  "dashboard": {
+    "title": "قياسات النظام",
+    "subtitle": "نظرة عامة فورية على نشاط المنصة وحالتها.",
+    "error": "فشل في استرداد قياسات النظام.",
+    "cards": {
+      "totalUsers": "إجمالي المستخدمين المسجّلين",
+      "totalUsersDesc": "عبر جميع الأسواق",
+      "activeProperties": "العقارات النشطة",
+      "activePropertiesDesc": "مباشرة على المنصة",
+      "pendingReviews": "المراجعات المعلّقة",
+      "pendingReviewsDesc": "تتطلب إجراء",
+      "contactReleases": "إصدارات التواصل",
+      "contactReleasesDesc": "هذا الشهر"
+    },
+    "distribution": {
+      "title": "توزيع المستخدمين",
+      "subtitle": "تصنيف حسب الدور المعيّن",
+      "buyers": "المشترون",
+      "sellers": "البائعون",
+      "brokers": "الوسطاء"
+    },
+    "analytics": {
+      "title": "تحليلات مفصّلة",
+      "offline": "استكشاف المقاييس الكامل والرسوم البيانية التاريخية متوقف مؤقتاً للصيانة. المؤشرات الأساسية تعمل بشكل طبيعي."
+    }
+  },
+  "users": {
+    "title": "دليل المستخدمين",
+    "subtitle": "إدارة صلاحيات المستخدمين ومتجهات الوصول.",
+    "searchPlaceholder": "ابحث بالمعرّف أو رقم الهاتف...",
+    "filters": {
+      "allClearances": "جميع الأدوار",
+      "buyer": "مشترٍ",
+      "seller": "بائع",
+      "broker": "وسيط",
+      "administrator": "مدير",
+      "allStates": "جميع الحالات",
+      "active": "نشط",
+      "suspended": "موقوف"
+    },
+    "table": {
+      "identity": "المعرّف",
+      "commLink": "الهاتف",
+      "clearance": "الدور",
+      "state": "الحالة",
+      "sector": "السوق",
+      "joined": "تاريخ الانضمام",
+      "actions": "الإجراءات"
+    },
+    "roles": {
+      "buyer": "مشترٍ",
+      "seller": "بائع",
+      "broker": "وسيط",
+      "admin": "مدير"
+    },
+    "status": {
+      "active": "نشط",
+      "suspended": "موقوف"
+    },
+    "actions": {
+      "suspend": "إيقاف",
+      "reinstate": "إعادة تفعيل",
+      "makeAdmin": "ترقية إلى مدير",
+      "makeBroker": "تعيين وسيطاً"
+    },
+    "empty": "لا توجد سجلات مستخدمين تطابق البحث.",
+    "pagination": {
+      "showing": "عرض {{count}} من {{total}} مستخدم",
+      "previous": "السابق",
+      "next": "التالي"
+    }
+  },
+  "properties": {
+    "title": "سجل العقارات",
+    "subtitle": "إدارة وإشراف على جميع عقارات المنصة.",
+    "searchPlaceholder": "ابحث بمعرّف العقار أو الموقع...",
+    "filters": {
+      "allStatuses": "جميع الحالات",
+      "active": "نشط",
+      "pendingReview": "قيد المراجعة",
+      "rejected": "مرفوض",
+      "deleted": "محذوف"
+    },
+    "table": {
+      "listing": "الإعلان",
+      "type": "النوع",
+      "location": "الموقع",
+      "price": "السعر",
+      "status": "الحالة",
+      "submitted": "تاريخ الإرسال",
+      "actions": "الإجراءات"
+    },
+    "status": {
+      "active": "نشط",
+      "pending_review": "قيد المراجعة",
+      "rejected": "مرفوض",
+      "deleted": "محذوف"
+    },
+    "actions": {
+      "approve": "موافقة",
+      "reject": "رفض",
+      "delete": "حذف"
+    },
+    "empty": "لا توجد عقارات تطابق الفلتر الحالي.",
+    "pagination": {
+      "showing": "عرض {{count}} من {{total}} أصل",
+      "previous": "السابق",
+      "next": "التالي"
+    }
+  },
+  "commission": {
+    "title": "هيكل العمولات",
+    "subtitle": "ضبط هياكل الرسوم العالمية لمعاملات المنصة.",
+    "warning": {
+      "title": "تأثير على الإيرادات العالمية",
+      "body": "يؤثر تعديل هذه المعطيات فوراً على جميع إصدارات التواصل والعقود الذكية الجديدة. العقود الموجودة مقفولة بأسعارها التاريخية."
+    },
+    "feeParams": "معطيات الرسوم",
+    "fields": {
+      "buyerPct": "عمولة المشتري (%)",
+      "buyerPctDesc": "الرسوم الثابتة المطبّقة على جانب المشتري.",
+      "sellerPct": "عمولة البائع (%)",
+      "sellerPctDesc": "الرسوم الثابتة المطبّقة على جانب البائع.",
+      "negotiable": "صلاحية التفاوض للوكيل",
+      "negotiableDesc": "السماح للوسيط الذكي بتعديل معدلات العمولة ديناميكياً خلال التفاوض لإبرام الاتفاقيات."
+    },
+    "submit": "حفظ الإعدادات",
+    "toast": {
+      "title": "تم تحديث الإعدادات",
+      "desc": "تمت مزامنة معدلات العمولة."
+    }
+  },
+  "settings": {
+    "title": "إعدادات النظام",
+    "subtitle": "معطيات المنصة الأساسية وضبط النماذج الذكية وأعلام الميزات.",
+    "submit": "حفظ التغييرات",
+    "tabs": {
+      "engine": "محرّك الذكاء الاصطناعي",
+      "security": "الأمان والمصادقة",
+      "features": "أعلام الميزات",
+      "platform": "الإقليمية والقواعد",
+      "system": "حالة النظام"
+    },
+    "engine": {
+      "model": "نموذج الاستنتاج",
+      "modelDesc": "معرّف نموذج المزوّد (مثلاً: gpt-4o، gemini-2.5-flash). التغييرات تسري خلال 5 دقائق.",
+      "temperature": "درجة الإبداع",
+      "temperatureDesc": "الإبداع مقابل الدقة (0.0 = حتمي، 1.0 = أكثر إبداعاً).",
+      "maxTurns": "الحد الأقصى لأدوار المحادثة",
+      "maxTurnsDesc": "حد صارم لعدد التبادلات في الجلسة الواحدة.",
+      "guardrail": "صرامة الحراسة",
+      "guardrailDesc": "يتحكم في مدى حدة الكشف عن المواضيع الخارجة عن النطاق.",
+      "guardrailOptions": {
+        "strict": "صارم (يحجب جميع الحالات الحدّية)",
+        "balanced": "متوازن (موصى به)",
+        "relaxed": "مرن (محادثة طليقة)"
+      }
+    },
+    "security": {
+      "otpExpiry": "انتهاء صلاحية OTP (دقيقة)",
+      "maxAttempts": "الحد الأقصى لمحاولات OTP",
+      "rateLimitCap": "حد معدل الطلبات",
+      "rateLimitWindow": "نافذة معدل الطلبات (دقيقة)",
+      "otpProvider": "مزوّد رسائل OTP",
+      "otpProviderDesc": "بوابة الرسائل القصيرة المستخدمة لإرسال رموز التحقق للمستخدمين.",
+      "otpProviders": {
+        "console": "Console — تطوير / بدون SMS (تُسجَّل الرموز في السيرفر)",
+        "twilio": "Twilio",
+        "unifonic": "Unifonic",
+        "msegat": "Msegat"
+      },
+      "credentialsTitle": "بيانات اعتماد المزوّد",
+      "twilioAccountSid": "Account SID",
+      "twilioAuthToken": "Auth Token",
+      "twilioFromNumber": "رقم الإرسال (E.164)",
+      "unifonicAppSid": "App SID",
+      "unifonicSender": "معرّف المُرسِل",
+      "msegatApiKey": "مفتاح API",
+      "msegatSender": "اسم المستخدم / المُرسِل"
+    },
+    "features": {
+      "voiceInput": "إدخال الصوت",
+      "voiceInputDesc": "السماح بالتسجيل الصوتي للتفاعل مع الذكاء الاصطناعي.",
+      "mapView": "الخريطة التفاعلية",
+      "mapViewDesc": "عرض الخريطة لنتائج البحث.",
+      "contactRelease": "عقد إصدار التواصل",
+      "contactReleaseDesc": "تفعيل اتفاقيات العمولة الرقمية.",
+      "sellerWizard": "معالج البائع الذكي",
+      "sellerWizardDesc": "السماح بإضافة عقار عبر الذكاء الاصطناعي التحادثي.",
+      "voiceAesthetic": "تصميم واجهة الصوت",
+      "voiceAestheticDesc": "النمط المرئي لمكوّن تفاعل الذكاء الاصطناعي الرئيسي.",
+      "voiceStyles": {
+        "greenCard": "البطاقة الخضراء (كلاسيكي)",
+        "orb": "الكرة العائمة (عصري)",
+        "waveform": "موجة الصوت (تقني)",
+        "sonar": "نبض السونار (ديناميكي)"
+      }
+    },
+    "platform": {
+      "defaultLocale": "اللغة الافتراضية",
+      "localeEn": "الإنجليزية (أمريكا)",
+      "localeAr": "العربية (الفصحى)",
+      "baseCurrency": "العملة الأساسية",
+      "currencySearch": "ابحث عن عملة...",
+      "currencyNotFound": "لم يُعثر على عملة.",
+      "maxImages": "الحد الأقصى للصور لكل عقار",
+      "listingTtl": "مدة العقار (أيام)",
+      "listingTtlDesc": "الأيام حتى الأرشفة التلقائية.",
+      "autoApprove": "الموافقة التلقائية على العقارات",
+      "autoApproveDesc": "تجاوز مراجعة المدير اليدوية للعقارات الجديدة.",
+      "mapProvider": "مزوّد الخريطة",
+      "mapProviderDesc": "محرك الخريطة المعروض في صفحة قوائم العقارات العامة.",
+      "mapProviders": {
+        "osm": "OpenStreetMap (مجاني — لا يتطلب مفتاح API)",
+        "mapbox": "Mapbox",
+        "google": "Google Maps"
+      },
+      "mapboxApiKey": "رمز وصول Mapbox",
+      "googleMapsApiKey": "مفتاح Google Maps API",
+      "mapKeyPlaceholder": "الصق مفتاح API هنا",
+      "mapKeyNote": "يُخزَّن على السيرفر. يُحدَّث عند الحفظ."
+    },
+    "system": {
+      "maintenanceTitle": "وضع صيانة المنصة",
+      "maintenanceDesc": "سيؤدي تفعيل وضع الصيانة فوراً إلى تعليق جميع جلسات المستخدمين النشطة وتعطيل وصول API لغير المديرين.",
+      "engageLockdown": "تفعيل الإغلاق"
+    },
+    "toast": {
+      "successTitle": "تم تحديث الإعدادات",
+      "successDesc": "تم تطبيق معطيات النظام بنجاح.",
+      "errorTitle": "خطأ في الإعدادات",
+      "errorDesc": "فشل في تطبيق المعطيات"
+    },
+    "voiceMeta": {
+      "green_card": { "label": "البطاقة الخضراء", "description": "بطاقة CTA زمردية عريضة" },
+      "orb":        { "label": "الكرة العائمة", "description": "لوحة داكنة مع كرة مضيئة" },
+      "waveform":   { "label": "موجة الصوت", "description": "أعمدة تردد متحركة" },
+      "sonar":      { "label": "نبض السونار", "description": "حلقات رادار حول أيقونة المايك" }
+    }
+  },
+  "notFound": {
+    "title": "القسم غير موجود",
+    "subtitle": "الوحدة الإدارية المطلوبة غير متاحة أو غير موجودة.",
+    "returnButton": "العودة إلى لوحة التحكم"
+  }
+}

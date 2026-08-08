@@ -193,3 +193,35 @@ def create_listing(
         "status": "pending_review",
         "message": "تم إنشاء الإعلان بنجاح وهو الآن قيد المراجعة.",
     }
+
+
+def get_system_settings() -> dict:
+    """Return AI/model settings from the system_settings table.
+
+    Falls back to sane defaults if the table is empty or unavailable.
+    """
+    defaults = {
+        "ai_model": "gpt-4o-mini",
+        "ai_temperature": 0.0,
+        "ai_max_turns": 10,
+        "ai_guardrail_level": "balanced",
+    }
+    try:
+        with _connect() as conn, conn.cursor() as cur:
+            cur.execute(
+                "SELECT ai_model, ai_temperature, ai_max_turns, ai_guardrail_level "
+                "FROM system_settings LIMIT 1"
+            )
+            row = cur.fetchone()
+        if not row:
+            return defaults
+        return {
+            "ai_model": row["ai_model"] or defaults["ai_model"],
+            "ai_temperature": float(row["ai_temperature"] or 0.0),
+            "ai_max_turns": int(row["ai_max_turns"] or 10),
+            "ai_guardrail_level": row["ai_guardrail_level"] or defaults["ai_guardrail_level"],
+        }
+    except Exception as exc:
+        import sys
+        print(f"[db] get_system_settings failed: {exc}", file=sys.stderr)
+        return defaults

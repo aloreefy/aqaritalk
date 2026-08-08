@@ -55,7 +55,7 @@ AI-guided real estate workflow platform for Jordan and Saudi Arabia — Arabic-f
 
 ## User preferences
 
-_None recorded yet._
+- **GitHub push branch:** `Aqari-Talk-Nasser` — always push Nasser's changes to this branch, never to main.
 
 ## Gotchas
 

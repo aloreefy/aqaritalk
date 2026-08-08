@@ -53,11 +53,14 @@ export const VerifyOtpResponse = zod.object({
   "id": zod.string(),
   "phone": zod.string(),
   "name": zod.string().nullish(),
+  "username": zod.string().nullish(),
   "role": zod.enum(['buyer', 'seller', 'broker', 'admin']),
   "market": zod.enum(['JO', 'SA', 'AE', 'EG', 'KW', 'QA', 'BH', 'OM', 'MA', 'LB', 'IQ']),
   "language": zod.enum(['ar', 'en']),
   "verificationStatus": zod.enum(['unverified', 'verified']),
-  "status": zod.enum(['active', 'suspended']),
+  "status": zod.enum(['active', 'restricted', 'suspended', 'banned']),
+  "avatarUrl": zod.string().nullish(),
+  "preferredCurrency": zod.string().nullish(),
   "autoSendVoice": zod.boolean(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date()
@@ -73,11 +76,14 @@ export const GetMeResponse = zod.object({
   "id": zod.string(),
   "phone": zod.string(),
   "name": zod.string().nullish(),
+  "username": zod.string().nullish(),
   "role": zod.enum(['buyer', 'seller', 'broker', 'admin']),
   "market": zod.enum(['JO', 'SA', 'AE', 'EG', 'KW', 'QA', 'BH', 'OM', 'MA', 'LB', 'IQ']),
   "language": zod.enum(['ar', 'en']),
   "verificationStatus": zod.enum(['unverified', 'verified']),
-  "status": zod.enum(['active', 'suspended']),
+  "status": zod.enum(['active', 'restricted', 'suspended', 'banned']),
+  "avatarUrl": zod.string().nullish(),
+  "preferredCurrency": zod.string().nullish(),
   "autoSendVoice": zod.boolean(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date()
@@ -99,11 +105,14 @@ export const UpdateMeResponse = zod.object({
   "id": zod.string(),
   "phone": zod.string(),
   "name": zod.string().nullish(),
+  "username": zod.string().nullish(),
   "role": zod.enum(['buyer', 'seller', 'broker', 'admin']),
   "market": zod.enum(['JO', 'SA', 'AE', 'EG', 'KW', 'QA', 'BH', 'OM', 'MA', 'LB', 'IQ']),
   "language": zod.enum(['ar', 'en']),
   "verificationStatus": zod.enum(['unverified', 'verified']),
-  "status": zod.enum(['active', 'suspended']),
+  "status": zod.enum(['active', 'restricted', 'suspended', 'banned']),
+  "avatarUrl": zod.string().nullish(),
+  "preferredCurrency": zod.string().nullish(),
   "autoSendVoice": zod.boolean(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date()
@@ -1164,29 +1173,78 @@ export const MarkNotificationReadParams = zod.object({
  * @summary List all users
  */
 export const adminListUsersQueryPageDefault = 1;
-export const adminListUsersQueryLimitDefault = 50;
+export const adminListUsersQueryLimitDefault = 25;
 
 export const AdminListUsersQueryParams = zod.object({
+  "search": zod.coerce.string().nullish(),
   "role": zod.coerce.string().nullish(),
   "status": zod.coerce.string().nullish(),
   "page": zod.coerce.number().default(adminListUsersQueryPageDefault),
   "limit": zod.coerce.number().default(adminListUsersQueryLimitDefault)
 })
 
-export const AdminListUsersResponseItem = zod.object({
+export const AdminListUsersResponse = zod.object({
+  "items": zod.array(zod.object({
   "id": zod.string(),
   "phone": zod.string(),
   "name": zod.string().nullish(),
+  "username": zod.string().nullish(),
   "role": zod.enum(['buyer', 'seller', 'broker', 'admin']),
   "market": zod.enum(['JO', 'SA', 'AE', 'EG', 'KW', 'QA', 'BH', 'OM', 'MA', 'LB', 'IQ']),
   "language": zod.enum(['ar', 'en']),
   "verificationStatus": zod.enum(['unverified', 'verified']),
-  "status": zod.enum(['active', 'suspended']),
+  "status": zod.enum(['active', 'restricted', 'suspended', 'banned']),
+  "avatarUrl": zod.string().nullish(),
+  "preferredCurrency": zod.string().nullish(),
+  "autoSendVoice": zod.boolean(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})),
+  "total": zod.number(),
+  "page": zod.number(),
+  "limit": zod.number()
+})
+
+
+/**
+ * @summary Create user (admin — bypasses OTP)
+ */
+export const AdminCreateUserBody = zod.object({
+  "phone": zod.string(),
+  "name": zod.string().nullish(),
+  "role": zod.enum(['buyer', 'seller', 'broker', 'admin']),
+  "market": zod.enum(['JO', 'SA', 'AE', 'EG', 'KW', 'QA', 'BH', 'OM', 'MA', 'LB', 'IQ']).optional(),
+  "status": zod.enum(['active', 'restricted', 'suspended', 'banned']).optional(),
+  "avatarUrl": zod.string().nullish(),
+  "preferredCurrency": zod.string().nullish(),
+  "username": zod.string().nullish(),
+  "password": zod.string().nullish()
+})
+
+
+/**
+ * @summary Get single user (admin)
+ */
+export const AdminGetUserParams = zod.object({
+  "id": zod.coerce.string()
+})
+
+export const AdminGetUserResponse = zod.object({
+  "id": zod.string(),
+  "phone": zod.string(),
+  "name": zod.string().nullish(),
+  "username": zod.string().nullish(),
+  "role": zod.enum(['buyer', 'seller', 'broker', 'admin']),
+  "market": zod.enum(['JO', 'SA', 'AE', 'EG', 'KW', 'QA', 'BH', 'OM', 'MA', 'LB', 'IQ']),
+  "language": zod.enum(['ar', 'en']),
+  "verificationStatus": zod.enum(['unverified', 'verified']),
+  "status": zod.enum(['active', 'restricted', 'suspended', 'banned']),
+  "avatarUrl": zod.string().nullish(),
+  "preferredCurrency": zod.string().nullish(),
   "autoSendVoice": zod.boolean(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date()
 })
-export const AdminListUsersResponse = zod.array(AdminListUsersResponseItem)
 
 
 /**
@@ -1197,20 +1255,30 @@ export const AdminUpdateUserParams = zod.object({
 })
 
 export const AdminUpdateUserBody = zod.object({
+  "phone": zod.string().optional(),
+  "name": zod.string().nullish(),
   "role": zod.enum(['buyer', 'seller', 'broker', 'admin']).optional(),
-  "status": zod.enum(['active', 'suspended']).optional(),
-  "verificationStatus": zod.enum(['unverified', 'verified']).optional()
+  "status": zod.enum(['active', 'restricted', 'suspended', 'banned']).optional(),
+  "market": zod.enum(['JO', 'SA', 'AE', 'EG', 'KW', 'QA', 'BH', 'OM', 'MA', 'LB', 'IQ']).optional(),
+  "verificationStatus": zod.enum(['unverified', 'verified']).optional(),
+  "avatarUrl": zod.string().nullish(),
+  "preferredCurrency": zod.string().nullish(),
+  "username": zod.string().nullish(),
+  "password": zod.string().nullish()
 })
 
 export const AdminUpdateUserResponse = zod.object({
   "id": zod.string(),
   "phone": zod.string(),
   "name": zod.string().nullish(),
+  "username": zod.string().nullish(),
   "role": zod.enum(['buyer', 'seller', 'broker', 'admin']),
   "market": zod.enum(['JO', 'SA', 'AE', 'EG', 'KW', 'QA', 'BH', 'OM', 'MA', 'LB', 'IQ']),
   "language": zod.enum(['ar', 'en']),
   "verificationStatus": zod.enum(['unverified', 'verified']),
-  "status": zod.enum(['active', 'suspended']),
+  "status": zod.enum(['active', 'restricted', 'suspended', 'banned']),
+  "avatarUrl": zod.string().nullish(),
+  "preferredCurrency": zod.string().nullish(),
   "autoSendVoice": zod.boolean(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date()
@@ -1218,13 +1286,24 @@ export const AdminUpdateUserResponse = zod.object({
 
 
 /**
+ * @summary Soft-delete user (admin)
+ */
+export const AdminDeleteUserParams = zod.object({
+  "id": zod.coerce.string()
+})
+
+
+/**
  * @summary List all properties (admin)
  */
 export const adminListPropertiesQueryPageDefault = 1;
-export const adminListPropertiesQueryLimitDefault = 50;
+export const adminListPropertiesQueryLimitDefault = 25;
 
 export const AdminListPropertiesQueryParams = zod.object({
+  "search": zod.coerce.string().nullish(),
   "status": zod.coerce.string().nullish(),
+  "propertyType": zod.coerce.string().nullish(),
+  "transactionMode": zod.coerce.string().nullish(),
   "page": zod.coerce.number().default(adminListPropertiesQueryPageDefault),
   "limit": zod.coerce.number().default(adminListPropertiesQueryLimitDefault)
 })
@@ -1280,6 +1359,171 @@ export const AdminListPropertiesResponse = zod.object({
   "total": zod.number(),
   "page": zod.number(),
   "limit": zod.number()
+})
+
+
+/**
+ * @summary Create property listing (admin — goes live immediately)
+ */
+export const AdminCreatePropertyBody = zod.object({
+  "listingName": zod.string().nullish(),
+  "propertyType": zod.string(),
+  "transactionMode": zod.string(),
+  "price": zod.number().nullish(),
+  "priceCurrency": zod.string().nullish(),
+  "priceNegotiable": zod.boolean().nullish(),
+  "country": zod.string().nullish(),
+  "city": zod.string().nullish(),
+  "district": zod.string().nullish(),
+  "street": zod.string().nullish(),
+  "areaSqm": zod.number().nullish(),
+  "rooms": zod.number().nullish(),
+  "bathrooms": zod.number().nullish(),
+  "floorNumber": zod.number().nullish(),
+  "furnishedStatus": zod.string().nullish(),
+  "condition": zod.string().nullish(),
+  "description": zod.string().nullish()
+})
+
+
+/**
+ * @summary Get single property (admin)
+ */
+export const AdminGetPropertyParams = zod.object({
+  "id": zod.coerce.string()
+})
+
+export const AdminGetPropertyResponse = zod.object({
+  "id": zod.string(),
+  "createdBy": zod.string(),
+  "listingName": zod.string().nullish(),
+  "listingDirection": zod.enum(['offering', 'seeking']),
+  "propertyType": zod.string(),
+  "transactionMode": zod.enum(['sale', 'rent', 'lease']),
+  "rentalPeriod": zod.string().nullish(),
+  "price": zod.number().nullish(),
+  "priceCurrency": zod.string().optional(),
+  "priceNegotiable": zod.boolean().optional(),
+  "country": zod.string().nullish(),
+  "city": zod.string().nullish(),
+  "district": zod.string().nullish(),
+  "street": zod.string().nullish(),
+  "addressFull": zod.string().nullish(),
+  "latitude": zod.number().nullish(),
+  "longitude": zod.number().nullish(),
+  "locationAccuracy": zod.string().nullish(),
+  "areaSqm": zod.number().nullish(),
+  "rooms": zod.number().nullish(),
+  "bathrooms": zod.number().nullish(),
+  "floorNumber": zod.number().nullish(),
+  "furnishedStatus": zod.string().nullish(),
+  "parking": zod.boolean().nullish(),
+  "hasElevator": zod.boolean().nullish(),
+  "condition": zod.string().nullish(),
+  "description": zod.string().nullish(),
+  "status": zod.enum(['draft', 'pending_review', 'active', 'sold', 'rented', 'expired', 'rejected', 'deleted']),
+  "verified": zod.boolean().optional(),
+  "aiMissingFields": zod.array(zod.string()).nullish(),
+  "contactPreference": zod.string().nullish(),
+  "brokerListing": zod.boolean(),
+  "images": zod.array(zod.object({
+  "id": zod.string(),
+  "propertyId": zod.string(),
+  "path": zod.string(),
+  "gpsLat": zod.number().nullish(),
+  "gpsLng": zod.number().nullish(),
+  "sizeBytes": zod.number().nullish(),
+  "isVoiceNote": zod.boolean(),
+  "createdAt": zod.coerce.date()
+})).optional(),
+  "distance": zod.number().nullish().describe('Distance in km from search center (only present in search results)'),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary Update property (admin)
+ */
+export const AdminUpdatePropertyParams = zod.object({
+  "id": zod.coerce.string()
+})
+
+export const AdminUpdatePropertyBody = zod.object({
+  "listingName": zod.string().nullish(),
+  "propertyType": zod.string().nullish(),
+  "transactionMode": zod.string().nullish(),
+  "status": zod.string().nullish(),
+  "price": zod.number().nullish(),
+  "priceCurrency": zod.string().nullish(),
+  "priceNegotiable": zod.boolean().nullish(),
+  "country": zod.string().nullish(),
+  "city": zod.string().nullish(),
+  "district": zod.string().nullish(),
+  "street": zod.string().nullish(),
+  "areaSqm": zod.number().nullish(),
+  "rooms": zod.number().nullish(),
+  "bathrooms": zod.number().nullish(),
+  "floorNumber": zod.number().nullish(),
+  "furnishedStatus": zod.string().nullish(),
+  "condition": zod.string().nullish(),
+  "description": zod.string().nullish()
+})
+
+export const AdminUpdatePropertyResponse = zod.object({
+  "id": zod.string(),
+  "createdBy": zod.string(),
+  "listingName": zod.string().nullish(),
+  "listingDirection": zod.enum(['offering', 'seeking']),
+  "propertyType": zod.string(),
+  "transactionMode": zod.enum(['sale', 'rent', 'lease']),
+  "rentalPeriod": zod.string().nullish(),
+  "price": zod.number().nullish(),
+  "priceCurrency": zod.string().optional(),
+  "priceNegotiable": zod.boolean().optional(),
+  "country": zod.string().nullish(),
+  "city": zod.string().nullish(),
+  "district": zod.string().nullish(),
+  "street": zod.string().nullish(),
+  "addressFull": zod.string().nullish(),
+  "latitude": zod.number().nullish(),
+  "longitude": zod.number().nullish(),
+  "locationAccuracy": zod.string().nullish(),
+  "areaSqm": zod.number().nullish(),
+  "rooms": zod.number().nullish(),
+  "bathrooms": zod.number().nullish(),
+  "floorNumber": zod.number().nullish(),
+  "furnishedStatus": zod.string().nullish(),
+  "parking": zod.boolean().nullish(),
+  "hasElevator": zod.boolean().nullish(),
+  "condition": zod.string().nullish(),
+  "description": zod.string().nullish(),
+  "status": zod.enum(['draft', 'pending_review', 'active', 'sold', 'rented', 'expired', 'rejected', 'deleted']),
+  "verified": zod.boolean().optional(),
+  "aiMissingFields": zod.array(zod.string()).nullish(),
+  "contactPreference": zod.string().nullish(),
+  "brokerListing": zod.boolean(),
+  "images": zod.array(zod.object({
+  "id": zod.string(),
+  "propertyId": zod.string(),
+  "path": zod.string(),
+  "gpsLat": zod.number().nullish(),
+  "gpsLng": zod.number().nullish(),
+  "sizeBytes": zod.number().nullish(),
+  "isVoiceNote": zod.boolean(),
+  "createdAt": zod.coerce.date()
+})).optional(),
+  "distance": zod.number().nullish().describe('Distance in km from search center (only present in search results)'),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary Soft-delete property (admin)
+ */
+export const AdminDeletePropertyParams = zod.object({
+  "id": zod.coerce.string()
 })
 
 
@@ -1345,6 +1589,40 @@ export const AdminUpdatePropertyStatusResponse = zod.object({
 
 
 /**
+ * @summary Admin portal password-based login (no OTP)
+ */
+
+
+
+
+export const AdminPortalLoginBody = zod.object({
+  "login": zod.string().min(1),
+  "password": zod.string().min(1)
+})
+
+export const AdminPortalLoginResponse = zod.object({
+  "token": zod.string(),
+  "user": zod.object({
+  "id": zod.string(),
+  "phone": zod.string(),
+  "name": zod.string().nullish(),
+  "username": zod.string().nullish(),
+  "role": zod.enum(['buyer', 'seller', 'broker', 'admin']),
+  "market": zod.enum(['JO', 'SA', 'AE', 'EG', 'KW', 'QA', 'BH', 'OM', 'MA', 'LB', 'IQ']),
+  "language": zod.enum(['ar', 'en']),
+  "verificationStatus": zod.enum(['unverified', 'verified']),
+  "status": zod.enum(['active', 'restricted', 'suspended', 'banned']),
+  "avatarUrl": zod.string().nullish(),
+  "preferredCurrency": zod.string().nullish(),
+  "autoSendVoice": zod.boolean(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+}),
+  "isNewUser": zod.boolean()
+})
+
+
+/**
  * @summary Platform statistics
  */
 export const GetAdminStatsResponse = zod.object({
@@ -1357,6 +1635,188 @@ export const GetAdminStatsResponse = zod.object({
   "seller": zod.number().optional(),
   "broker": zod.number().optional()
 }).optional()
+})
+
+
+/**
+ * @summary Get public app settings (no auth required)
+ */
+export const GetAppSettingsResponse = zod.object({
+  "voiceCtaStyle": zod.enum(['green_card', 'orb', 'waveform', 'sonar']),
+  "mapProvider": zod.enum(['osm', 'mapbox', 'google']),
+  "mapApiKey": zod.string().nullish().describe('The API key for the configured map provider (Mapbox token or Google Maps key). Null for OSM.'),
+  "featureMapView": zod.boolean(),
+  "featureVoiceInput": zod.boolean(),
+  "featureContactRelease": zod.boolean(),
+  "featureSellerWizard": zod.boolean()
+})
+
+
+/**
+ * @summary Get system settings
+ */
+export const GetAdminSettingsResponse = zod.object({
+  "id": zod.string(),
+  "otpExpiryMinutes": zod.number(),
+  "otpMaxAttempts": zod.number(),
+  "otpRateLimitCount": zod.number(),
+  "otpRateLimitWindowMinutes": zod.number(),
+  "aiModel": zod.string(),
+  "aiTemperature": zod.number(),
+  "aiMaxTurns": zod.number(),
+  "aiGuardrailLevel": zod.enum(['strict', 'balanced', 'relaxed']),
+  "defaultLanguage": zod.enum(['ar', 'en']),
+  "defaultCurrency": zod.enum(['JOD', 'SAR', 'AED', 'EGP', 'KWD', 'QAR', 'BHD', 'OMR', 'MAD', 'LBP', 'IQD']),
+  "maxImagesPerProperty": zod.number(),
+  "autoApproveListings": zod.boolean(),
+  "listingExpiryDays": zod.number(),
+  "maintenanceMode": zod.boolean(),
+  "featureVoiceInput": zod.boolean(),
+  "featureMapView": zod.boolean(),
+  "featureContactRelease": zod.boolean(),
+  "featureSellerWizard": zod.boolean(),
+  "voiceCtaStyle": zod.enum(['green_card', 'orb', 'waveform', 'sonar']),
+  "mapProvider": zod.enum(['osm', 'mapbox', 'google']),
+  "mapboxApiKey": zod.string().nullish(),
+  "googleMapsApiKey": zod.string().nullish(),
+  "otpProvider": zod.enum(['console', 'twilio', 'unifonic', 'msegat']),
+  "twilioAccountSid": zod.string().nullish(),
+  "twilioAuthToken": zod.string().nullish(),
+  "twilioFromNumber": zod.string().nullish(),
+  "unifonicAppSid": zod.string().nullish(),
+  "unifonicSender": zod.string().nullish(),
+  "msegatApiKey": zod.string().nullish(),
+  "msegatSender": zod.string().nullish(),
+  "updatedAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary Update system settings (admin only)
+ */
+export const updateAdminSettingsBodyOtpExpiryMinutesMax = 60;
+
+export const updateAdminSettingsBodyOtpMaxAttemptsMax = 10;
+
+export const updateAdminSettingsBodyOtpRateLimitCountMax = 10;
+
+export const updateAdminSettingsBodyOtpRateLimitWindowMinutesMax = 60;
+
+export const updateAdminSettingsBodyAiTemperatureMin = 0;
+export const updateAdminSettingsBodyAiTemperatureMax = 1;
+
+export const updateAdminSettingsBodyAiMaxTurnsMax = 20;
+
+export const updateAdminSettingsBodyMaxImagesPerPropertyMax = 50;
+
+export const updateAdminSettingsBodyListingExpiryDaysMax = 365;
+
+
+
+export const UpdateAdminSettingsBody = zod.object({
+  "voiceCtaStyle": zod.enum(['green_card', 'orb', 'waveform', 'sonar']).optional(),
+  "otpExpiryMinutes": zod.number().min(1).max(updateAdminSettingsBodyOtpExpiryMinutesMax).optional(),
+  "otpMaxAttempts": zod.number().min(1).max(updateAdminSettingsBodyOtpMaxAttemptsMax).optional(),
+  "otpRateLimitCount": zod.number().min(1).max(updateAdminSettingsBodyOtpRateLimitCountMax).optional(),
+  "otpRateLimitWindowMinutes": zod.number().min(1).max(updateAdminSettingsBodyOtpRateLimitWindowMinutesMax).optional(),
+  "aiModel": zod.string().optional(),
+  "aiTemperature": zod.number().min(updateAdminSettingsBodyAiTemperatureMin).max(updateAdminSettingsBodyAiTemperatureMax).optional(),
+  "aiMaxTurns": zod.number().min(1).max(updateAdminSettingsBodyAiMaxTurnsMax).optional(),
+  "aiGuardrailLevel": zod.enum(['strict', 'balanced', 'relaxed']).optional(),
+  "defaultLanguage": zod.enum(['ar', 'en']).optional(),
+  "defaultCurrency": zod.enum(['JOD', 'SAR', 'AED', 'EGP', 'KWD', 'QAR', 'BHD', 'OMR', 'MAD', 'LBP', 'IQD']).optional(),
+  "maxImagesPerProperty": zod.number().min(1).max(updateAdminSettingsBodyMaxImagesPerPropertyMax).optional(),
+  "autoApproveListings": zod.boolean().optional(),
+  "listingExpiryDays": zod.number().min(1).max(updateAdminSettingsBodyListingExpiryDaysMax).optional(),
+  "maintenanceMode": zod.boolean().optional(),
+  "featureVoiceInput": zod.boolean().optional(),
+  "featureMapView": zod.boolean().optional(),
+  "featureContactRelease": zod.boolean().optional(),
+  "featureSellerWizard": zod.boolean().optional(),
+  "mapProvider": zod.enum(['osm', 'mapbox', 'google']).optional(),
+  "mapboxApiKey": zod.string().nullish(),
+  "googleMapsApiKey": zod.string().nullish(),
+  "otpProvider": zod.enum(['console', 'twilio', 'unifonic', 'msegat']).optional(),
+  "twilioAccountSid": zod.string().nullish(),
+  "twilioAuthToken": zod.string().nullish(),
+  "twilioFromNumber": zod.string().nullish(),
+  "unifonicAppSid": zod.string().nullish(),
+  "unifonicSender": zod.string().nullish(),
+  "msegatApiKey": zod.string().nullish(),
+  "msegatSender": zod.string().nullish()
+})
+
+export const UpdateAdminSettingsResponse = zod.object({
+  "id": zod.string(),
+  "otpExpiryMinutes": zod.number(),
+  "otpMaxAttempts": zod.number(),
+  "otpRateLimitCount": zod.number(),
+  "otpRateLimitWindowMinutes": zod.number(),
+  "aiModel": zod.string(),
+  "aiTemperature": zod.number(),
+  "aiMaxTurns": zod.number(),
+  "aiGuardrailLevel": zod.enum(['strict', 'balanced', 'relaxed']),
+  "defaultLanguage": zod.enum(['ar', 'en']),
+  "defaultCurrency": zod.enum(['JOD', 'SAR', 'AED', 'EGP', 'KWD', 'QAR', 'BHD', 'OMR', 'MAD', 'LBP', 'IQD']),
+  "maxImagesPerProperty": zod.number(),
+  "autoApproveListings": zod.boolean(),
+  "listingExpiryDays": zod.number(),
+  "maintenanceMode": zod.boolean(),
+  "featureVoiceInput": zod.boolean(),
+  "featureMapView": zod.boolean(),
+  "featureContactRelease": zod.boolean(),
+  "featureSellerWizard": zod.boolean(),
+  "voiceCtaStyle": zod.enum(['green_card', 'orb', 'waveform', 'sonar']),
+  "mapProvider": zod.enum(['osm', 'mapbox', 'google']),
+  "mapboxApiKey": zod.string().nullish(),
+  "googleMapsApiKey": zod.string().nullish(),
+  "otpProvider": zod.enum(['console', 'twilio', 'unifonic', 'msegat']),
+  "twilioAccountSid": zod.string().nullish(),
+  "twilioAuthToken": zod.string().nullish(),
+  "twilioFromNumber": zod.string().nullish(),
+  "unifonicAppSid": zod.string().nullish(),
+  "unifonicSender": zod.string().nullish(),
+  "msegatApiKey": zod.string().nullish(),
+  "msegatSender": zod.string().nullish(),
+  "updatedAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary Request a presigned URL for file upload
+ */
+
+
+
+
+
+export const RequestUploadUrlBody = zod.object({
+  "name": zod.string().min(1),
+  "size": zod.number().min(1),
+  "contentType": zod.string().min(1)
+})
+
+
+
+
+
+
+export const RequestUploadUrlResponse = zod.object({
+  "uploadURL": zod.string().url(),
+  "objectPath": zod.string(),
+  "metadata": zod.object({
+  "name": zod.string().min(1),
+  "size": zod.number().min(1),
+  "contentType": zod.string().min(1)
+}).optional()
+})
+
+
+/**
+ * @summary Serve an object entity
+ */
+export const GetStorageObjectParams = zod.object({
+  "objectPath": zod.coerce.string()
 })
 
 
