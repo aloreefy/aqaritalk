@@ -91,6 +91,9 @@ export default function ChatDetailPage() {
     | "buyer_search"
     | "seller_listing";
 
+  // localStorage key that persists the active conversation ID per type
+  const storageKey = `aqari_active_convo_${convoType}`;
+
   const [convId, setConvId] = useState<string | null>(isNew ? null : id);
   const [input, setInput] = useState("");
   const [localMessages, setLocalMessages] = useState<ConversationMessage[]>([]);
@@ -108,6 +111,13 @@ export default function ChatDetailPage() {
     },
   });
 
+  // When a conversation finishes, clear the persisted ID so the next visit starts fresh
+  useEffect(() => {
+    if (convo && convo.status !== "active") {
+      localStorage.removeItem(storageKey);
+    }
+  }, [convo?.status, storageKey]);
+
   // Speech input — appends final transcript to the textarea
   const speech = useSpeechInput({
     lang: i18n.language === "ar" ? "ar-JO" : "en-US",
@@ -122,14 +132,24 @@ export default function ChatDetailPage() {
   }, [isAuthenticated, navigate]);
 
   useEffect(() => {
-    if (isNew && !convId) {
-      createConvo
-        .mutateAsync({ data: { type: convoType, market: user?.market ?? "JO" } })
-        .then((c) => {
-          setConvId(c.id);
-          navigate(`/chat/${c.id}`, { replace: true });
-        });
+    if (!isNew || convId) return;
+
+    // Resume an existing active conversation if one was saved
+    const savedId = localStorage.getItem(storageKey);
+    if (savedId) {
+      setConvId(savedId);
+      navigate(`/chat/${savedId}`, { replace: true });
+      return;
     }
+
+    // No saved conversation — create a new one and persist its ID
+    createConvo
+      .mutateAsync({ data: { type: convoType, market: user?.market ?? "JO" } })
+      .then((c) => {
+        localStorage.setItem(storageKey, c.id);
+        setConvId(c.id);
+        navigate(`/chat/${c.id}`, { replace: true });
+      });
   }, [isNew, convId]);
 
   useEffect(() => {
