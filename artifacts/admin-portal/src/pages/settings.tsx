@@ -124,6 +124,15 @@ function VoiceStylePreview({ style }: { style: string }) {
   );
 }
 
+// ── AI Models ─────────────────────────────────────────────────────────────
+const AI_MODEL_GROUPS: { label: string; models: string[] }[] = [
+  { label: "GPT-4o family",   models: ["gpt-4o-mini", "gpt-4o"] },
+  { label: "GPT-4.1 family",  models: ["gpt-4.1-nano", "gpt-4.1-mini", "gpt-4.1"] },
+  { label: "GPT-4 Turbo",     models: ["gpt-4-turbo", "gpt-4-turbo-preview"] },
+  { label: "Reasoning",       models: ["o1-mini", "o3-mini", "o4-mini"] },
+];
+const AI_MODELS_FLAT = AI_MODEL_GROUPS.flatMap((g) => g.models);
+
 // ── Currencies ────────────────────────────────────────────────────────────
 const CURRENCIES = ['JOD', 'SAR', 'AED', 'EGP', 'KWD', 'QAR', 'BHD', 'OMR', 'MAD', 'LBP', 'IQD'] as const;
 type Currency = typeof CURRENCIES[number];
@@ -248,8 +257,9 @@ export default function Settings() {
   const otpProvider = form.watch('otpProvider');
   const mapProvider = form.watch('mapProvider');
 
-  // Currency combobox state
+  // Combobox open states
   const [currencyOpen, setCurrencyOpen] = useState(false);
+  const [modelOpen, setModelOpen] = useState(false);
 
   const initialized = useRef(false);
 
@@ -369,40 +379,49 @@ export default function Settings() {
             <TabsContent value="engine" className="p-6 m-0 focus-visible:outline-none">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
 
-                {/* Model */}
+                {/* Model — searchable combobox */}
                 <FormField control={form.control} name="aiModel" render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">{t('settings.engine.model')}</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger className="bg-muted/30 font-mono text-sm" dir="ltr">
-                          <SelectValue />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent dir="ltr">
-                        <SelectGroup>
-                          <SelectLabel className="text-[10px] text-muted-foreground font-semibold tracking-wider uppercase px-2 py-1.5">GPT-4o family</SelectLabel>
-                          <SelectItem value="gpt-4o-mini">gpt-4o-mini</SelectItem>
-                          <SelectItem value="gpt-4o">gpt-4o</SelectItem>
-                        </SelectGroup>
-                        <SelectGroup>
-                          <SelectLabel className="text-[10px] text-muted-foreground font-semibold tracking-wider uppercase px-2 py-1.5">GPT-4.1 family</SelectLabel>
-                          <SelectItem value="gpt-4.1-mini">gpt-4.1-mini</SelectItem>
-                          <SelectItem value="gpt-4.1-nano">gpt-4.1-nano</SelectItem>
-                          <SelectItem value="gpt-4.1">gpt-4.1</SelectItem>
-                        </SelectGroup>
-                        <SelectGroup>
-                          <SelectLabel className="text-[10px] text-muted-foreground font-semibold tracking-wider uppercase px-2 py-1.5">GPT-4 Turbo</SelectLabel>
-                          <SelectItem value="gpt-4-turbo">gpt-4-turbo</SelectItem>
-                          <SelectItem value="gpt-4-turbo-preview">gpt-4-turbo-preview</SelectItem>
-                        </SelectGroup>
-                        <SelectGroup>
-                          <SelectLabel className="text-[10px] text-muted-foreground font-semibold tracking-wider uppercase px-2 py-1.5">Reasoning</SelectLabel>
-                          <SelectItem value="o1-mini">o1-mini</SelectItem>
-                          <SelectItem value="o3-mini">o3-mini</SelectItem>
-                        </SelectGroup>
-                      </SelectContent>
-                    </Select>
+                    <Popover open={modelOpen} onOpenChange={setModelOpen}>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <button
+                            type="button"
+                            className={cn(
+                              "flex w-full items-center justify-between h-10 rounded-md border border-input bg-muted/30 px-3 py-2 text-sm font-mono ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                            )}
+                            dir="ltr"
+                          >
+                            <span>{field.value || "Select model…"}</span>
+                            <ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50" />
+                          </button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-[260px] p-0" align="start">
+                        <Command>
+                          <CommandInput placeholder="Search models…" />
+                          <CommandEmpty>No model found.</CommandEmpty>
+                          <div className="max-h-64 overflow-y-auto">
+                            {AI_MODEL_GROUPS.map((group) => (
+                              <CommandGroup key={group.label} heading={group.label}>
+                                {group.models.map((m) => (
+                                  <CommandItem
+                                    key={m}
+                                    value={m}
+                                    onSelect={() => { field.onChange(m); setModelOpen(false); }}
+                                    className="font-mono text-sm"
+                                  >
+                                    <Check className={cn("me-2 h-4 w-4", field.value === m ? "opacity-100" : "opacity-0")} />
+                                    {m}
+                                  </CommandItem>
+                                ))}
+                              </CommandGroup>
+                            ))}
+                          </div>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
                     <p className="text-[10px] text-muted-foreground">{t('settings.engine.modelDesc')}</p>
                     <FormMessage />
                   </FormItem>
