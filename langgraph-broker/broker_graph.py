@@ -94,17 +94,36 @@ llm = ChatOpenAI(
 # The function's DOCSTRING becomes the tool description the model sees.
 # The type hints become the input schema. These call the real db.py.
 
+# The exact values of the `property_type` Postgres enum. Spelling these out in
+# the tool signature (instead of a bare `str`) puts them in the schema the model
+# sees, so it can no longer invent a value like "land" and crash the query.
+PropertyType = Literal[
+    "apartment", "house", "floor", "building", "villa", "palace", "roof",
+    "studio", "room", "office", "shop", "warehouse", "factory", "farm",
+    "land_residential", "land_commercial", "land_agricultural", "hotel",
+    "hospital", "clinic", "showroom", "mixed", "chalet", "rest_house", "other",
+]
+
+
 @tool
 def search_properties(
     city: Optional[str] = None,
-    property_type: Optional[str] = None,
+    property_type: Optional[list[PropertyType]] = None,
     transaction_mode: Optional[Literal["sale", "rent", "lease"]] = None,
     min_price: Optional[float] = None,
     max_price: Optional[float] = None,
     min_rooms: Optional[int] = None,
     limit: int = 5,
 ) -> dict:
-    """ابحث عن العقارات النشطة المطابقة لمعايير المشتري."""
+    """ابحث عن العقارات النشطة المطابقة لمعايير المشتري.
+
+    property_type قائمة أنواع (وليس نوعاً واحداً): مرّر كل الأنواع التي تطابق
+    طلب العميل. أمثلة:
+      «أرض» → ["land_residential", "land_commercial", "land_agricultural"]
+      «شقة» → ["apartment"]
+      «سكن»  → ["apartment", "house", "villa", "studio"]
+    اتركه فارغاً إذا لم يحدد العميل نوعاً.
+    """
     args = {
         "city": city, "property_type": property_type,
         "transaction_mode": transaction_mode, "min_price": min_price,

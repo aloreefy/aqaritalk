@@ -40,9 +40,50 @@ def _connect() -> psycopg.Connection:
     return psycopg.connect(DB_URL, row_factory=dict_row)
 
 
+# Words users (and the model) reach for that are NOT enum values, mapped to the
+# enum values they mean. Without this, "land" reaches SQL and Postgres raises
+# InvalidTextRepresentation against the property_type enum.
+TYPE_ALIASES: dict[str, list[str]] = {
+    "land": ["land_residential", "land_commercial", "land_agricultural"],
+    "أرض": ["land_residential", "land_commercial", "land_agricultural"],
+    "ارض": ["land_residential", "land_commercial", "land_agricultural"],
+    "أراضي": ["land_residential", "land_commercial", "land_agricultural"],
+    "اراضي": ["land_residential", "land_commercial", "land_agricultural"],
+    "apartment_or_house": ["apartment", "house", "villa", "studio"],
+}
+
+
+def _normalize_types(value: Any) -> tuple[list[str], list[str]]:
+    """Coerce whatever the model sent into valid enum values.
+
+    Accepts a single string or a list. Expands aliases, drops anything that is
+    not a real enum value, and de-duplicates while preserving order.
+    Returns (valid_types, rejected_inputs).
+    """
+    if value is None:
+        return [], []
+    raw = [value] if isinstance(value, str) else list(value)
+
+    valid: list[str] = []
+    rejected: list[str] = []
+    for item in raw:
+        if not isinstance(item, str):
+            rejected.append(str(item))
+            continue
+        key = item.strip()
+        expanded = TYPE_ALIASES.get(key, TYPE_ALIASES.get(key.lower(), [key]))
+        for t in expanded:
+            if t in VALID_TYPES:
+                if t not in valid:
+                    valid.append(t)
+            else:
+                rejected.append(t)
+    return valid, rejected
+
+
 def search_properties(
     city: Optional[str] = None,
-    property_type: Optional[str] = None,
+    property_type: Optional[Any] = None,
     transaction_mode: Optional[str] = None,
     min_price: Optional[float] = None,
     max_price: Optional[float] = None,
@@ -65,7 +106,19 @@ def search_properties(
             f"REPLACE({p(city)}, {p(SHADDA)}, '') || '%%'"
         )
     if property_type:
-        clauses.append(f"property_type = {p(property_type)}")
+        types, rejected = _normalize_types(property_type)
+        if not types:
+            # Every value was unusable — tell the model what's valid instead of
+            # letting an invalid enum literal blow up the query.
+            return {
+                "count": 0,
+                "results": [],
+                "error": (
+                    f"أنواع عقارات غير صالحة: {', '.join(rejected)}. "
+                    f"اختر من: {', '.join(sorted(VALID_TYPES))}"
+                ),
+            }
+        clauses.append(f"property_type = ANY({p(types)}::property_type[])")
     if transaction_mode:
         clauses.append(f"transaction_mode = {p(transaction_mode)}")
     if min_price is not None:
